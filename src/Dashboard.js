@@ -8,10 +8,10 @@ import BalanceModal from './components/BalanceModal';
 import BlockDAGBox from './components/BlockDAG';
 import BlockOverview from './components/BlockOverview';
 import CoinsupplyBox from './components/CoinsupplyBox';
-import KaspadInfoBox from './components/KaspadInfoBox';
+import KaspadInfoBox from './components/HtndInfoBox';
 import MarketDataBox from './components/MarketDataBox';
 import TxOverview from './components/TxOverview';
-import { getBlock } from './kaspa-api-client';
+import { getBlock } from './htn-api-client';
 
 
 
@@ -27,7 +27,7 @@ function Dashboard() {
   const [showLoadingModal, setShowLoadingModal] = useState(false)
 
   const [balance, setBalance] = useState(0);
-  const [address, setAddress] = useState("kaspa:");
+  const [address, setAddress] = useState("hoosat:");
 
   const search = (e) => {
     e.preventDefault();
@@ -50,7 +50,7 @@ function Dashboard() {
       })
     }
 
-    if (v.startsWith("kaspa:")) {
+    if (v.startsWith("hoosat:")) {
       navigate(`/addresses/${v}`)
     }
 
@@ -70,9 +70,9 @@ function Dashboard() {
         <Container className="firstRow webpage" fluid>
           <Row>
             <Col md={12} className='d-flex flex-row justify-content-start text-light d-xs-none align-items-center'>
-              <img className="big-kaspa-icon" src="/k-icon-glow.png" />
-              <div className="bigfont kas-badge">
-                KASPA<br />EXPLORER
+              <img className="big-htn-icon" src="/k-icon-glow.png" />
+              <div className="bigfont htn-badge">
+                HOOSAT<br />EXPLORER
               </div>
             </Col>
           </Row>
@@ -80,7 +80,7 @@ function Dashboard() {
             <Col xs={11}>
               <Form onSubmit={search}>
                 <InputGroup className="ms-md-5 mt-5 me-5 dashboard-search-box">
-                  <Form.Control className="bg-light text-dark shadow-none" name="searchInput" type="text" placeholder="Search for kaspa:address or block" />
+                  <Form.Control className="bg-light text-dark shadow-none" name="searchInput" type="text" placeholder="Search for hoosat:address or block" />
                   <Button type="submit" className="shadow-none searchButton" variant="dark" ><i className='fa fa-search' /></Button>
                 </InputGroup>
               </Form>

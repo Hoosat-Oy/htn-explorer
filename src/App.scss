@@ -8,9 +8,9 @@
 
 $color1: #F6F5F4;
 $color2: #14F1D9;
-$color3: #519AA3;
+$color3: #116466;
 $color4: #7F8994;
-$color5: #181D30;
+$color5: #2c3531;
 $superdark: $color5;
 
 $theme-colors: (
@@ -179,7 +179,7 @@ body {
 //   }
 // }
 
-.big-kaspa-icon {
+.big-htn-icon {
   position: relative;
   margin-bottom: -3rem;
   top: 0rem;
@@ -195,14 +195,18 @@ body {
 }
 
 @include media-breakpoint-up(md) {
-  .big-kaspa-icon {
+  .big-htn-icon {
     width: 10rem;
     height: 10rem;
   }
 }
+.htn-badge {
+  padding-left: 1rem;
+}
 
 @include media-breakpoint-down(md) {
-  .kas-badge {
+  .htn-badge {
+    padding-left: 1rem;
     width: 0;
     height: 0;
     display: none;
