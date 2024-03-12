@@ -9,7 +9,7 @@ const KaspadInfoBox = () => {
     const [data, setData] = useState({});
 
     async function updateData() {
-        await fetch('http://api.network.hoosat.fi/info/htnd')
+        await fetch('https://api.network.hoosat.fi/info/htnd')
             .then((response) => response.json())
             .then(d => setData(d))
             .catch(err => console.log("Error", err))

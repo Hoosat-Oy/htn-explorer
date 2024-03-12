@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-const socket = io("wss://api.network.hoosat.fi", {
+const socket = io("wss://socket.network.hoosat.fi", {
   path: '/ws/socket.io'
 });
 
@@ -89,8 +89,8 @@ function App() {
   }
 
   const updatePrice = () => {
-    fetch(`http://api.network.hoosat.fi/info/market-data`, {
-      headers: { "Cache-Control": "no-cache" }
+    fetch(`https://api.network.hoosat.fi/info/market-data`, {
+      headers: { 'Access-Control-Allow-Origin': '*', mode: 'no-cors', "Cache-Control": "no-cache" }
     })
       .then(response => response.json())
       .then(data => {
@@ -214,10 +214,10 @@ function App() {
                       <a className="blockinfo-link" href="https://github.com/Hoosat-Oy/htnd-explorer" target="_blank"><FaGithub size="1.3rem" /></a>
                     </OverlayTrigger>
                     <OverlayTrigger placement="right" overlay={<Tooltip id="donate">Donation address</Tooltip>}>
-                      <Link className="blockinfo-link ms-3" to="/addresses/hoosat:qqkqkzjvr7zwxxmjxjkmxxdwju9kjs6e9u82uh59z07vgaks6gg62v8707g73"><BiDonateHeart size="1.3rem" /></Link>
+                      <Link className="blockinfo-link ms-3" to="/addresses/hoosat:qq5gtjz7xhghcyauyhwmy9a696ym7nhaj857t32l25qqysyzz27lzy9esv046"><BiDonateHeart size="1.3rem" /></Link>
                     </OverlayTrigger>
                     <OverlayTrigger placement="right" overlay={<Tooltip id="github">REST-API server</Tooltip>}>
-                      <a className="blockinfo-link ms-3" href="http://api.network.hoosat.fi/" target="_blank"><SiFastapi size="1.3rem" /></a>
+                      <a className="blockinfo-link ms-3" href="https://api.network.hoosat.fi/" target="_blank"><SiFastapi size="1.3rem" /></a>
                     </OverlayTrigger>
                   </span>
                   <span className="px-3 build">|</span>
@@ -239,7 +239,7 @@ function App() {
                       <Link className="blockinfo-link ms-2" to="/addresses/hoosat:qqkqkzjvr7zwxxmjxjkmxxdwju9kjs6e9u82uh59z07vgaks6gg62v8707g73"><BiDonateHeart size="1.1rem" /></Link>
                     </OverlayTrigger>
                     <OverlayTrigger placement="right" overlay={<Tooltip id="github">REST-API server</Tooltip>}>
-                      <a className="blockinfo-link ms-2" href="http://api.network.hoosat.fi/" target="_blank"><SiFastapi size="1.1rem" /></a>
+                      <a className="blockinfo-link ms-2" href="https://api.network.hoosat.fi/" target="_blank"><SiFastapi size="1.1rem" /></a>
                     </OverlayTrigger>
                   </span>
                 </Col>

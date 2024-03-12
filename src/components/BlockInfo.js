@@ -139,7 +139,7 @@ const BlockInfo = () => {
                                         <CopyButton text={blockInfo.verboseData.hash} />
                                         <OverlayTrigger overlay={<Tooltip id="tooltip-kgi">Open in Kaspa Graph Inspector</Tooltip>}>
                                             <span>
-                                                <BiNetworkChart className="ms-2 copy-symbol" size="20" onClick={() => { window.open(`https://kgi.kaspad.net/?hash=${id}`, '_blank'); }} />
+                                                <BiNetworkChart className="ms-2 copy-symbol" size="20" onClick={() => { window.open(`https://explorer.hoosat.fi/?hash=${id}`, '_blank'); }} />
                                             </span>
                                         </OverlayTrigger>
                                     </Col>
@@ -257,7 +257,7 @@ const BlockInfo = () => {
                                                                 </Col></>
                                                                 :
                                                                 <><Col xs={12} sm={8} md={9} lg={9} xl={8} xxl={7} className="text-truncate">
-                                                                    <a className="blockinfo-link" href={`https://katnip.kaspad.net/tx/${txInput.previousOutpoint.transactionId}`} target="_blank">
+                                                                    <a className="blockinfo-link" href={`https://explorer.hoosat.fi/tx/${txInput.previousOutpoint.transactionId}`} target="_blank">
                                                                         TX #{txInput.previousOutpoint.index || 0} {txInput.previousOutpoint.transactionId}
                                                                     </a>
                                                                 </Col><Col className="me-auto" xs={12} sm={4} md={2}></Col>

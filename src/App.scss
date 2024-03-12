@@ -200,6 +200,7 @@ body {
     height: 10rem;
   }
 }
+
 .htn-badge {
   padding-left: 1rem;
 }
@@ -322,7 +323,7 @@ body {
   border-bottom: 2px solid $color1;
   padding: 2rem;
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
 }
 
 .row2 {

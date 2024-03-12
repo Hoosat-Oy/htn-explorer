@@ -42,7 +42,7 @@ const CBox = () => {
     }, [])
 
     async function getBlockReward() {
-        await fetch('http://api.network.hoosat.fi/info/blockreward')
+        await fetch('https://api.network.hoosat.fi/info/blockreward')
             .then((response) => response.json())
             .then(d => {
                 setBlockReward(d.blockreward.toFixed(2))
@@ -90,7 +90,7 @@ const CBox = () => {
                     </tr>
                     <tr>
                         <td className="cardBoxElement align-top">Max <span className="approx">(approx.)</span></td>
-                        <td className="pt-1">10,100,000,000 HTN</td>
+                        <td className="pt-1">17,100,000,000 HTN</td>
                     </tr>
                     <tr>
                         <td className="cardBoxElement align-top">Mined</td>
