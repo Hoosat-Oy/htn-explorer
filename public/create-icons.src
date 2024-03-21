@@ -1,0 +1,4 @@
+convert logo512.png -resize 192x192 icon.png
+convert logo512.png -resize 192x192 logo192.png
+convert logo512.png -resize 512x512 k-icon-glow.png
+convert icon.png -define icon:auto-resize=16,32,48,64,128,256 favicon.ico
