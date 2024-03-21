@@ -403,7 +403,7 @@ const AddressInfo = () => {
                                 <div className="utxo-header">Details</div>
                                 <div className="utxo-value mt-2 d-flex flex-row flex-wrap" style={{ marginBottom: "-1rem", textDecoration: "none" }}>
                                     {x.is_accepted ? <div className="accepted-true me-3 mb-3">accepted</div> :
-                                        <span className="accepted-false">confirming</span>}
+                                        <span className="accepted-false">Confirming</span>}
                                     {x.is_accepted && blueScore !== 0 && (blueScore - x.accepting_block_blue_score) < 86400 && <div className="confirmations mb-3">{blueScore - x.accepting_block_blue_score}&nbsp;confirmations</div>}
                                     {x.is_accepted && blueScore !== 0 && (blueScore - x.accepting_block_blue_score) >= 86400 && <div className="confirmations mb-3">confirmed</div>}
                                 </div>

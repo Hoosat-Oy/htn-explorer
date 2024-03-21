@@ -296,7 +296,7 @@ const BlockInfo = () => {
                                                 <div className="utxo-header mt-3">details</div>
                                                 <div className="utxo-value d-flex flex-row flex-wrap">{!!txInfo && txInfo[tx.verboseData.transactionId] ?
                                                     txInfo[tx.verboseData.transactionId]?.is_accepted ? <div className="accepted-true mb-3 me-3">accepted</div> :
-                                                        <span className="accepted-false">confirming</span> : <>-</>}
+                                                        <span className="accepted-false">Confirming</span> : <>-</>}
                                                     {!!txInfo && !!txInfo[tx.verboseData.transactionId]?.is_accepted && blueScore !== 0 && (blueScore - txInfo[tx.verboseData.transactionId].accepting_block_blue_score < 86400) && <div className="confirmations mb-3">{blueScore - txInfo[tx.verboseData.transactionId].accepting_block_blue_score}&nbsp;confirmations</div>}
                                                     {!!txInfo && !!txInfo[tx.verboseData.transactionId]?.is_accepted && blueScore !== 0 && (blueScore - txInfo[tx.verboseData.transactionId].accepting_block_blue_score >= 86400) && <div className="confirmations mb-3">finalized</div>}
 
