@@ -68,7 +68,7 @@ const MarketDataBox = () => {
                     </tr>
                     <tr>
                         <td className="cardBoxElement">MCAP</td>
-                        <td className="pt-1">$ {(circCoinsMData * price / 1000000000).toFixed(2)} B <a href="https://www.coingecko.com/en/coins/htn" target="_blank" className="rank ms-1">Rank #{marketData?.market_cap_rank}</a></td>
+                        <td className="pt-1">$ {(circCoinsMData * price / 1000000000).toFixed(2)} B <a href="https://api.coingecko.com/api/v3/coins/hoosat-network" target="_blank" className="rank ms-1">Rank #{marketData?.market_cap_rank}</a></td>
                     </tr>
                 </tbody>
             </table>
