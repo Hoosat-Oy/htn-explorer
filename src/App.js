@@ -175,6 +175,7 @@ function App() {
                     <Nav.Item><NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/"}>Dashboard</NavLink></Nav.Item>
                     <Nav.Item><NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/blocks"}>Blocks</NavLink></Nav.Item>
                     <Nav.Item><NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/txs"}>Transactions</NavLink></Nav.Item>
+                    <Nav.Item><a className="nav-link fs-5" onClick={closeMenuIfNeeded} href={"https://wallet.hoosat.fi"}>Web Wallet</a></Nav.Item>
                   </Nav>
                   <div className='ms-auto navbar-price'>${price} <span className="text-light">/ HTN</span></div>
                 </Navbar.Collapse>

@@ -10,18 +10,18 @@ const BlockDAGBox = () => {
     const [isConnected, setIsConnected] = useState(false);
 
     const [blockCount, setBlockCount] = useState();
+    const [difficulty, setDifficulty] = useState();
     const [headerCount, setHeaderCount] = useState("");
     const [virtualDaaScore, setVirtualDaaScore] = useState("");
     const [hashrate, setHashrate] = useState("");
 
     const initBox = async () => {
         const dag_info = await getBlockdagInfo()
-
         console.log('DAG Info ', dag_info)
-
         setBlockCount(dag_info.blockCount)
         setHeaderCount(dag_info.headerCount)
         setVirtualDaaScore(dag_info.virtualDaaScore)
+        setDifficulty(dag_info.difficulty)
         setHashrate((dag_info.difficulty * 2 / 1000000000000).toFixed(2))
     }
 
@@ -32,6 +32,7 @@ const BlockDAGBox = () => {
             setBlockCount(dag_info.blockCount)
             setHeaderCount(dag_info.headerCount)
             setVirtualDaaScore(dag_info.virtualDaaScore)
+            setDifficulty(dag_info.difficulty)
             setHashrate((dag_info.difficulty * 2 / 1000000000000).toFixed(2))
         }, 60000)
         return (async () => {
@@ -113,26 +114,26 @@ const BlockDAGBox = () => {
                     </tr>
                     <tr>
                         <td className="cardBoxElement">
-                            Block count
+                            Block height
                         </td>
                         <td className="pt-1" id="blockCount">
-                            {blockCount}
+                            {Number(blockCount).toLocaleString()}
                         </td>
                     </tr>
                     <tr>
                         <td className="cardBoxElement">
-                            Header count
+                            Header height
                         </td>
                         <td className="pt-1" id="headerCount">
-                            {headerCount}
+                            {Number(headerCount).toLocaleString()}
                         </td>
                     </tr>
                     <tr>
                         <td className="cardBoxElement">
-                            Virtual DAA Score
+                            Difficulty
                         </td>
                         <td className="pt-1 align-top" id="virtualDaaScore">
-                            {virtualDaaScore}
+                            {(Number(difficulty) / 1e12).toFixed(3)} T
                         </td>
                     </tr>
                     <tr>
@@ -141,6 +142,14 @@ const BlockDAGBox = () => {
                         </td>
                         <td className="pt-1" id="hashrate">
                             {(Number(hashrate)).toFixed(3)} TH/s
+                        </td>
+                    </tr>
+                    <tr>
+                        <td className="cardBoxElement">
+                            Virtual DAA
+                        </td>
+                        <td className="pt-1 align-top" id="virtualDaaScore">
+                            {Number(virtualDaaScore).toLocaleString()}
                         </td>
                     </tr>
                 </tbody>
