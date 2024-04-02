@@ -212,7 +212,7 @@ function App() {
                   Made with <font className="fs-5" color="red">♥</font> by Kaspa developers & Hoosat Oy
                   <span className="ms-3">
                     <OverlayTrigger placement="left" overlay={<Tooltip id="github">Source code</Tooltip>}>
-                      <a className="blockinfo-link" href="https://github.com/Hoosat-Oy/htnd-explorer" target="_blank"><FaGithub size="1.3rem" /></a>
+                      <a className="blockinfo-link" href="https://github.com/Hoosat-Oy/htn-explorer" target="_blank"><FaGithub size="1.3rem" /></a>
                     </OverlayTrigger>
                     <OverlayTrigger placement="right" overlay={<Tooltip id="donate">Donation address</Tooltip>}>
                       <Link className="blockinfo-link ms-3" to="/addresses/hoosat:qq5gtjz7xhghcyauyhwmy9a696ym7nhaj857t32l25qqysyzz27lzy9esv046"><BiDonateHeart size="1.3rem" /></Link>
