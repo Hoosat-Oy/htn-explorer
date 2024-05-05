@@ -103,7 +103,6 @@ const AddressInfo = () => {
     }
 
     useEffect(() => {
-
         const qrCode = new QRCodeStyling({
             data: addr.replace(":", "\:"),
             width: 200,

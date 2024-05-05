@@ -28,7 +28,7 @@ import { getBlock } from './htn-api-client';
 // moment.locale(locale);
 // moment.locale('en');
 
-const buildVersion = process.env.REACT_APP_VERCEL_GIT_COMMIT_SHA || "xxxxxx"
+const buildVersion = process.env.REACT_APP_VERCEL_GIT_COMMIT_SHA || "0.1.0"
 
 
 document.addEventListener("DOMContentLoaded", function () {
