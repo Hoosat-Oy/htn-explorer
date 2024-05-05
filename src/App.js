@@ -90,7 +90,7 @@ function App() {
 
   const updatePrice = () => {
     fetch(`https://api.network.hoosat.fi/info/market-data`, {
-      headers: { 'Access-Control-Allow-Origin': '*', mode: 'no-cors', "Cache-Control": "no-cache" }
+      headers: { mode: 'no-cors', "Cache-Control": "no-cache" }
     })
       .then(response => response.json())
       .then(data => {
