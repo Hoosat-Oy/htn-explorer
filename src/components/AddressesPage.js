@@ -188,7 +188,7 @@ const AddressesPage = () => {
               <RiMoneyDollarCircleFill className={"rotate"} size="1.7rem" />Addresses and Balances
             </h4>
           </div>
-          <div class="block-overview-content">
+          <div className="block-overview-content">
             {loading ? (
               <Spinner animation="border" role="status">
                 <span className="visually-hidden">Loading...</span>
@@ -253,6 +253,9 @@ const AddressesPage = () => {
                 </div>
                 <div className="d-flex justify-content-center mt-4">
                   <p style={{fontSize: "8pt"}}>The HTN pie chart above illustrates the distribution of addresses based on their balance thresholds. For instance, addresses holding 15,000,000 HTN are categorized only under 'More than 10,000,000 HTN'. Conversely, the category 'Less than 1,000 HTN' excludes addresses with zero balance.</p>
+                </div>
+                <div className="d-flex justify-content-center mt-4">  
+                  <img src="/HTN-holder-rankings.webp" className="img-fluid" alt="Holder Rankings" />
                 </div>
               </>
             )}
