@@ -21,6 +21,7 @@ import PriceContext from './components/PriceContext';
 import TransactionInfo from './components/TransactionInfo';
 import TxPage from './components/TxPage';
 import Dashboard from './Dashboard';
+import AddressesPage from './components/AddressesPage';
 import { getBlock } from './htn-api-client';
 // import 'moment/min/locales';
 
@@ -173,10 +174,12 @@ function App() {
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
                   <Nav className="me-auto">
+                    <Nav.Item><a className="nav-link fs-5" onClick={closeMenuIfNeeded} href={"https://network.hoosat.fi"}>Home</a></Nav.Item>
                     <Nav.Item><NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/"}>Dashboard</NavLink></Nav.Item>
                     <Nav.Item><NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/blocks"}>Blocks</NavLink></Nav.Item>
                     <Nav.Item><NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/txs"}>Transactions</NavLink></Nav.Item>
-                    <Nav.Item><a className="nav-link fs-5" onClick={closeMenuIfNeeded} href={"https://wallet.hoosat.fi"}>Web Wallet</a></Nav.Item>
+                    <Nav.Item><NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/addresses"}>Addresses</NavLink></Nav.Item>
+                    <Nav.Item><a className="nav-link fs-5" onClick={closeMenuIfNeeded} href={"https://wallet.hoosat.fi"}>Wallet</a></Nav.Item>
                   </Nav>
                   <div className='ms-auto navbar-price'>${price} <span className="text-light">/ HTN</span></div>
                 </Navbar.Collapse>
@@ -199,6 +202,7 @@ function App() {
               <Route path="/blocks" element={<BlocksPage />} />
               <Route path="/blocks/:id" element={<BlockInfo />} />
               <Route path="/blocks/:id/:txview" element={<BlockInfo />} />
+              <Route path="/addresses" element={<AddressesPage />} />
               <Route path="/addresses/:addr" element={<AddressInfoPage />} />
               <Route path="/txs" element={<TxPage />} />
               <Route path="/txs/:id" element={<TransactionInfo />} />
