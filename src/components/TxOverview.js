@@ -83,9 +83,6 @@ const TxOverview = (props) => {
                                 <td className="hashh" onClick={onClickAddr}>{x.address}</td>
                             </tr>
                         })}
-
-
-
                 </tbody>
             </table>
         </div>

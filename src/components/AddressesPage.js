@@ -112,25 +112,24 @@ const AddressesPage = () => {
     <div className="blocks-page">
       <Container className="webpage px-md-5 blocks-page-overview" fluid>
         <div className="block-overview mb-4">
-          <Row>
-            <Col>
               <div className="d-flex flex-row w-100">
                 <h4 className="block-overview-header text-center w-100 me-4">
                   <RiMoneyDollarCircleFill className={"rotate"} size="1.7rem" />Addresses and Balances
                 </h4>
               </div>
+              <div class="block-overview-content">
               {loading ? (
                 <Spinner animation="border" role="status">
                   <span className="visually-hidden">Loading...</span>
                 </Spinner>
               ) : (
                 <>
-                  <Table className='styled-table w-100' hover>
+                  <table className={`styled-table w-100`}>
                     <thead>
                       <tr>
                         <th>Rank</th>
-                        <th>Address</th>
                         <th>Balance</th>
+                        <th>Address</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -138,12 +137,12 @@ const AddressesPage = () => {
                         <tr key={index}
                           id={address.address}>
                           <td>{address.index}</td>
-                          <td className='hash' onClick={onClickAddr}>{address.address}</td>
                           <td>{Number(address.balance).toLocaleString()}</td>
+                          <td className='hashh w-100' onClick={onClickAddr}>{address.address}</td>
                         </tr>
                       ))}
                     </tbody>
-                  </Table>
+                  </table>
                   <div className="d-flex justify-content-center">
                     <Pagination>
                       <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
@@ -163,8 +162,7 @@ const AddressesPage = () => {
                   </div>
                 </>
               )}
-            </Col>
-          </Row>
+              </div>
         </div>
       </Container>
     </div>
