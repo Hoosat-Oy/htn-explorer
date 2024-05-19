@@ -88,6 +88,7 @@ const AddressesPage = () => {
     addresses.forEach(address => {
       const balance = parseInt(address.balance);
       if (balance >= 10000000) {
+        console.log(balance);
         balanceRanges['More than 10,000,000']++;
       } else if (balance >= 1000000 && balance < 10000000) {
         balanceRanges['More than 1,000,000']++;
@@ -138,7 +139,7 @@ const AddressesPage = () => {
         const rows = data.trim().split('\n').slice(1);
         const parsedAddresses = rows.map((row, index) => {
           const [address, balance] = row.split(',');
-          return { index, address, balance: balance / 100000 };
+          return { index, address, balance: balance / 100000000 };
         });
         calculateRanges(parsedAddresses);
         setLoading(false);
@@ -148,7 +149,7 @@ const AddressesPage = () => {
         const rows = testData.trim().split('\n').slice(1);
         const parsedAddresses = rows.map((row, index) => {
           const [address, balance] = row.split(',');
-          return { index, address, balance: balance / 100000 };
+          return { index, address, balance: balance / 100000000 };
         });
         calculateRanges(parsedAddresses);
         setLoading(false);
@@ -234,9 +235,10 @@ const AddressesPage = () => {
                 <div className="d-flex justify-content-center mt-4">
                   <PieChart
                     data={chartData}
-                    label={({ dataEntry }) => Math.round(dataEntry.percentage) + '% ' + dataEntry.title }
+                    label={({ dataEntry }) => parseFloat(dataEntry.percentage).toFixed(2) + '% ' + dataEntry.title}
                     lineWidth={15}
-                    paddingAngle={5} 
+                    rounded
+                    paddingAngle={15} 
                     radius={pieChartDefaultProps.radius - shiftSize}
                     segmentsShift={(index) => (index === 0 ? shiftSize : 0.5)}
                     labelStyle={(index) => ({
