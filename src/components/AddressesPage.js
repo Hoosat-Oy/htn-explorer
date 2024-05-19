@@ -251,6 +251,9 @@ const AddressesPage = () => {
                     lengthAngle={-360}
                   />
                 </div>
+                <div className="d-flex justify-content-center mt-4">
+                  <p style={{fontSize: "8pt"}}>The HTN pie chart above illustrates the distribution of addresses based on their balance thresholds. For instance, addresses holding 15,000,000 HTN are categorized only under 'More than 10,000,000 HTN'. Conversely, the category 'Less than 1,000 HTN' excludes addresses with zero balance.</p>
+                </div>
               </>
             )}
           </div>
