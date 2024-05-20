@@ -65,6 +65,7 @@ const shiftSize = 7;
 const AddressesPage = () => {
   const [circCoins, setCircCoins] = useState("-");
   const [addresses, setAddresses] = useState([]);
+  const [yesterdays, setYesterdays] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(25); // You can change this number to set rows per page
@@ -175,10 +176,25 @@ const AddressesPage = () => {
         const rows = data.trim().split('\n').slice(1);
         const parsedAddresses = rows.map((row, index) => {
           const [address, balance] = row.split(',');
-          return { index, address, balance: balance / 100000000 };
+          return { index, address, balance: parseFloat(balance) / 100000000 };
         });
+        const responseYesterdays = await fetch('https://shitlist.hoosat.fi/balances-yesterday.csv');
+        const dataYesterdays = await responseYesterdays.text(); 
+        const rowsYesterdays = dataYesterdays.trim().split('\n').slice(1); 
+        const parsedYesterdays = rowsYesterdays.map((row, index) => { 
+          const [address, balance] = row.split(',');
+          return { index, address, balance: parseFloat(balance) / 100000000 }; 
+        });
+
+        const yesterdayBalancesMap = new Map(parsedYesterdays.map(item => [item.address, item.balance]));
+        setYesterdays(yesterdayBalancesMap)
+        const balanceChanges = parsedAddresses.map((address, index) => {
+          const yesterdayBalance = yesterdayBalancesMap.get(address.address);
+          let change = yesterdayBalance !== undefined ? address.balance - yesterdayBalance : 0;
+          return { index, address: address.address, balance: address.balance, change };
+        });
+        setAddresses(balanceChanges)
         setLoading(false);
-        setAddresses(parsedAddresses);
       } catch (error) {
         console.error('Error fetching the CSV file:', error);
         const rows = testData.trim().split('\n').slice(1);
@@ -186,8 +202,10 @@ const AddressesPage = () => {
           const [address, balance] = row.split(',');
           return { index, address, balance: balance / 100000000 };
         });
-        setLoading(false);
+        const yesterdayBalancesMap = new Map(parsedAddresses.map(item => [item.address, item.balance]));
+        setYesterdays(yesterdayBalancesMap)
         setAddresses(parsedAddresses);
+        setLoading(false);
       }
     };
 
@@ -234,6 +252,7 @@ const AddressesPage = () => {
                     <tr>
                       <th>Rank</th>
                       <th>Balance</th>
+                      <th>Change</th>
                       <th>Address</th>
                     </tr>
                   </thead>
@@ -243,6 +262,7 @@ const AddressesPage = () => {
                         id={address.address}>
                         <td>{address.index}</td>
                         <td>{Number(address.balance).toLocaleString()}</td>
+                        <td className={Number(address.change) < 0 ? 'text-red' : 'text-white'}>{Number(address.change).toLocaleString()}</td>
                         <td className='hashh w-100' onClick={onClickAddr}>{address.address}</td>
                       </tr>
                     ))}
