@@ -4,6 +4,7 @@ import { RiMoneyDollarCircleFill } from 'react-icons/ri';
 import { useNavigate } from "react-router-dom";
 import { PieChart, pieChartDefaultProps  } from 'react-minimal-pie-chart';
 import { useWindowSize } from 'react-use';
+import { getCoinSupply } from '../htn-api-client';
 
 
 
@@ -62,11 +63,13 @@ const defaultLabelStyle = {
 const shiftSize = 7;
 
 const AddressesPage = () => {
+  const [circCoins, setCircCoins] = useState("-");
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(25); // You can change this number to set rows per page
   const [chartData, setChartData] = useState([]);
+  const [holdingData, setHoldingData] = useState([]);
   const { width } = useWindowSize();
 
 
@@ -76,7 +79,13 @@ const AddressesPage = () => {
     navigate(`/addresses/${e.target.closest("tr").getAttribute("id")}`)
   }
 
-  const calculateRanges = (addresses) => {
+  const calculateCharts = (addresses) => {
+    const holdingRanges = {
+      'Top 10': 0,
+      'Top 100': 0,
+      'Top 1000': 0,
+      'Top 10000': 0,
+    }
     const balanceRanges = {
       'More than 10,000,000': 0,
       'More than 1,000,000': 0,
@@ -85,10 +94,31 @@ const AddressesPage = () => {
       'More than 1,000': 0,
       'Less than 1,000': 0,
     }
+    addresses.forEach((address, index) => {
+      const balance = parseFloat(address.balance);
+      if (index <= 10) {
+        holdingRanges['Top 10'] += balance;
+      } else if (index > 10 && index <= 100) {
+        holdingRanges['Top 100'] += balance;
+      } else if (index > 100 && index <= 1000) {
+        holdingRanges['Top 1000'] += balance;
+      } else if (index > 1000 && index <= 10000) {
+        holdingRanges['Top 10000'] += balance;
+      }
+    }); 
+    console.log(holdingRanges);
+    console.log(circCoins)
+    const holdingPercentage = {
+      'Top 10': (holdingRanges['Top 10'] / parseFloat(circCoins)) * 100,
+      'Top 100': (holdingRanges['Top 100'] / parseFloat(circCoins)) * 100,
+      'Top 1000': (holdingRanges['Top 1000'] / parseFloat(circCoins)) * 100,
+      'Top 10000': (holdingRanges['Top 10000'] / parseFloat(circCoins)) * 100,
+    }
+    console.log(holdingPercentage);
+    
     addresses.forEach(address => {
       const balance = parseInt(address.balance);
       if (balance >= 10000000) {
-        console.log(balance);
         balanceRanges['More than 10,000,000']++;
       } else if (balance >= 1000000 && balance < 10000000) {
         balanceRanges['More than 1,000,000']++;
@@ -102,34 +132,40 @@ const AddressesPage = () => {
         balanceRanges['Less than 1,000']++;
       }
     });
-    const _chartData = {
-      labels: Object.keys(balanceRanges),
-      datasets: [{
-        data: Object.values(balanceRanges),
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.6)',
-          'rgba(54, 162, 235, 0.6)',
-          'rgba(255, 206, 86, 0.6)',
-          'rgba(75, 192, 192, 0.6)',
-          'rgba(153, 102, 255, 0.6)',
-          'rgba(255, 159, 64, 0.6)'
-        ]
-      }]
-    };
-    console.log(balanceRanges);
     const colors = ['#FF5733', '#FFC300', '#33FF57', '#33AFFF', '#B233FF', '#FF3399'];
+    const holdingData = [
+      { title: 'Top 10', value: holdingPercentage['Top 10'], color: colors[0] },
+      { title: 'Top 100', value: holdingPercentage['Top 100'], color: colors[1] },
+      { title: 'Top 1000', value: holdingPercentage['Top 1000'], color: colors[2] },
+      { title: 'Top 10000', value: holdingPercentage['Top 10000'], color: colors[3] },
+    ]
+    setHoldingData(holdingData);
+    
     const chartData = [
-      { title: 'More than 10,000,000', value: balanceRanges['More than 10,000,000'], color: colors[0]},
-      { title: 'More than 1,000,000', value: balanceRanges['More than 1,000,000'], color: colors[1]},
-      { title: 'More than 100,000', value: balanceRanges['More than 100,000'], color: colors[2]},
-      { title: 'More than 10,000', value: balanceRanges['More than 10,000'], color: colors[3]},
-      { title: 'More than 1,000', value: balanceRanges['More than 1,000'], color: colors[4]},
-      { title: 'Less than 1,000', value: balanceRanges['Less than 1,000'], color: colors[5]}
+      { title: 'More than 10,000,000', value: balanceRanges['More than 10,000,000'], color: colors[0] },
+      { title: 'More than 1,000,000', value: balanceRanges['More than 1,000,000'], color: colors[1] },
+      { title: 'More than 100,000', value: balanceRanges['More than 100,000'], color: colors[2] },
+      { title: 'More than 10,000', value: balanceRanges['More than 10,000'], color: colors[3] },
+      { title: 'More than 1,000', value: balanceRanges['More than 1,000'], color: colors[4] },
+      { title: 'Less than 1,000', value: balanceRanges['Less than 1,000'], color: colors[5] }
     ];
-    
-    
     setChartData(chartData);
   }
+
+  useEffect(() => {
+    if(circCoins !== '-' && addresses.length > 0) {
+      calculateCharts(addresses);
+    }
+  }, [circCoins, addresses])
+
+  useEffect(() => {
+    const fetchCircCoins = async () => {
+      const coinSupplyResp = await getCoinSupply();
+      console.log(coinSupplyResp);
+      setCircCoins(Math.round(coinSupplyResp.circulatingSupply / 100000000));
+    }
+    fetchCircCoins();
+  }, [])
 
   useEffect(() => {
     const fetchCSV = async () => {
@@ -141,7 +177,6 @@ const AddressesPage = () => {
           const [address, balance] = row.split(',');
           return { index, address, balance: balance / 100000000 };
         });
-        calculateRanges(parsedAddresses);
         setLoading(false);
         setAddresses(parsedAddresses);
       } catch (error) {
@@ -151,7 +186,6 @@ const AddressesPage = () => {
           const [address, balance] = row.split(',');
           return { index, address, balance: balance / 100000000 };
         });
-        calculateRanges(parsedAddresses);
         setLoading(false);
         setAddresses(parsedAddresses);
       }
@@ -184,7 +218,7 @@ const AddressesPage = () => {
       <Container className="webpage px-md-5 blocks-page-overview" fluid>
         <div className="block-overview mb-4">
           <div className="d-flex flex-row w-100">
-            <h4 className="block-overview-header text-center w-100 me-4">
+            <h4 className="block-overview-header text-center w-100 mt-4">
               <RiMoneyDollarCircleFill className={"rotate"} size="1.7rem" />Addresses and Balances
             </h4>
           </div>
@@ -231,7 +265,31 @@ const AddressesPage = () => {
                     <Pagination.Last onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} />
                   </Pagination>
                 </div>
-                
+                <h4 className="block-overview-header text-center w-100 mt-4">
+                  Top addresses own HTN.
+                </h4>
+                <div className="d-flex justify-content-center mt-4">
+                  <PieChart
+                    data={holdingData}
+                    label={({ dataEntry }) => parseFloat(dataEntry.value).toFixed(2) + '% ' + dataEntry.title}
+                    lineWidth={15}
+                    rounded
+                    paddingAngle={15} 
+                    radius={pieChartDefaultProps.radius - shiftSize}
+                    segmentsShift={(index) => (index === 0 ? shiftSize : 0.5)}
+                    labelStyle={(index) => ({
+                      fill: holdingData[index].color,
+                      fontSize: '5px',
+                      fontFamily: 'sans-serif',
+                    })}
+                    labelPosition={112}
+                    style={{ maxHeight: (width < 768) ? '150px': '250px', width: '100%'}}
+                    lengthAngle={-360}
+                  />
+                </div>
+                <h4 className="block-overview-header text-center w-100 mt-4">
+                  Addresses own more than HTN.
+                </h4>
                 <div className="d-flex justify-content-center mt-4">
                   <PieChart
                     data={chartData}
