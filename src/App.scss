@@ -263,7 +263,8 @@ body {
 .nav-link {
   align-items: center;
   color: #43e9d6;
-
+  font-size: 0.8rem !important;
+  white-space: nowrap !important;
 }
 
 .active {
