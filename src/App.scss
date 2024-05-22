@@ -269,6 +269,12 @@ body {
   white-space: nowrap !important;
 }
 
+@media (max-width: 1300px) {
+  .nav-link {
+    font-size: 0.9rem !important;
+  }
+}
+
 .active {
   font-weight: bolder;
 }
