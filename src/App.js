@@ -175,12 +175,12 @@ function App() {
                 <Navbar.Collapse id="responsive-navbar-nav">
                   <Nav className="me-auto">
                     <Nav.Item><a className="nav-link fs-5" onClick={closeMenuIfNeeded} href={"https://network.hoosat.fi"}>Home</a></Nav.Item>
-                    <Nav.Item><NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/"}>Dashboard</NavLink></Nav.Item>
-                    <Nav.Item><NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/blocks"}>Blocks</NavLink></Nav.Item>
+                    <Nav.Item><NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/"}>Explorer Dashboard</NavLink></Nav.Item>
+                    <Nav.Item><NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/blocks"}>New Blocks</NavLink></Nav.Item>
                     <Nav.Item><NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/txs"}>Transactions</NavLink></Nav.Item>
-                    <Nav.Item><NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/addresses"}>Addresses</NavLink></Nav.Item>
-                    <Nav.Item><a className="nav-link fs-5" onClick={closeMenuIfNeeded} href={"https://wallet.hoosat.fi"}>Wallet</a></Nav.Item>
-                    <Nav.Item><a className="nav-link fs-5" onClick={closeMenuIfNeeded} href={"https://pool.hoosat.fi"}>Pool</a></Nav.Item>
+                    <Nav.Item><NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/addresses"}>Top Addresses</NavLink></Nav.Item>
+                    <Nav.Item><a className="nav-link fs-5" onClick={closeMenuIfNeeded} href={"https://wallet.hoosat.fi"}>Web Wallet</a></Nav.Item>
+                    <Nav.Item><a className="nav-link fs-5" onClick={closeMenuIfNeeded} href={"https://pool.hoosat.fi"}>Mining Pool</a></Nav.Item>
                   </Nav>
                   <div className='ms-auto navbar-price'>${price} <span className="text-light">/ HTN</span></div>
                 </Navbar.Collapse>
