@@ -1,7 +1,7 @@
 import { Container } from "react-bootstrap";
 import TxOverview from "./TxOverview";
 
-const blocksPage = () => {
+const TxPage = () => {
   return (
     <div className="blocks-page">
       <Container className="webpage px-md-5 blocks-page-overview" fluid>
@@ -11,4 +11,4 @@ const blocksPage = () => {
   );
 };
 
-export default blocksPage;
+export default TxPage;

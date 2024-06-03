@@ -6,8 +6,6 @@ import { getBlockdagInfo } from '../htn-api-client';
 
 const BlockDAGBox = () => {
 
-    const [data, setData] = useState({});
-    const [isConnected, setIsConnected] = useState(false);
 
     const [blockCount, setBlockCount] = useState();
     const [difficulty, setDifficulty] = useState();
