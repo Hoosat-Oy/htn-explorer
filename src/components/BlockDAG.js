@@ -25,7 +25,7 @@ const BlockDAGBox = () => {
 
         const unixTimestamp = Math.floor(Date.now() / 1000);
         const timeToFork = 17500000 - dag_info.virtualDaaScore;
-        const hardForkTime = new Date(unixTimestamp + timeToFork * 1000).toUTCString();
+        const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
         setNextHardForkTime(hardForkTime)
     }
 
@@ -40,7 +40,7 @@ const BlockDAGBox = () => {
             setHashrate((dag_info.difficulty * 2 / 1000000000000).toFixed(2))
             const unixTimestamp = Math.floor(Date.now() / 1000);
             const timeToFork = 17500000 - dag_info.virtualDaaScore;
-            const hardForkTime = new Date(unixTimestamp + timeToFork * 1000).toUTCString();
+            const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
             setNextHardForkTime(hardForkTime)
         }, 60000)
         return (async () => {
