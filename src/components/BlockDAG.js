@@ -12,6 +12,7 @@ const BlockDAGBox = () => {
     const [headerCount, setHeaderCount] = useState("");
     const [virtualDaaScore, setVirtualDaaScore] = useState("");
     const [hashrate, setHashrate] = useState("");
+    const [nextHardForkTime, setNextHardForkTime] = useState("");
 
     const initBox = async () => {
         const dag_info = await getBlockdagInfo()
@@ -21,6 +22,11 @@ const BlockDAGBox = () => {
         setVirtualDaaScore(dag_info.virtualDaaScore)
         setDifficulty(dag_info.difficulty)
         setHashrate((dag_info.difficulty * 2 / 1000000000000).toFixed(2))
+
+        const unixTimestamp = Math.floor(Date.now() / 1000);
+        const timeToFork = 17500000 - dag_info.virtualDaaScore;
+        const hardForkTime = new Date(unixTimestamp + timeToFork * 1000).toUTCString();
+        setNextHardForkTime(hardForkTime)
     }
 
     useEffect(() => {
@@ -32,6 +38,10 @@ const BlockDAGBox = () => {
             setVirtualDaaScore(dag_info.virtualDaaScore)
             setDifficulty(dag_info.difficulty)
             setHashrate((dag_info.difficulty * 2 / 1000000000000).toFixed(2))
+            const unixTimestamp = Math.floor(Date.now() / 1000);
+            const timeToFork = 17500000 - dag_info.virtualDaaScore;
+            const hardForkTime = new Date(unixTimestamp + timeToFork * 1000).toUTCString();
+            setNextHardForkTime(hardForkTime)
         }, 60000)
         return (async () => {
             clearInterval(updateInterval)
@@ -85,6 +95,18 @@ const BlockDAGBox = () => {
             duration: 300
         });
     }, [hashrate])
+
+    useEffect((e) => {
+        document.getElementById('nextHardForkTime').animate([
+            // keyframes
+            { opacity: '1' },
+            { opacity: '0.6' },
+            { opacity: '1' },
+        ], {
+            // timing options
+            duration: 300
+        });
+    }, [nextHardForkTime])
 
 
     return <>
@@ -148,6 +170,14 @@ const BlockDAGBox = () => {
                         </td>
                         <td className="pt-1 align-top" id="virtualDaaScore">
                             {Number(virtualDaaScore).toLocaleString()}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td className="cardBoxElement">
+                            Next Hard Fork Time:
+                        </td>
+                        <td className="pt-1 align-top" id="nextHardForkTime">
+                            {nextHardForkTime}
                         </td>
                     </tr>
                 </tbody>
