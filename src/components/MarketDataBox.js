@@ -103,7 +103,7 @@ const MarketDataBox = () => {
             </tr>
             <tr>
               <td className="cardBoxElement nowrap">Revenue Gh</td>
-              <td className="pt-1">$ {(dailyYield * price).toFixed(2)}</td>
+              <td className="pt-1">$ {(dailyYield * price).toFixed(6)}</td>
             </tr>
           </tbody>
         </table>
