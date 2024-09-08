@@ -2,21 +2,43 @@ import { useContext, useEffect, useState } from "react";
 import { HiCurrencyDollar } from "react-icons/hi";
 import { IoMdTrendingDown, IoMdTrendingUp } from "react-icons/io";
 import { numberWithCommas } from "../helper";
-import { getCoinSupply } from "../htn-api-client";
+import { getCoinSupply, getBlockdagInfo } from "../htn-api-client";
 import PriceContext from "./PriceContext";
 
 const MarketDataBox = () => {
   const [circCoinsMData, setCircCoinsMData] = useState("-");
   const { price, marketData } = useContext(PriceContext);
+  const [dailyYield, setDailyYield] = useState(0);
 
   const initBox = async () => {
     const coin_supply = await getCoinSupply();
+    const dag_info = await getBlockdagInfo();
     setCircCoinsMData(Math.round(parseFloat(coin_supply.circulatingSupply) / 100000000));
+    // daily yield = (your hashrate / network hashrate) * block reward * (86400 / blocks per second)
+    const blockReward = await getBlockReward();
+    if (dag_info.virtualDaaScore > 17500000) {
+      setDailyYield((1 / (dag_info.difficulty * 2 / 1000000000)) * (blockReward * 0.95) * (86400 / 1))
+    } else {
+      setDailyYield((1 / (dag_info.difficulty * 2 / 1000000000)) * blockReward * (86400 / 1))
+    }
+    
   };
+
+  async function getBlockReward() {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API}/info/blockreward`);
+      const data = await response.json();
+      return data.blockreward;  
+    } catch (err) {
+      console.log("Error", err);
+      return null;
+    }
+  }
 
   useEffect(() => {
     initBox();
   }, []);
+
 
   return (
     <>
@@ -32,6 +54,12 @@ const MarketDataBox = () => {
             <tr>
               <td colSpan="2" className="text-center">
                 <h3>Market data</h3>
+              </td>
+            </tr>
+            <tr>
+              <td className="cardBoxElement">MCAP</td>
+              <td className="pt-1">
+                $ {((circCoinsMData * price)).toFixed(2)} {" "}
               </td>
             </tr>
             <tr>
@@ -70,13 +98,12 @@ const MarketDataBox = () => {
               <td className="pt-1">$ {numberWithCommas(marketData?.total_volume?.usd)}</td>
             </tr>
             <tr>
-              <td className="cardBoxElement">MCAP</td>
-              <td className="pt-1">
-                $ {((circCoinsMData * price) / 1000000).toFixed(2)} M{" "}
-                <a href={process.env.REACT_APP_COINGECKO} target="_blank" rel="noreferrer" className="rank ms-1">
-                  Rank #{marketData?.market_cap_rank}
-                </a>
-              </td>
+              <td className="cardBoxElement nowrap">Yield Gh</td>
+              <td className="pt-1">{dailyYield.toFixed(2)} HTN</td>
+            </tr>
+            <tr>
+              <td className="cardBoxElement nowrap">Revenue Gh</td>
+              <td className="pt-1">$ {(dailyYield * price).toFixed(2)}</td>
             </tr>
           </tbody>
         </table>

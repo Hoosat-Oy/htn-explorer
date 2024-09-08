@@ -125,7 +125,7 @@ const BlockDAGBox = () => {
                         </td>
                     </tr>
                     <tr>
-                        <td className="cardBoxElement">
+                        <td className="cardBoxElement nowrap">
                             Network name
                         </td>
                         <td className="pt-1 text-nowrap">
@@ -173,10 +173,10 @@ const BlockDAGBox = () => {
                         </td>
                     </tr>
                     <tr>
-                        <td className="cardBoxElement">
-                            Next Hard Fork Time:
+                        <td className="cardBoxElement nowrap">
+                            Hard Fork Time:
                         </td>
-                        <td className="pt-1 align-top" id="nextHardForkTime">
+                        <td className="pt-1 align-top nowrap" id="nextHardForkTime">
                             {nextHardForkTime}
                         </td>
                     </tr>

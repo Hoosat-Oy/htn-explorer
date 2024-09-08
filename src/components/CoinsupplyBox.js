@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
 import { useEffect, useState, useCallback } from "react";
 import { numberWithCommas } from "../helper";
-import { getCoinSupply, getHalving } from "../htn-api-client";
+import { getCoinSupply, getHalving, getBlockdagInfo } from "../htn-api-client";
 
 const CBox = () => {
   const [circCoins, setCircCoins] = useState("-");
@@ -14,7 +14,8 @@ const CBox = () => {
   const initBox = useCallback(() => {
     const fetchCoinSupply = async () => {
       const coinSupplyResp = await getCoinSupply();
-      getBlockReward();
+      const dag_info = await getBlockdagInfo();
+      getBlockReward(dag_info);
 
       getHalving().then((d) => {
         setHalvingDate(moment(d.nextHalvingTimestamp * 1000).format("YYYY-MM-DD HH:mm"));
@@ -39,11 +40,16 @@ const CBox = () => {
     };
   }, [initBox]);
 
-  async function getBlockReward() {
+  async function getBlockReward(dag_info) {
     await fetch(`${process.env.REACT_APP_API}/info/blockreward`)
       .then((response) => response.json())
       .then((d) => {
-        setBlockReward(d.blockreward.toFixed(2));
+        if (dag_info.virtualDaaScore > 17500000) {
+          setBlockReward((d.blockreward * 0.95).toFixed(2));
+        } else {
+          setBlockReward(d.blockreward.toFixed(2));
+        }
+        
       })
       .catch((err) => console.log("Error", err));
   }

@@ -93,19 +93,14 @@ function Dashboard() {
                 <BlockDAGBox />
               </div>
             </Col>
-            <Col sm={12} md={6} xl={3}>
+            <Col sm={12} md={6} xl={4}>
               <div className="infoBox">
                 <CoinsupplyBox />
               </div>
             </Col>
-            <Col sm={12} md={6} xl={2}>
+            <Col sm={12} md={6} xl={4}>
               <div className="infoBox">
                 <MarketDataBox />
-              </div>
-            </Col>
-            <Col sm={12} md={6} xl={2}>
-              <div className="infoBox">
-                <KaspadInfoBox />
               </div>
             </Col>
           </Row>
@@ -126,6 +121,17 @@ function Dashboard() {
             </Col>
             <Col className="mt-5 mt-lg-0" xs={12} lg={6}>
               <TxOverview lines={12} />
+            </Col>
+          </Row>
+        </Container>
+      </div>
+      <div className="row5">
+        <Container className="secondRow webpage" fluid>
+          <Row>
+            <Col sm={12} md={12} xl={12}>
+              <div className="infoBox">
+                <KaspadInfoBox />
+              </div>
             </Col>
           </Row>
         </Container>
