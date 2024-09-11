@@ -32,6 +32,7 @@ const TransactionInfo = () => {
     () =>
       getTransaction(id)
         .then((res) => {
+          console.log(res);
           setTxInfo(res);
         })
         .catch((err) => {
@@ -169,8 +170,8 @@ const TransactionInfo = () => {
                       <Col className="blockinfo-value-mono" lg={10}>
                         {txInfo && additionalTxInfo && (
                           <>
-                            {(txInfo.inputs.map((tx_input) => getOutputFromIndex(additionalTxInfo[tx_input.previous_outpoint_hash]?.outputs || [], tx_input.previous_outpoint_index)?.amount || 0).reduce((a, b) => a + b) -
-                              (txInfo.outputs?.map((v) => v.amount) || [0]).reduce((a, b) => a + b)) /
+                            {(txInfo.inputs.map((tx_input) => getOutputFromIndex(additionalTxInfo[tx_input.previous_outpoint_hash]?.outputs || [], tx_input?.previous_outpoint_index)?.amount || 0).reduce((a, b) => a + b) -
+                              (txInfo.outputs?.map((v) => v?.amount) || [0]).reduce((a, b) => a + b)) /
                               100000000}{" "}
                             HTN
                           </>
@@ -233,14 +234,14 @@ const TransactionInfo = () => {
                           <Col sm={12} md={12} lg={3}>
                             <div className="blockinfo-key mt-2">Amount</div>
                             <div className="utxo-value">
-                              <span className="utxo-amount-minus">-{getOutputFromIndex(additionalTxInfo[tx_input.previous_outpoint_hash].outputs, tx_input.previous_outpoint_index).amount / 100000000}&nbsp;HTN</span>
+                              <span className="utxo-amount-minus">-{getOutputFromIndex(additionalTxInfo[tx_input.previous_outpoint_hash].outputs, tx_input?.previous_outpoint_index)?.amount / 100000000}&nbsp;HTN</span>
                             </div>
                           </Col>
                         )}
                         <Col sm={12} md={12} lg={12}>
                           <div className="blockinfo-key mt-2">Previous Outpoint Index + Hash</div>
                           <div className="utxo-value-mono">
-                            #{tx_input.previous_outpoint_index} {tx_input.previous_outpoint_hash}
+                            #{tx_input?.previous_outpoint_index} {tx_input.previous_outpoint_hash}
                           </div>
                         </Col>
                         {additionalTxInfo && additionalTxInfo[tx_input.previous_outpoint_hash] && (
@@ -248,8 +249,8 @@ const TransactionInfo = () => {
                             <Col sm={12} md={12} lg={12}>
                               <div className="blockinfo-key mt-2">Address</div>
                               <div className="utxo-value-mono">
-                                <Link to={`/addresses/${getOutputFromIndex(additionalTxInfo[tx_input.previous_outpoint_hash].outputs, tx_input.previous_outpoint_index).script_public_key_address}`} className="blockinfo-link">
-                                  {getOutputFromIndex(additionalTxInfo[tx_input.previous_outpoint_hash].outputs, tx_input.previous_outpoint_index).script_public_key_address}
+                                <Link to={`/addresses/${getOutputFromIndex(additionalTxInfo[tx_input.previous_outpoint_hash].outputs, tx_input?.previous_outpoint_index)?.script_public_key_address}`} className="blockinfo-link">
+                                  {getOutputFromIndex(additionalTxInfo[tx_input.previous_outpoint_hash].outputs, tx_input?.previous_outpoint_index)?.script_public_key_address}
                                 </Link>
                               </div>
                             </Col>
@@ -276,7 +277,7 @@ const TransactionInfo = () => {
                       <Col sm={6} md={6} lg={3}>
                         <div className="blockinfo-key mt-2 mt-lg-0">Amount</div>
                         <div className="utxo-value">
-                          <span className="utxo-amount">+{numberWithCommas(tx_output.amount / 100000000)}&nbsp;HTN</span>
+                          <span className="utxo-amount">+{numberWithCommas(tx_output?.amount / 100000000)}&nbsp;HTN</span>
                         </div>
                       </Col>
                       <Col sm={12} md={12} lg={12}>
@@ -286,8 +287,8 @@ const TransactionInfo = () => {
                       <Col sm={12} md={12} lg={12}>
                         <div className="blockinfo-key mt-2">Script Public Key Address</div>
                         <div className="utxo-value-mono">
-                          <Link to={`/addresses/${tx_output.script_public_key_address}`} className="blockinfo-link">
-                            {tx_output.script_public_key_address}
+                          <Link to={`/addresses/${tx_output?.script_public_key_address}`} className="blockinfo-link">
+                            {tx_output?.script_public_key_address}
                           </Link>
                         </div>
                       </Col>
