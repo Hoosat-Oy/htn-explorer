@@ -9,12 +9,7 @@ import BlueScoreContext from "./BlueScoreContext.js";
 import CopyButton from "./CopyButton.js";
 
 const getOutputFromIndex = (outputs, index) => {
-  console.log(outputs);
-  for (const output of outputs) {
-    if (output.index === index) {
-      return output;
-    }
-  }
+  return outputs[index];
 };
 
 const TransactionInfo = () => {
