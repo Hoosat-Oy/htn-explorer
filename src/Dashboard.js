@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "font-awesome/css/font-awesome.min.css";
-import { useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Button, Col, Container, Form, InputGroup, Modal, Row, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import "./App.scss";
@@ -11,18 +11,53 @@ import CoinsupplyBox from "./components/CoinsupplyBox";
 import KaspadInfoBox from "./components/HtndInfoBox";
 import MarketDataBox from "./components/MarketDataBox";
 import TxOverview from "./components/TxOverview";
+import DAGGraph from "./components/DAGGraph";
+import LastBlocksContext from "./components/LastBlocksContext";
 import { getBlock } from "./htn-api-client";
+import { mockData } from './components/data'; 
 
 function Dashboard() {
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
-
+  const { blocks, isConnected } = useContext(LastBlocksContext);
   const handleClose = () => setShow(false);
 
   const [showLoadingModal, setShowLoadingModal] = useState(false);
 
   const [balance] = useState(0);
   const [address] = useState("hoosat:");
+
+  const [ghostDAG, setGhostDAG ] = useState([]);
+
+  const getDAGData = async (lastBlocks) => {
+    let verboseBlocks = [];
+    console.log(lastBlocks);
+    for (let i = 0; i < lastBlocks.length; i++) {
+        try {
+            const block = await getBlock(lastBlocks[i].block_hash);
+            verboseBlocks.push(block);
+        } catch (error) {
+            console.error(`Error fetching block ${lastBlocks[i].block_hash}:`, error);
+        }
+    }
+    console.log(`Verbose Blocks`);
+    console.log(verboseBlocks);
+    let blocks = verboseBlocks.map(block => ({
+      id: block.verboseData.hash,  // Assuming block_hash corresponds to the block's ID
+      parents: block.verboseData.mergeSetBluesHashes || []  // Assuming parents are provided or default to an empty array
+    }));
+    if (blocks.length < 100) {
+      blocks[0].parents = [mockData[mockData.length-1].id]
+      setGhostDAG([...mockData, ...blocks]);
+    } else {
+      setGhostDAG(blocks);
+    }
+    
+  };
+
+  useEffect(() => {
+    getDAGData(blocks);
+  }, [blocks])
 
   const search = (e) => {
     e.preventDefault();
@@ -106,13 +141,9 @@ function Dashboard() {
           </Row>
         </Container>
       </div>
-      {/* <div className="row3">
-        <Container className="thirdRow webpage" fluid>
-          <Row>
-            <Col xs={12}><BlockDagVisualization /></Col>
-          </Row>
-        </Container>
-      </div> */}
+      <div className="row3">
+        <DAGGraph data={ghostDAG}/>
+      </div>
       <div className="row4">
         <Container className="fourthRow webpage" fluid>
           <Row>
