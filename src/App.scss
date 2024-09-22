@@ -351,7 +351,7 @@ body {
 
 .row1 {
   color: $color3;
-  background-color: rgba($color3, 0.5);
+  background-color: $color3;
   border-bottom: 2px solid $color1;
   padding: 2rem;
   display: flex;
@@ -369,7 +369,7 @@ body {
   background-color: #2c3531;
   position: absolute;
   width: 100%;
-  top: 500px;
+  top: 460px;
   z-index: -1000;
 }
 
@@ -378,13 +378,15 @@ body {
 }
 
 .row4 {
-  color: F3EEF1;
+  // color: F3EEF1;
   background-color: $color5;
 }
 
 @include media-breakpoint-up(sm) {
   .fourthRow {
-    padding: 3rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    padding-bottom: 3rem;
   }
 }
 

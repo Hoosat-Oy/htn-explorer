@@ -31,7 +31,6 @@ function Dashboard() {
 
   const getDAGData = async (lastBlocks) => {
     let verboseBlocks = [];
-    console.log(lastBlocks);
     for (let i = 0; i < lastBlocks.length; i++) {
         try {
             const block = await getBlock(lastBlocks[i].block_hash);
@@ -40,18 +39,16 @@ function Dashboard() {
             console.error(`Error fetching block ${lastBlocks[i].block_hash}:`, error);
         }
     }
-    console.log(`Verbose Blocks`);
     console.log(verboseBlocks);
     let blocks = verboseBlocks.map(block => ({
-      id: block.verboseData.hash,  // Assuming block_hash corresponds to the block's ID
-      parents: block.verboseData.mergeSetBluesHashes || []  // Assuming parents are provided or default to an empty array
+      id: block.verboseData.hash,
+      isChain: block.verboseData.isChainBlock,
+      blueparents: block.verboseData.mergeSetBluesHashes || [],  
+      redparents: block.verboseData.mergeSetRedsHashes || []
     }));
-    if (blocks.length < 100) {
-      blocks[0].parents = [mockData[mockData.length-1].id]
-      setGhostDAG([...mockData, ...blocks]);
-    } else {
-      setGhostDAG(blocks);
-    }
+    blocks[0].blueparents = [mockData[mockData.length-1].id]
+    let ghostDAG = [...mockData, ...blocks];
+    setGhostDAG(ghostDAG.slice(-60));
     
   };
 

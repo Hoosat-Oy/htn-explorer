@@ -176,7 +176,7 @@ const BlockDAGBox = () => {
                         <td className="cardBoxElement nowrap">
                             Hard Fork Time:
                         </td>
-                        <td className="pt-1 align-top nowrap" id="nextHardForkTime">
+                        <td className="pt-1 align-top" id="nextHardForkTime">
                             {nextHardForkTime}
                         </td>
                     </tr>
