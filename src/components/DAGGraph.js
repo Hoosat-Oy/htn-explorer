@@ -12,9 +12,10 @@ const DAGGraph = (props) => {
     const g = svg.append('g');
 
     const graph = new dagreD3.graphlib.Graph().setGraph({
-      rankdir: 'LR',
-      ranksep: 35, // Reduce vertical space between nodes
-      nodesep: 5, // Adjust horizontal space if necessary (optional)
+      rankdir: 'LR',  // Direction for rank nodes. Can be TB, BT, LR, or RL, where T = top, B = bottom, L = left, and R = right.
+      ranksep: 50,    // Number of pixels between each rank in the layout.
+      nodesep: 10,    // Number of pixels that separate nodes horizontally in the layout.
+      edgesep: 5,     // Number of pixels that separate edges horizontally in the layout.
     });
 
     graph.setDefaultNodeLabel(() => ({}));
@@ -89,14 +90,14 @@ const DAGGraph = (props) => {
       const scale = Math.min(svgWidth / graphWidth, svgHeight / graphHeight);
       const xCenterOffset = (svgWidth - graphWidth * scale) / 2 - leftShift;
       const yCenterOffset = (svgHeight - graphHeight * scale) / 2;
-      
+
       // Apply transformation to scale and center the graph
       g.attr('transform', `translate(${xCenterOffset}, ${yCenterOffset}) scale(${scale})`);
     } else {
       // Center the graph if no scaling is needed
       const xCenterOffset = (svgWidth - graphWidth) / 2 - leftShift;
       const yCenterOffset = (svgHeight - graphHeight) / 2;
-      
+
       // Apply translation to center the graph
       g.attr('transform', `translate(${xCenterOffset}, ${yCenterOffset})`);
     }
