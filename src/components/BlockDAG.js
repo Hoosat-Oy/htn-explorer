@@ -111,17 +111,17 @@ const BlockDAGBox = () => {
         });
     }, [hashrate])
 
-    useEffect((e) => {
-        document.getElementById('nextHardForkTime').animate([
-            // keyframes
-            { opacity: '1' },
-            { opacity: '0.6' },
-            { opacity: '1' },
-        ], {
-            // timing options
-            duration: 300
-        });
-    }, [nextHardForkTime])
+    // useEffect((e) => {
+    //     document.getElementById('nextHardForkTime').animate([
+    //         // keyframes
+    //         { opacity: '1' },
+    //         { opacity: '0.6' },
+    //         { opacity: '1' },
+    //     ], {
+    //         // timing options
+    //         duration: 300
+    //     });
+    // }, [nextHardForkTime])
 
 
     return <>
