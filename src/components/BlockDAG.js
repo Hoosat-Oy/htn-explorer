@@ -13,6 +13,7 @@ const BlockDAGBox = () => {
     const [virtualDaaScore, setVirtualDaaScore] = useState("");
     const [hashrate, setHashrate] = useState("");
     const [nextHardForkTime, setNextHardForkTime] = useState("");
+    const [nextHardForkTimeTo, setNextHardForkTimeTo] = useState("");
 
     const initBox = async () => {
         const dag_info = await getBlockdagInfo()
@@ -27,6 +28,13 @@ const BlockDAGBox = () => {
         const timeToFork = 17500000 - dag_info.virtualDaaScore;
         const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
         setNextHardForkTime(hardForkTime)
+        const hours = Math.floor(timeToFork / 3600);
+        const minutes = Math.floor((timeToFork % 3600) / 60);
+        const seconds = timeToFork % 60;
+
+        const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
+
+        setNextHardForkTimeTo(formattedTimeToFork);
     }
 
     useEffect(() => {
@@ -42,6 +50,13 @@ const BlockDAGBox = () => {
             const timeToFork = 17500000 - dag_info.virtualDaaScore;
             const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
             setNextHardForkTime(hardForkTime)
+            const hours = Math.floor(timeToFork / 3600);
+            const minutes = Math.floor((timeToFork % 3600) / 60);
+            const seconds = timeToFork % 60;
+    
+            const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
+    
+            setNextHardForkTimeTo(formattedTimeToFork);
         }, 60000)
         return (async () => {
             clearInterval(updateInterval)
@@ -174,10 +189,10 @@ const BlockDAGBox = () => {
                     </tr>
                     <tr>
                         <td className="cardBoxElement nowrap">
-                            Hard Fork Time:
+                            Time to Hard Fork:
                         </td>
                         <td className="pt-1 align-top" id="nextHardForkTime">
-                            {nextHardForkTime}
+                            {nextHardForkTimeTo}
                         </td>
                     </tr>
                 </tbody>
