@@ -22,19 +22,19 @@ const BlockDAGBox = () => {
         setHeaderCount(dag_info.headerCount)
         setVirtualDaaScore(dag_info.virtualDaaScore)
         setDifficulty(dag_info.difficulty)
-        setHashrate((dag_info.difficulty * 2 / 1000000000000).toFixed(2))
+        // setHashrate((dag_info.difficulty * 2 / 1000000000000).toFixed(2))
 
-        const unixTimestamp = Math.floor(Date.now() / 1000);
-        const timeToFork = 17500000 - dag_info.virtualDaaScore;
-        const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
-        setNextHardForkTime(hardForkTime)
-        const hours = Math.floor(timeToFork / 3600);
-        const minutes = Math.floor((timeToFork % 3600) / 60);
-        const seconds = timeToFork % 60;
+        // const unixTimestamp = Math.floor(Date.now() / 1000);
+        // const timeToFork = 17500000 - dag_info.virtualDaaScore;
+        // const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
+        // setNextHardForkTime(hardForkTime)
+        // const hours = Math.floor(timeToFork / 3600);
+        // const minutes = Math.floor((timeToFork % 3600) / 60);
+        // const seconds = timeToFork % 60;
 
-        const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
+        // const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
 
-        setNextHardForkTimeTo(formattedTimeToFork);
+        // setNextHardForkTimeTo(formattedTimeToFork);
     }
 
     useEffect(() => {
@@ -46,17 +46,17 @@ const BlockDAGBox = () => {
             setVirtualDaaScore(dag_info.virtualDaaScore)
             setDifficulty(dag_info.difficulty)
             setHashrate((dag_info.difficulty * 2 / 1000000000000).toFixed(2))
-            const unixTimestamp = Math.floor(Date.now() / 1000);
-            const timeToFork = 17500000 - dag_info.virtualDaaScore;
-            const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
-            setNextHardForkTime(hardForkTime)
-            const hours = Math.floor(timeToFork / 3600);
-            const minutes = Math.floor((timeToFork % 3600) / 60);
-            const seconds = timeToFork % 60;
+            // const unixTimestamp = Math.floor(Date.now() / 1000);
+            // const timeToFork = 17500000 - dag_info.virtualDaaScore;
+            // const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
+            // setNextHardForkTime(hardForkTime)
+            // const hours = Math.floor(timeToFork / 3600);
+            // const minutes = Math.floor((timeToFork % 3600) / 60);
+            // const seconds = timeToFork % 60;
     
-            const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
+            // const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
     
-            setNextHardForkTimeTo(formattedTimeToFork);
+            // setNextHardForkTimeTo(formattedTimeToFork);
         }, 60000)
         return (async () => {
             clearInterval(updateInterval)
