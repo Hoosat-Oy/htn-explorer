@@ -187,14 +187,14 @@ const BlockDAGBox = () => {
                             {Number(virtualDaaScore).toLocaleString()}
                         </td>
                     </tr>
-                    <tr>
+                    {/* <tr>
                         <td className="cardBoxElement nowrap">
                             Time to Hard Fork:
                         </td>
                         <td className="pt-1 align-top" id="nextHardForkTime">
                             {nextHardForkTimeTo}
                         </td>
-                    </tr>
+                    </tr> */}
                 </tbody>
             </table>
         </div>
