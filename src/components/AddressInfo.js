@@ -69,31 +69,52 @@ const AddressInfo = () => {
     e.preventDefault();
   };
 
-  const getAddrFromOutputs = (outputs, i) => {
-    for (const o of outputs) {
-      if (o.index === i) {
-        return o.script_public_key_address;
+  const getAddrFromOutputs = (outputs, index) => {
+    if (outputs[index] && outputs[index].index == index) {
+      return outputs[index].script_public_key_address;
+    } else {
+      for (var i = 0; i < outputs.length; i++) {
+        if (outputs[i].index === index) {
+          return outputs[i].script_public_key_address;
+        }
       }
     }
   };
-  const getAmountFromOutputs = (outputs, i) => {
-    for (const o of outputs) {
-      if (o.index === i) {
-        return o.amount / 100000000;
+  
+  const getAmountFromOutputs = (outputs, index) => {
+    if (outputs[index] && outputs[index].index == index) {
+      return outputs[index].amount / 100000000;
+    } else {
+      for (var i = 0; i < outputs.length; i++) {
+        if (outputs[i].index === index) {
+          return outputs[i].amount / 100000000;
+        }
       }
     }
+    
   };
+
+  const calculationFailed = (balance) => {
+    if(balance === "0") {
+      return "Calculation failed"
+    } 
+    return balance;
+  }
 
   const getAmount = (outputs, inputs) => {
     var balance = 0;
-    for (const o of outputs || []) {
-      if (o.script_public_key_address === addr) {
-        balance = balance + o.amount / 100000000;
+    for (var i = 0; i < outputs.length; i++) {
+      if (outputs[i].script_public_key_address === addr) {
+        balance += outputs[i].amount / 100000000;
       }
     }
-    for (const i of inputs || []) {
-      if (getAddrFromOutputs(txsInpCache[i.previous_outpoint_hash]?.outputs || [], i.previous_outpoint_index) === addr) {
-        balance = balance - getAmountFromOutputs(txsInpCache[i.previous_outpoint_hash]["outputs"], i.previous_outpoint_index);
+    for (var i = 0; i < inputs.length; i++) {
+      var outputs = txsInpCache[inputs[i].previous_outpoint_hash]?.outputs;
+      if (outputs !== undefined && outputs.length > 0) {
+        if (getAddrFromOutputs(outputs, inputs[i].previous_outpoint_index) === addr) {
+          let amount = getAmountFromOutputs(outputs, inputs[i].previous_outpoint_index);
+          balance -= amount
+        }
       }
     }
     return balance;
@@ -191,7 +212,7 @@ const AddressInfo = () => {
               .map((item) => item.inputs)
               .flatMap((x) => x)
               .map((x) => x.previous_outpoint_hash)
-          )
+          ).slice(-1000)
         ).then((txs) => {
           var txInpObj = {};
           txs.forEach((x) => (txInpObj[x.transaction_id] = x));
@@ -365,7 +386,7 @@ const AddressInfo = () => {
                           {getAmount(x.outputs, x.inputs) > 0 ? (
                             <span className="utxo-amount">+{numberWithCommas(floatToStr(getAmount(x.outputs, x.inputs)))}&nbsp;HTN</span>
                           ) : (
-                            <span className="utxo-amount-minus">{numberWithCommas(floatToStr(getAmount(x.outputs, x.inputs)))}&nbsp;HTN</span>
+                            <span className="utxo-amount-minus">{calculationFailed(numberWithCommas(floatToStr(getAmount(x.outputs, x.inputs))))}&nbsp;HTN</span>
                           )}
                         </Link>
                       </div>
