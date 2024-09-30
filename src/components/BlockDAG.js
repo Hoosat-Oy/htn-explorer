@@ -22,7 +22,7 @@ const BlockDAGBox = () => {
         setHeaderCount(dag_info.headerCount)
         setVirtualDaaScore(dag_info.virtualDaaScore)
         setDifficulty(dag_info.difficulty)
-        // setHashrate((dag_info.difficulty * 2 / 1000000000000).toFixed(2))
+        setHashrate((dag_info.difficulty * 2 / 1000000000).toFixed(2))
 
         // const unixTimestamp = Math.floor(Date.now() / 1000);
         // const timeToFork = 17500000 - dag_info.virtualDaaScore;
