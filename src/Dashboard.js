@@ -27,32 +27,40 @@ function Dashboard() {
   const [balance] = useState(0);
   const [address] = useState("hoosat:");
 
-  const [ghostDAG, setGhostDAG ] = useState([]);
+  const [ghostDAG, setGhostDAG] = useState([]);
 
-  const getDAGData = async (lastBlocks) => {
-    let verboseBlocks = [];
-    for (let i = 0; i < lastBlocks.length; i++) {
-        try {
-            const block = await getBlock(lastBlocks[i].block_hash);
-            verboseBlocks.push(block);
-        } catch (error) {
-            console.error(`Error fetching block ${lastBlocks[i].block_hash}:`, error);
+
+  const getDAGData = async (newBlock) => {
+    try {
+      if (newBlock.block_hash !== undefined && (ghostDAG.length == 0 || ghostDAG[ghostDAG.length - 1].id !== newBlock.block_hash)) {
+        const block = await getBlock(newBlock.block_hash);
+        let formattedBlock = {
+          id: block.verboseData.hash,
+          isChain: block.verboseData.isChainBlock,
+          blueparents: block.verboseData.mergeSetBluesHashes || [],
+          redparents: block.verboseData.mergeSetRedsHashes || []
+        };
+        if (ghostDAG.length > 0) {
+          let blocks = ghostDAG;
+          blocks[0].blueparents = [mockData[mockData.length-1].id]
+          let newGhostDAG = [...mockData, ...blocks, formattedBlock];
+          setGhostDAG(newGhostDAG.slice(-60));
+        } else {
+          formattedBlock.blueparents = [mockData[mockData.length-1].id]
+          let newGhostDAG = [...mockData, formattedBlock];
+          setGhostDAG(newGhostDAG.slice(-60));
         }
+      }
+    } catch (error) {
+      console.error(`Error fetching block ${newBlock.block_hash}:`, error);
     }
-    console.log(verboseBlocks);
-    let blocks = verboseBlocks.map(block => ({
-      id: block.verboseData.hash,
-      isChain: block.verboseData.isChainBlock,
-      blueparents: block.verboseData.mergeSetBluesHashes || [],  
-      redparents: block.verboseData.mergeSetRedsHashes || []
-    }));
-    blocks[0].blueparents = [mockData[mockData.length-1].id]
-    let ghostDAG = [...mockData, ...blocks];
-    setGhostDAG(ghostDAG.slice(-60));
-    
-  };
+  }
 
   useEffect(() => {
+    if (blocks && blocks.length > 0) {
+      const latestBlock = blocks[blocks.length - 1]; // Get the most recent block
+      getDAGData(latestBlock); // Only fetch and add the latest block to DAG
+    }
     getDAGData(blocks);
   }, [blocks])
 
