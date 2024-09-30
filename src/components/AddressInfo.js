@@ -73,9 +73,11 @@ const AddressInfo = () => {
     if (outputs[index] && outputs[index].index == index) {
       return outputs[index].script_public_key_address;
     } else {
-      for (var i = 0; i < outputs.length; i++) {
-        if (outputs[i].index === index) {
-          return outputs[i].script_public_key_address;
+      if (outputs && outputs.length > 0) {
+        for (var i = 0; i < outputs.length; i++) {
+          if (outputs[i].index === index) {
+            return outputs[i].script_public_key_address;
+          }
         }
       }
     }
@@ -85,9 +87,11 @@ const AddressInfo = () => {
     if (outputs[index] && outputs[index].index == index) {
       return outputs[index].amount / 100000000;
     } else {
-      for (var i = 0; i < outputs.length; i++) {
-        if (outputs[i].index === index) {
-          return outputs[i].amount / 100000000;
+      if (outputs && outputs.length > 0) {
+        for (var i = 0; i < outputs.length; i++) {
+          if (outputs[i].index === index) {
+            return outputs[i].amount / 100000000;
+          }
         }
       }
     }
@@ -108,12 +112,14 @@ const AddressInfo = () => {
         balance += outputs[i].amount / 100000000;
       }
     }
-    for (var i = 0; i < inputs.length; i++) {
-      var outputs = txsInpCache[inputs[i].previous_outpoint_hash]?.outputs;
-      if (outputs !== undefined && outputs.length > 0) {
-        if (getAddrFromOutputs(outputs, inputs[i].previous_outpoint_index) === addr) {
-          let amount = getAmountFromOutputs(outputs, inputs[i].previous_outpoint_index);
-          balance -= amount
+    if (inputs && inputs.length > 0) {
+      for (var i = 0; i < inputs.length; i++) {
+        var outputs = txsInpCache[inputs[i].previous_outpoint_hash]?.outputs;
+        if (outputs !== undefined && outputs.length > 0) {
+          if (getAddrFromOutputs(outputs, inputs[i].previous_outpoint_index) === addr) {
+            let amount = getAmountFromOutputs(outputs, inputs[i].previous_outpoint_index);
+            balance -= amount
+          }
         }
       }
     }
