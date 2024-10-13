@@ -203,11 +203,6 @@ function App() {
                         Web Wallet
                       </a>
                     </Nav.Item>
-                    <Nav.Item>
-                      <a className="nav-link fs-5" onClick={closeMenuIfNeeded} href={"https://pool.hoosat.fi"}>
-                        Mining Pool
-                      </a>
-                    </Nav.Item>
                   </Nav>
                   <div className="ms-auto navbar-price">
                     ${price} <span className="text-light">/ HTN</span>
