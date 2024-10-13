@@ -2,7 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "font-awesome/css/font-awesome.min.css";
 import { useContext, useState, useEffect } from "react";
 import { Button, Col, Container, Form, InputGroup, Modal, Row, Spinner } from "react-bootstrap";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import "./App.scss";
 import BalanceModal from "./components/BalanceModal";
 import BlockDAGBox from "./components/BlockDAG";
@@ -29,25 +29,25 @@ function Dashboard() {
 
   const [ghostDAG, setGhostDAG] = useState([]);
 
-
   const getDAGData = async (newBlock) => {
     try {
       if (newBlock.block_hash !== undefined && (ghostDAG.length == 0 || ghostDAG[ghostDAG.length - 1].id !== newBlock.block_hash)) {
         const block = await getBlock(newBlock.block_hash);
+        console.log(block);
         let formattedBlock = {
           id: block.verboseData.hash,
           isChain: block.verboseData.isChainBlock,
           blueparents: block.verboseData.mergeSetBluesHashes || [],
           redparents: block.verboseData.mergeSetRedsHashes || []
         };
-        if (ghostDAG.length > 0) {
-          let blocks = ghostDAG;
+
+        let blocks = ghostDAG;
+        if (blocks.length > 0 && blocks.length < 60) {
           blocks[0].blueparents = [mockData[mockData.length-1].id]
           let newGhostDAG = [...mockData, ...blocks, formattedBlock];
           setGhostDAG(newGhostDAG.slice(-60));
         } else {
-          formattedBlock.blueparents = [mockData[mockData.length-1].id]
-          let newGhostDAG = [...mockData, formattedBlock];
+          let newGhostDAG = [...blocks, formattedBlock];
           setGhostDAG(newGhostDAG.slice(-60));
         }
       }

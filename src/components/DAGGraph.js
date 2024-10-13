@@ -118,7 +118,7 @@ const DAGGraph = (props) => {
     const yCenterOffset = (svgHeight - graphHeight) / 2;
 
     // Apply translation to center the graph
-    g.attr('transform', `translate(${xCenterOffset}, ${yCenterOffset})`);
+    g.attr('transform', `translate(${xCenterOffset.toFixed(2)}, ${yCenterOffset.toFixed(2)})`);
 
     // Set viewBox for responsive scaling
     svg.attr('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
