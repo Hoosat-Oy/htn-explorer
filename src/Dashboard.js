@@ -125,6 +125,9 @@ function Dashboard() {
           </Row>
         </Container>
       </div>
+      <div className="row3">
+        <DAGGraph data={ghostDAG}/>
+      </div>
       <div className="row2">
         <Container className="secondRow webpage" fluid>
           <Row>
@@ -145,9 +148,6 @@ function Dashboard() {
             </Col>
           </Row>
         </Container>
-      </div>
-      <div className="row3">
-        <DAGGraph data={ghostDAG}/>
       </div>
       <div className="row4">
         <Container className="fourthRow webpage" fluid>

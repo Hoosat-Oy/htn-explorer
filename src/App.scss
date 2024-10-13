@@ -362,15 +362,16 @@ body {
 @include media-breakpoint-up(sm) {
   .secondRow {
     padding: 3rem;
+    padding-top: 0px;
   }
 }
 
 .row3 {
   background-color: #2c3531;
-  position: absolute;
   width: 100%;
-  top: 460px;
-  z-index: -1000;
+  //position: absolute;
+  //top: 460px;
+  //z-index: -1000;
 }
 
 .thirdRow {
