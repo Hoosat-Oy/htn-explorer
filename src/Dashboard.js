@@ -64,6 +64,10 @@ function Dashboard() {
     getDAGData(blocks);
   }, [blocks])
 
+  useEffect(() => {
+    setGhostDAG([]);
+  }, [])
+
   const search = (e) => {
     e.preventDefault();
     const v = e.target.searchInput.value;
