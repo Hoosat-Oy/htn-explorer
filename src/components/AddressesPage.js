@@ -283,10 +283,10 @@ const AddressesPage = () => {
                   <PieChart
                     data={holdingData}
                     label={({ dataEntry }) => parseFloat(dataEntry.value).toFixed(2) + "% " + dataEntry.title}
-                    lineWidth={15}
+                    lineWidth={10}
                     rounded
                     paddingAngle={15}
-                    radius={pieChartDefaultProps.radius - shiftSize}
+                    radius={pieChartDefaultProps.radius - shiftSize * 4}
                     segmentsShift={(index) => (index === 0 ? shiftSize : 0.5)}
                     labelStyle={(index) => ({
                       fill: holdingData[index].color,
@@ -303,10 +303,10 @@ const AddressesPage = () => {
                   <PieChart
                     data={chartData}
                     label={({ dataEntry }) => parseFloat(dataEntry.percentage).toFixed(2) + "% " + dataEntry.title}
-                    lineWidth={15}
+                    lineWidth={10}
                     rounded
                     paddingAngle={15}
-                    radius={pieChartDefaultProps.radius - shiftSize}
+                    radius={pieChartDefaultProps.radius - shiftSize * 4}
                     segmentsShift={(index) => (index === 0 ? shiftSize : 0.5)}
                     labelStyle={(index) => ({
                       fill: chartData[index].color,
