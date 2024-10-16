@@ -29,37 +29,73 @@ function Dashboard() {
 
   const [ghostDAG, setGhostDAG] = useState([]);
 
-  const getDAGData = async (newBlock) => {
+  const getDAGData = async (loadVerboseForThisBlock) => {
     try {
-      if (newBlock.block_hash !== undefined && (ghostDAG.length == 0 || ghostDAG[ghostDAG.length - 1].id !== newBlock.block_hash)) {
-        const block = await getBlock(newBlock.block_hash);
-        console.log(block);
-        let formattedBlock = {
-          id: block.verboseData.hash,
-          isChain: block.verboseData.isChainBlock,
-          blueparents: block.verboseData.mergeSetBluesHashes || [],
-          redparents: block.verboseData.mergeSetRedsHashes || []
-        };
-
-        let blocks = ghostDAG;
-        if (blocks.length > 0 && blocks.length < 60) {
-          blocks[0].blueparents = [mockData[mockData.length-1].id]
-          let newGhostDAG = [...mockData, ...blocks, formattedBlock];
-          setGhostDAG(newGhostDAG.slice(-60));
-        } else {
-          let newGhostDAG = [...blocks, formattedBlock];
-          setGhostDAG(newGhostDAG.slice(-60));
-        }
+      if (loadVerboseForThisBlock.block_hash !== undefined && (ghostDAG.length == 0 || ghostDAG[ghostDAG.length - 1].id !== loadVerboseForThisBlock.block_hash)) {
+        let tries = 3;
+        do {
+          // Retrieve the latest block verbosedata.
+          const block = await getBlock(loadVerboseForThisBlock.block_hash);
+          if (block) {
+            let newBlock = {
+              id: loadVerboseForThisBlock.block_hash,
+              isChain: block.verboseData.isChainBlock === true ? true : false,
+              blueparents: block.verboseData.mergeSetBluesHashes || [],
+              redparents: block.verboseData.mergeSetRedsHashes || []
+            };
+            let blocks = ghostDAG;
+            if (blocks.length === 0) {
+              newBlock.blueparents = [mockData[mockData.length-1].id]
+              let newGhostDAG = [...mockData, newBlock];
+              setGhostDAG(newGhostDAG.slice(-60));
+              return
+            } else if (blocks.length > 0 && blocks.length < 60) {
+              blocks[0].blueparents = [mockData[mockData.length - 1].id]
+              let newGhostDAG = [...mockData, ...blocks, newBlock];
+              setGhostDAG(newGhostDAG.slice(-60));
+              return
+            } else if(blocks.length >= 60) {
+              // Check that newblock has last block as parent. 
+              const lastBlock = blocks[blocks.length - 1];
+              let lastBlockIsParentOfNewBlock = false;
+              for (let i = 0; i < newBlock.blueparents.length; i++) {
+                if (lastBlock.id === newBlock.blueparents[i]) {
+                  lastBlockIsParentOfNewBlock = true;
+                  break;
+                }
+              }
+              for (let i = 0; i < newBlock.redparents.length; i++) {
+                if (lastBlock.id === newBlock.redparents[i]) {
+                  lastBlockIsParentOfNewBlock = true;
+                  break;
+                }
+              }
+              if (lastBlockIsParentOfNewBlock) {
+                let newGhostDAG = [...blocks, newBlock];
+                setGhostDAG(newGhostDAG.slice(-60));
+                return
+              } else {
+                // Do a dirty fix and tie them together, it's just animation. We have just missed block fetch, even if we tried 3 times. 
+                newBlock.blueparents = [...newBlock.blueparents, lastBlock.id]
+                let newGhostDAG = [...blocks, newBlock];
+                setGhostDAG(newGhostDAG.slice(-60));
+                return
+              }
+            }
+          }
+          console.log(`Error fetching block ${loadVerboseForThisBlock.block_hash}, tries left ${tries}`);
+          tries = tries - 1;
+        } while(tries > 0);
       }
     } catch (error) {
-      console.error(`Error fetching block ${newBlock.block_hash}:`, error);
+      console.error(`Error fetching block ${loadVerboseForThisBlock.block_hash}:`, error);
     }
   }
 
   useEffect(() => {
     if (blocks && blocks.length > 0) {
-      const latestBlock = blocks[blocks.length - 1]; // Get the most recent block
-      getDAGData(latestBlock); // Only fetch and add the latest block to DAG
+      const loadVerboseForThisBlock = blocks[blocks.length - 1]; // Get the most recent block
+      getDAGData(loadVerboseForThisBlock); // Only fetch and add the latest block to DAG
     }
     getDAGData(blocks);
   }, [blocks])
