@@ -9,6 +9,16 @@ export async function getBlock(hash) {
   return res;
 }
 
+export async function getInfo() {
+  const res = await fetch(`${API_BASE}info/htnd`, {})
+    .then((response) => response.json())
+    .then((data) => {
+      return data;
+    });
+  return res;
+}
+
+
 export async function getTransaction(hash) {
   const res = await fetch(`${API_BASE}transactions/${hash}`, {})
     .then((response) => response.json())

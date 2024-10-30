@@ -1,7 +1,7 @@
 import { faDiagramProject } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from "react";
-import { getBlockdagInfo } from '../htn-api-client';
+import { getBlockdagInfo, getInfo } from '../htn-api-client';
 
 
 const BlockDAGBox = () => {
@@ -14,6 +14,7 @@ const BlockDAGBox = () => {
     const [hashrate, setHashrate] = useState("");
     const [nextHardForkTime, setNextHardForkTime] = useState("");
     const [nextHardForkTimeTo, setNextHardForkTimeTo] = useState("");
+    const [mempoolSize, setMempoolSize] = useState();
 
     const initBox = async () => {
         const dag_info = await getBlockdagInfo()
@@ -23,6 +24,8 @@ const BlockDAGBox = () => {
         setVirtualDaaScore(dag_info.virtualDaaScore)
         setDifficulty(dag_info.difficulty)
         setHashrate((dag_info.difficulty * 2 / 1000000000).toFixed(2))
+        const info = await getInfo();
+        setMempoolSize(info.mempoolSize);
 
         // const unixTimestamp = Math.floor(Date.now() / 1000);
         // const timeToFork = 17500000 - dag_info.virtualDaaScore;
@@ -58,6 +61,17 @@ const BlockDAGBox = () => {
     
             // setNextHardForkTimeTo(formattedTimeToFork);
         }, 60000)
+        return (async () => {
+            clearInterval(updateInterval)
+        })
+        
+    }, [])
+
+    useEffect(() => {
+        const updateInterval = setInterval(async () => {
+            const info = await getInfo();
+            setMempoolSize(info.mempoolSize);
+        }, 1000)
         return (async () => {
             clearInterval(updateInterval)
         })
@@ -136,7 +150,7 @@ const BlockDAGBox = () => {
                     </tr>
                     <tr>
                         <td colSpan="2" className="text-center">
-                            <h3>BLOCKDAG INFO</h3>
+                            <h3>NETWORK INFO</h3>
                         </td>
                     </tr>
                     <tr>
@@ -144,7 +158,15 @@ const BlockDAGBox = () => {
                             Network name
                         </td>
                         <td className="pt-1 text-nowrap">
-                            hoosat-mainnet
+                            hoosat mainnet
+                        </td>
+                    </tr>
+                    <tr>
+                        <td className="cardBoxElement text-nowrap">
+                            Virtual DAA Score
+                        </td>
+                        <td className="pt-1 align-top" id="virtualDaaScore">
+                            {Number(virtualDaaScore).toLocaleString()}
                         </td>
                     </tr>
                     <tr>
@@ -153,14 +175,6 @@ const BlockDAGBox = () => {
                         </td>
                         <td className="pt-1" id="blockCount">
                             {Number(blockCount).toLocaleString()}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td className="cardBoxElement">
-                            Header height
-                        </td>
-                        <td className="pt-1" id="headerCount">
-                            {Number(headerCount).toLocaleString()}
                         </td>
                     </tr>
                     <tr>
@@ -181,10 +195,10 @@ const BlockDAGBox = () => {
                     </tr>
                     <tr>
                         <td className="cardBoxElement">
-                            Virtual DAA
+                            Mempool size
                         </td>
-                        <td className="pt-1 align-top" id="virtualDaaScore">
-                            {Number(virtualDaaScore).toLocaleString()}
+                        <td className="pt-1" id="headerCount">
+                            {Number(mempoolSize).toLocaleString()}
                         </td>
                     </tr>
                     {/* <tr>

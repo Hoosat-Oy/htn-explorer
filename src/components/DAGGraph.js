@@ -108,17 +108,22 @@ const DAGGraph = (props) => {
     const svgHeight = svg.node().getBoundingClientRect().height;
     const graphWidth = graph.graph().width;
     const graphHeight = graph.graph().height;
-    var leftShift = svgWidth / 24
+
+    let leftShift = svgWidth / 24;
     if (graphWidth > svgWidth) {
-      // Calculate how much to shift right to show the left edge of the graph
       leftShift = (graphWidth - svgWidth) + leftShift;
     }
-    // Center the graph if no scaling is needed
-    const xCenterOffset = -leftShift;
-    const yCenterOffset = (svgHeight - graphHeight) / 2;
-
-    // Apply translation to center the graph
-    g.attr('transform', `translate(${xCenterOffset.toFixed(2)}, ${yCenterOffset.toFixed(2)})`);
+    if (svgHeight < graphHeight) {
+      const scaleY = svgHeight / graphHeight;
+      const xCenterOffset = -leftShift;
+      const yCenterOffset = (svgHeight - graphHeight) / 2;
+      g.attr('transform', `translate(${xCenterOffset.toFixed(2)}, ${yCenterOffset.toFixed(2)}) scale(${scaleY.toFixed(2)})`);
+    } else {
+      const xCenterOffset = -leftShift;
+      const yCenterOffset = (svgHeight - graphHeight) / 2;
+      g.attr('transform', `translate(${xCenterOffset.toFixed(2)}, ${yCenterOffset.toFixed(2)})`);
+    }
+    
 
     // Set viewBox for responsive scaling
     svg.attr('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
