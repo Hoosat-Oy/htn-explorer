@@ -6,7 +6,8 @@ import { getBlockdagInfo, getInfo } from '../htn-api-client';
 
 const BlockDAGBox = () => {
 
-
+    const [showHF, setShowHF] = useState(false);
+    cosnt [nextHFDAAScore, setNextHFDAAScore] = (21821800);
     const [blockCount, setBlockCount] = useState();
     const [difficulty, setDifficulty] = useState();
     const [headerCount, setHeaderCount] = useState("");
@@ -26,16 +27,18 @@ const BlockDAGBox = () => {
         setHashrate((dag_info.difficulty * 2 / 1000000000).toFixed(2))
         const info = await getInfo();
         setMempoolSize(info.mempoolSize);
-
-        const unixTimestamp = Math.floor(Date.now() / 1000);
-        const timeToFork = (21821800) - dag_info.virtualDaaScore;
-        const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
-        setNextHardForkTime(hardForkTime)
-        const hours = Math.floor(timeToFork / 3600);
-        const minutes = Math.floor((timeToFork % 3600) / 60);
-        const seconds = timeToFork % 60;
-        const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
-        setNextHardForkTimeTo(formattedTimeToFork);
+        if(showHF) {
+            const unixTimestamp = Math.floor(Date.now() / 1000);
+            const timeToFork = (nextHFDAAScore) - dag_info.virtualDaaScore;
+            const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
+            setNextHardForkTime(hardForkTime)
+            const hours = Math.floor(timeToFork / 3600);
+            const minutes = Math.floor((timeToFork % 3600) / 60);
+            const seconds = timeToFork % 60;
+            const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
+            setNextHardForkTimeTo(formattedTimeToFork);
+        }
+        
     }
 
     useEffect(() => {
@@ -47,17 +50,17 @@ const BlockDAGBox = () => {
             setVirtualDaaScore(dag_info.virtualDaaScore)
             setDifficulty(dag_info.difficulty)
             setHashrate((dag_info.difficulty * 2 / 1000000000).toFixed(2))
-            const unixTimestamp = Math.floor(Date.now() / 1000);
-            const timeToFork = (21821800) - dag_info.virtualDaaScore;
-            const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
-            setNextHardForkTime(hardForkTime)
-            const hours = Math.floor(timeToFork / 3600);
-            const minutes = Math.floor((timeToFork % 3600) / 60);
-            const seconds = timeToFork % 60;
-    
-            const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
-    
-            setNextHardForkTimeTo(formattedTimeToFork);
+            if(showHF) {
+                const unixTimestamp = Math.floor(Date.now() / 1000);
+                const timeToFork = (nextHFDAAScore) - dag_info.virtualDaaScore;
+                const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
+                setNextHardForkTime(hardForkTime)
+                const hours = Math.floor(timeToFork / 3600);
+                const minutes = Math.floor((timeToFork % 3600) / 60);
+                const seconds = timeToFork % 60;
+                const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
+                setNextHardForkTimeTo(formattedTimeToFork);
+            }
         }, 60000)
         return (async () => {
             clearInterval(updateInterval)
@@ -199,22 +202,26 @@ const BlockDAGBox = () => {
                             {Number(mempoolSize).toLocaleString()}
                         </td>
                     </tr>
-                    <tr>
-                        <td className="cardBoxElement nowrap">
-                            Hard Fork Date & Time:
-                        </td>
-                        <td className="pt-1 align-top" id="nextHardForkTime">
-                            {nextHardForkTime}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td className="cardBoxElement nowrap">
-                            Time to the Hard Fork:
-                        </td>
-                        <td className="pt-1 align-top" id="nextHardForkTime">
-                            {nextHardForkTimeTo}
-                        </td>
-                    </tr>
+                    { showHF && (
+                        <>
+                        <tr>
+                            <td className="cardBoxElement nowrap">
+                                Hard Fork Date & Time:
+                            </td>
+                            <td className="pt-1 align-top" id="nextHardForkTime">
+                                {nextHardForkTime}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td className="cardBoxElement nowrap">
+                                Time to the Hard Fork:
+                            </td>
+                            <td className="pt-1 align-top" id="nextHardForkTime">
+                                {nextHardForkTimeTo}
+                            </td>
+                        </tr>
+                        </>
+                    )}
                 </tbody>
             </table>
         </div>
