@@ -104,16 +104,18 @@ const BlockDAGBox = () => {
     }, [headerCount])
 
     useEffect((e) => {
-        document.getElementById('virtualDaaScore').animate([
-            // keyframes
-            { opacity: '1' },
-            { opacity: '0.6' },
-            { opacity: '1' },
-        ], {
-            // timing options
-            duration: 300
-        });
-    }, [virtualDaaScore])
+        if (showHF === true) {
+            document.getElementById('virtualDaaScore').animate([
+                // keyframes
+                { opacity: '1' },
+                { opacity: '0.6' },
+                { opacity: '1' },
+            ], {
+                // timing options
+                duration: 300
+            });
+        }
+    }, [virtualDaaScore, showHF])
 
     useEffect((e) => {
         document.getElementById('hashrate').animate([
@@ -128,16 +130,18 @@ const BlockDAGBox = () => {
     }, [hashrate])
 
     useEffect((e) => {
-        document.getElementById('nextHardForkTime').animate([
-            // keyframes
-            { opacity: '1' },
-            { opacity: '0.6' },
-            { opacity: '1' },
-        ], {
-            // timing options
-            duration: 300
-        });
-    }, [nextHardForkTime])
+        if (showHF === true) {
+            document.getElementById('nextHardForkTime').animate([
+                // keyframes
+                { opacity: '1' },
+                { opacity: '0.6' },
+                { opacity: '1' },
+            ], {
+                // timing options
+                duration: 300
+            });
+        }
+    }, [nextHardForkTime, showHF])
 
 
     return <>
