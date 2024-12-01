@@ -6,7 +6,7 @@ import { getBlockdagInfo, getInfo } from '../htn-api-client';
 
 const BlockDAGBox = () => {
 
-    cosnt [nextHFDAAScore, setNextHFDAAScore] = (21821800);
+    const [nextHFDAAScore, setNextHFDAAScore] = (21821800);
     const [showHF, setShowHF] = useState(false);
     const [blockCount, setBlockCount] = useState();
     const [difficulty, setDifficulty] = useState();
@@ -30,11 +30,11 @@ const BlockDAGBox = () => {
         const unixTimestamp = Math.floor(Date.now() / 1000);
         const timeToFork = (nextHFDAAScore) - dag_info.virtualDaaScore;
         const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
-        const hours = Math.floor(timeToFork / 3600);
-        const minutes = Math.floor((timeToFork % 3600) / 60);
-        const seconds = timeToFork % 60;
-        const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
-        if (hours > 0) {
+        if (hardForkTime > 0) {
+            const hours = Math.floor(timeToFork / 3600);
+            const minutes = Math.floor((timeToFork % 3600) / 60);
+            const seconds = timeToFork % 60;
+            const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
             setShowHF(true);
             setNextHardForkTime(hardForkTime)
             setNextHardForkTimeTo(formattedTimeToFork);
@@ -53,11 +53,11 @@ const BlockDAGBox = () => {
             const unixTimestamp = Math.floor(Date.now() / 1000);
             const timeToFork = (nextHFDAAScore) - dag_info.virtualDaaScore;
             const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
-            const hours = Math.floor(timeToFork / 3600);
-            const minutes = Math.floor((timeToFork % 3600) / 60);
-            const seconds = timeToFork % 60;
-            const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
-            if (hours > 0) {
+            if (hardForkTime > 0) {
+                const hours = Math.floor(timeToFork / 3600);
+                const minutes = Math.floor((timeToFork % 3600) / 60);
+                const seconds = timeToFork % 60;
+                const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
                 setShowHF(true);
                 setNextHardForkTime(hardForkTime)
                 setNextHardForkTimeTo(formattedTimeToFork);
