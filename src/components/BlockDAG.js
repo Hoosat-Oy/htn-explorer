@@ -6,8 +6,8 @@ import { getBlockdagInfo, getInfo } from '../htn-api-client';
 
 const BlockDAGBox = () => {
 
-    const [showHF, setShowHF] = useState(false);
     cosnt [nextHFDAAScore, setNextHFDAAScore] = (21821800);
+    const [showHF, setShowHF] = useState(false);
     const [blockCount, setBlockCount] = useState();
     const [difficulty, setDifficulty] = useState();
     const [headerCount, setHeaderCount] = useState("");
@@ -27,18 +27,18 @@ const BlockDAGBox = () => {
         setHashrate((dag_info.difficulty * 2 / 1000000000).toFixed(2))
         const info = await getInfo();
         setMempoolSize(info.mempoolSize);
-        if(showHF) {
-            const unixTimestamp = Math.floor(Date.now() / 1000);
-            const timeToFork = (nextHFDAAScore) - dag_info.virtualDaaScore;
-            const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
+        const unixTimestamp = Math.floor(Date.now() / 1000);
+        const timeToFork = (nextHFDAAScore) - dag_info.virtualDaaScore;
+        const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
+        const hours = Math.floor(timeToFork / 3600);
+        const minutes = Math.floor((timeToFork % 3600) / 60);
+        const seconds = timeToFork % 60;
+        const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
+        if (hours > 0) {
+            setShowHF(true);
             setNextHardForkTime(hardForkTime)
-            const hours = Math.floor(timeToFork / 3600);
-            const minutes = Math.floor((timeToFork % 3600) / 60);
-            const seconds = timeToFork % 60;
-            const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
             setNextHardForkTimeTo(formattedTimeToFork);
         }
-        
     }
 
     useEffect(() => {
@@ -50,15 +50,16 @@ const BlockDAGBox = () => {
             setVirtualDaaScore(dag_info.virtualDaaScore)
             setDifficulty(dag_info.difficulty)
             setHashrate((dag_info.difficulty * 2 / 1000000000).toFixed(2))
-            if(showHF) {
-                const unixTimestamp = Math.floor(Date.now() / 1000);
-                const timeToFork = (nextHFDAAScore) - dag_info.virtualDaaScore;
-                const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
+            const unixTimestamp = Math.floor(Date.now() / 1000);
+            const timeToFork = (nextHFDAAScore) - dag_info.virtualDaaScore;
+            const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
+            const hours = Math.floor(timeToFork / 3600);
+            const minutes = Math.floor((timeToFork % 3600) / 60);
+            const seconds = timeToFork % 60;
+            const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
+            if (hours > 0) {
+                setShowHF(true);
                 setNextHardForkTime(hardForkTime)
-                const hours = Math.floor(timeToFork / 3600);
-                const minutes = Math.floor((timeToFork % 3600) / 60);
-                const seconds = timeToFork % 60;
-                const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
                 setNextHardForkTimeTo(formattedTimeToFork);
             }
         }, 60000)
@@ -202,7 +203,7 @@ const BlockDAGBox = () => {
                             {Number(mempoolSize).toLocaleString()}
                         </td>
                     </tr>
-                    { showHF && (
+                    { (showHF === true) && (
                         <>
                         <tr>
                             <td className="cardBoxElement nowrap">
