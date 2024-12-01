@@ -30,7 +30,7 @@ const BlockDAGBox = () => {
         const unixTimestamp = Math.floor(Date.now() / 1000);
         const timeToFork = (nextHFDAAScore) - dag_info.virtualDaaScore;
         const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
-        if (hardForkTime > 0) {
+        if (timeToFork > unixTimestamp) {
             const hours = Math.floor(timeToFork / 3600);
             const minutes = Math.floor((timeToFork % 3600) / 60);
             const seconds = timeToFork % 60;
@@ -53,7 +53,7 @@ const BlockDAGBox = () => {
             const unixTimestamp = Math.floor(Date.now() / 1000);
             const timeToFork = (nextHFDAAScore) - dag_info.virtualDaaScore;
             const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
-            if (hardForkTime > 0) {
+            if (timeToFork > unixTimestamp) {
                 const hours = Math.floor(timeToFork / 3600);
                 const minutes = Math.floor((timeToFork % 3600) / 60);
                 const seconds = timeToFork % 60;
