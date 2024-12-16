@@ -29,7 +29,7 @@ const tags = new Map([
   ['hoosat:qpndzp0qdy882xt5n0ckq5ls0tqk7545mg7z984yhzgle7g599kkqawrxywsw', 'JoesJules'],
   ['hoosat:qq96y2ew87phurzktjmttsmeh6eaymgndaatnsw7ze6pxf7xga3tuhzt9t8jv', 'S.I.G '],
   ['hoosat:qr97kz9ujwylwxd8jkh9zs0nexlkkuu0v3aj0a6htvapan0a0arjugmlqf5ur', 'Mutiq'],
-  ['hoosat:qqdythqca8axcrvl7k0ep62yyzprcv8qw4xvlyvwnq7srx3angqrk92n74kut', 'Owl Dick'],
+  ['hoosat:qqdythqca8axcrvl7k0ep62yyzprcv8qw4xvlyvwnq7srx3angqrk92n74kut', 'OWL DICK'],
   ['hoosat:qrhed37kge64z6agkq82l7xce423ugdf308ehtsh72y2nee7x2kvzxv6xqwd4', 'M4P PPLNSBF5'],
   ['hoosat:qpuvlmta9s07znc3hf0j4jvuwkgxzus5aen7echhr4mg5y4naxcxyuhetmvq9', 'M4P PPLNSBF70'],
 ]);
