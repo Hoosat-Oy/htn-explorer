@@ -155,6 +155,10 @@ const AddressesPage = () => {
       }
     };
     fetchAddressBalancesForPage();
+    const interval = setInterval(() => {
+      fetchAddressBalancesForPage();
+    }, 60000);
+    return () => clearInterval(interval);
   }, [yAddresses, currentPage, rowsPerPage])
 
   useEffect(() => {

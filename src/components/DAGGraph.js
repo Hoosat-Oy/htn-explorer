@@ -113,15 +113,17 @@ const DAGGraph = (props) => {
     if (graphWidth > svgWidth) {
       leftShift = (graphWidth - svgWidth) + leftShift;
     }
-    if (svgHeight < graphHeight) {
+    if (graphHeight > 0 && svgHeight < graphHeight) {
       const scaleY = svgHeight / graphHeight;
       const xCenterOffset = -leftShift;
       const yCenterOffset = (svgHeight - graphHeight) / 2;
-      g.attr('transform', `translate(${xCenterOffset.toFixed(2)}, ${yCenterOffset.toFixed(2)}) scale(${scaleY.toFixed(2)})`);
+      const safeScaleY = isFinite(scaleY) && scaleY > 0 ? scaleY : 1;
+      g.attr('transform', `translate(${xCenterOffset.toFixed(2)}, ${yCenterOffset.toFixed(2)}) scale(${safeScaleY.toFixed(2)})`);
     } else {
       const xCenterOffset = -leftShift;
       const yCenterOffset = (svgHeight - graphHeight) / 2;
-      g.attr('transform', `translate(${xCenterOffset.toFixed(2)}, ${yCenterOffset.toFixed(2)})`);
+      const safeYCenterOffset = isFinite(yCenterOffset) ? yCenterOffset : 0;
+      g.attr('transform', `translate(${xCenterOffset.toFixed(2)}, ${safeYCenterOffset.toFixed(2)})`);
     }
     
 
