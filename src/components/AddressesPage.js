@@ -6,64 +6,29 @@ import { PieChart, pieChartDefaultProps } from "react-minimal-pie-chart";
 import { useWindowSize } from "react-use";
 import { getCoinSupply } from "../htn-api-client";
 
-const testData = `
-Address,Balance
-hoosat:qq2eecuzygu7hptkn9rch8z8c3adr5mtyv5w69x6m5mwrvtz80wz6jqwnahml,956732578311665
-hoosat:qz0vs7dkpatuyl5n77gpguc0dd0anmskdfp5yerss04xcljhdlkzk8yrm2kzd,956392452957145
-hoosat:qz6qz78vt5h3l26rwfqhk0qj26t2xh65lrhfgpwxqqcaykp5t0l2kssn3cyaa,952404352145380
-hoosat:qpldvahz3sgxsspl2wezppm99vz4r5kpqlz7ddjh2sytgx5jgmsccp9329xcy,824257538375117
-hoosat:qz0vs7dkpatuyl5n77gpguc0dd0anmskdfp5yerss04xcljhdlkzk8yrm2kzd,956392452957145
-hoosat:qz6qz78vt5h3l26rwfqhk0qj26t2xh65lrhfgpwxqqcaykp5t0l2kssn3cyaa,952404352145380
-hoosat:qpldvahz3sgxsspl2wezppm99vz4r5kpqlz7ddjh2sytgx5jgmsccp9329xcy,824257538375117
-hoosat:qz0vs7dkpatuyl5n77gpguc0dd0anmskdfp5yerss04xcljhdlkzk8yrm2kzd,956392452957145
-hoosat:qz6qz78vt5h3l26rwfqhk0qj26t2xh65lrhfgpwxqqcaykp5t0l2kssn3cyaa,952404352145380
-hoosat:qpldvahz3sgxsspl2wezppm99vz4r5kpqlz7ddjh2sytgx5jgmsccp9329xcy,824257538375117
-hoosat:qz0vs7dkpatuyl5n77gpguc0dd0anmskdfp5yerss04xcljhdlkzk8yrm2kzd,956392452957145
-hoosat:qz6qz78vt5h3l26rwfqhk0qj26t2xh65lrhfgpwxqqcaykp5t0l2kssn3cyaa,952404352145380
-hoosat:qpldvahz3sgxsspl2wezppm99vz4r5kpqlz7ddjh2sytgx5jgmsccp9329xcy,824257538375117
-hoosat:qz0vs7dkpatuyl5n77gpguc0dd0anmskdfp5yerss04xcljhdlkzk8yrm2kzd,956392452957145
-hoosat:qz6qz78vt5h3l26rwfqhk0qj26t2xh65lrhfgpwxqqcaykp5t0l2kssn3cyaa,952404352145380
-hoosat:qpldvahz3sgxsspl2wezppm99vz4r5kpqlz7ddjh2sytgx5jgmsccp9329xcy,824257538375117
-hoosat:qz0vs7dkpatuyl5n77gpguc0dd0anmskdfp5yerss04xcljhdlkzk8yrm2kzd,956392452957145
-hoosat:qz6qz78vt5h3l26rwfqhk0qj26t2xh65lrhfgpwxqqcaykp5t0l2kssn3cyaa,952404352145380
-hoosat:qpldvahz3sgxsspl2wezppm99vz4r5kpqlz7ddjh2sytgx5jgmsccp9329xcy,824257538375117
-hoosat:qz6qz78vt5h3l26rwfqhk0qj26t2xh65lrhfgpwxqqcaykp5t0l2kssn3cyaa,952404352145380
-hoosat:qpldvahz3sgxsspl2wezppm99vz4r5kpqlz7ddjh2sytgx5jgmsccp9329xcy,824257538375117
-hoosat:qz0vs7dkpatuyl5n77gpguc0dd0anmskdfp5yerss04xcljhdlkzk8yrm2kzd,956392452957145
-hoosat:qz6qz78vt5h3l26rwfqhk0qj26t2xh65lrhfgpwxqqcaykp5t0l2kssn3cyaa,952404352145380
-hoosat:qpldvahz3sgxsspl2wezppm99vz4r5kpqlz7ddjh2sytgx5jgmsccp9329xcy,824257538375117
-hoosat:qz0vs7dkpatuyl5n77gpguc0dd0anmskdfp5yerss04xcljhdlkzk8yrm2kzd,956392452957145
-hoosat:qz6qz78vt5h3l26rwfqhk0qj26t2xh65lrhfgpwxqqcaykp5t0l2kssn3cyaa,952404352145380
-hoosat:qpldvahz3sgxsspl2wezppm99vz4r5kpqlz7ddjh2sytgx5jgmsccp9329xcy,824257538375117
-hoosat:qz6qz78vt5h3l26rwfqhk0qj26t2xh65lrhfgpwxqqcaykp5t0l2kssn3cyaa,952404352145380
-hoosat:qpldvahz3sgxsspl2wezppm99vz4r5kpqlz7ddjh2sytgx5jgmsccp9329xcy,824257538375117
-hoosat:qz0vs7dkpatuyl5n77gpguc0dd0anmskdfp5yerss04xcljhdlkzk8yrm2kzd,956392452957145
-hoosat:qz6qz78vt5h3l26rwfqhk0qj26t2xh65lrhfgpwxqqcaykp5t0l2kssn3cyaa,952404352145380
-hoosat:qpldvahz3sgxsspl2wezppm99vz4r5kpqlz7ddjh2sytgx5jgmsccp9329xcy,824257538375117
-hoosat:qz0vs7dkpatuyl5n77gpguc0dd0anmskdfp5yerss04xcljhdlkzk8yrm2kzd,956392452957145
-hoosat:qz6qz78vt5h3l26rwfqhk0qj26t2xh65lrhfgpwxqqcaykp5t0l2kssn3cyaa,952404352145380
-hoosat:qpldvahz3sgxsspl2wezppm99vz4r5kpqlz7ddjh2sytgx5jgmsccp9329xcy,824257538375117
-hoosat:qz6qz78vt5h3l26rwfqhk0qj26t2xh65lrhfgpwxqqcaykp5t0l2kssn3cyaa,952404352145380
-hoosat:qpldvahz3sgxsspl2wezppm99vz4r5kpqlz7ddjh2sytgx5jgmsccp9329xcy,824257538375117
-hoosat:qz0vs7dkpatuyl5n77gpguc0dd0anmskdfp5yerss04xcljhdlkzk8yrm2kzd,956392452957145
-hoosat:qz6qz78vt5h3l26rwfqhk0qj26t2xh65lrhfgpwxqqcaykp5t0l2kssn3cyaa,952404352145380
-hoosat:qpldvahz3sgxsspl2wezppm99vz4r5kpqlz7ddjh2sytgx5jgmsccp9329xcy,824257538375117
-hoosat:qz0vs7dkpatuyl5n77gpguc0dd0anmskdfp5yerss04xcljhdlkzk8yrm2kzd,956392452957145
-hoosat:qz6qz78vt5h3l26rwfqhk0qj26t2xh65lrhfgpwxqqcaykp5t0l2kssn3cyaa,952404352145380
-hoosat:qpldvahz3sgxsspl2wezppm99vz4r5kpqlz7ddjh2sytgx5jgmsccp9329xcy,824257538375117
-        `;
-
 const shiftSize = 7;
 
+const tags = new Map([
+  ['hoosat:qzm5vg7uv66ze6mv8d32xhv50sxwhthkz9ly7049e87hr2rm7wr6zjxytztv7', 'Burn Address'],
+  ['hoosat:qp4ad2eh72xc8dtjjyz4llxzq9utn6k26uyl644xxw70wskdfl85zsqj9k4vz', 'Developer fee'],
+  ['hoosat:qpfmzu6566ejkcfgktrcm2v3e3w9m7u4gandyy2aulhzugcps3ln7dcq87qz2', 'Xeggex'],
+  ['hoosat:qqdythqca8axcrvl7k0ep62yyzprcv8qw4xvlyvwnq7srx3angqrk92n74kut', 'Owl Dick'],
+  ['hoosat:qrhed37kge64z6agkq82l7xce423ugdf308ehtsh72y2nee7x2kvzxv6xqwd4', 'M4P PPLNSBF5'],
+  ['hoosat:qpuvlmta9s07znc3hf0j4jvuwkgxzus5aen7echhr4mg5y4naxcxyuhetmvq9', 'M4P PPLNSBF70'],
+]);
+
 const AddressesPage = () => {
-  const [circCoins, setCircCoins] = useState("-");
+  const [circCoins, setCircCoins] = useState(0);
   const [addresses, setAddresses] = useState([]);
-  const [, setYesterdays] = useState([]);
+  const [yAddresses, setYAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(25); // You can change this number to set rows per page
   const [chartData, setChartData] = useState([]);
   const [holdingData, setHoldingData] = useState([]);
+  const [totalPages, setTotalPages] = useState([]);
+  const [startPage, setStartPage] = useState([]);
+  const [endPage, setEndPage] = useState([]);
   const { width } = useWindowSize();
 
   const navigate = useNavigate();
@@ -149,10 +114,10 @@ const AddressesPage = () => {
   );
 
   useEffect(() => {
-    if (circCoins !== "-" && addresses.length > 0) {
-      calculateCharts(addresses);
+    if (yAddresses.length > 0) {
+      calculateCharts(yAddresses);
     }
-  }, [circCoins, addresses, calculateCharts]);
+  }, [yAddresses, calculateCharts]);
 
   useEffect(() => {
     const fetchCircCoins = async () => {
@@ -163,16 +128,38 @@ const AddressesPage = () => {
     fetchCircCoins();
   }, []);
 
+  
+
   useEffect(() => {
-    const fetchCSV = async () => {
+    const fetchAddressBalancesForPage = async () => {
       try {
-        const response = await fetch(process.env.REACT_APP_ADDRESSES);
+        const response = await fetch(`https://api.network.hoosat.fi/addresses/balances/csv/paged?page=${currentPage}&items_per_page=${rowsPerPage}`);
         const data = await response.text();
         const rows = data.trim().split("\n").slice(1);
         const parsedAddresses = rows.map((row, index) => {
           const [address, balance] = row.split(",");
           return { index, address, balance: parseFloat(balance) / 100000000 };
         });
+        const yesterdayBalancesMap = new Map(yAddresses.map((item) => [item.address, item.balance]));
+        const balanceChanges = parsedAddresses.map((address, index) => {
+          const yesterdayBalance = yesterdayBalancesMap.get(address.address);
+          const tag = tags.get(address.address); 
+          let change = yesterdayBalance !== undefined ? address.balance - yesterdayBalance : 0;
+          return { index, address: address.address, balance: address.balance, change: change, tag: tag };
+        });
+        setAddresses(balanceChanges);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching the CSV file:", error);
+        setLoading(false);
+      }
+    };
+    fetchAddressBalancesForPage();
+  }, [yAddresses, currentPage, rowsPerPage])
+
+  useEffect(() => {
+    const fetchYesterdaysCSV = async () => {
+      try {
         const responseYesterdays = await fetch("https://shitlist.hoosat.fi/balances-yesterday.csv");
         const dataYesterdays = await responseYesterdays.text();
         const rowsYesterdays = dataYesterdays.trim().split("\n").slice(1);
@@ -180,51 +167,29 @@ const AddressesPage = () => {
           const [address, balance] = row.split(",");
           return { index, address, balance: parseFloat(balance) / 100000000 };
         });
-
-        const yesterdayBalancesMap = new Map(parsedYesterdays.map((item) => [item.address, item.balance]));
-        setYesterdays(yesterdayBalancesMap);
-        const balanceChanges = parsedAddresses.map((address, index) => {
-          const yesterdayBalance = yesterdayBalancesMap.get(address.address);
-          let change = yesterdayBalance !== undefined ? address.balance - yesterdayBalance : 0;
-          return { index, address: address.address, balance: address.balance, change };
-        });
-        setAddresses(balanceChanges);
-        setLoading(false);
+        console.log("Fetched yesterdays addresses.");
+        setYAddresses(parsedYesterdays);
+        setTotalPages(Math.ceil(parsedYesterdays.length));
       } catch (error) {
         console.error("Error fetching the CSV file:", error);
-        const rows = testData.trim().split("\n").slice(1);
-        const parsedAddresses = rows.map((row, index) => {
-          const [address, balance] = row.split(",");
-          return { index, address, balance: balance / 100000000 };
-        });
-        const yesterdayBalancesMap = new Map(parsedAddresses.map((item) => [item.address, item.balance]));
-        setYesterdays(yesterdayBalancesMap);
-        setAddresses(parsedAddresses);
         setLoading(false);
       }
     };
-
-    fetchCSV();
+    fetchYesterdaysCSV();
   }, []);
-
-  // Calculate total pages
-  const totalPages = Math.ceil(addresses.length / rowsPerPage);
-
-  // Get current page data
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = addresses.slice(indexOfFirstRow, indexOfLastRow);
 
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
-  // Determine the range of pages to display
-  let startPage = Math.max(1, currentPage - 4); // Ensure startPage is at least 1
-  let endPage = Math.min(startPage + 9, totalPages); // Ensure endPage is within totalPages
-
-  // Adjust startPage if endPage is less than 10 pages away from totalPages
-  if (endPage === totalPages) {
-    startPage = Math.max(1, endPage - 9); // Ensure startPage is at least 1
-  }
+  useEffect(() => {
+    let startPage = Math.max(1, currentPage - 4); 
+    let endPage = Math.min(startPage + 9, totalPages); 
+    if (endPage === totalPages) {
+      startPage = Math.max(1, endPage - 9);
+    }
+    console.log(`Total pages ${totalPages} and start page ${startPage} and end page ${endPage}`)
+    setStartPage(startPage);
+    setEndPage(endPage);
+  },[totalPages])
 
   return (
     <div className="blocks-page">
@@ -253,7 +218,7 @@ const AddressesPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {currentRows.map((address, index) => (
+                    {addresses.map((address, index) => (
                       <tr key={index} id={address.address}>
                         <td>{address.index}</td>
                         <td>{Number(address.balance).toLocaleString()}</td>
@@ -261,6 +226,7 @@ const AddressesPage = () => {
                         <td className="hashh w-100" onClick={onClickAddr}>
                           {address.address}
                         </td>
+                        <td className="nowrap">{address.tag}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -322,6 +288,9 @@ const AddressesPage = () => {
                   <p style={{ fontSize: "8pt" }}>
                     The HTN pie chart above illustrates the distribution of addresses based on their balance thresholds. For instance, addresses holding 15,000,000 HTN are categorized only under 'More than 10,000,000 HTN'. Conversely, the category
                     'Less than 1,000 HTN' excludes addresses with zero balance.
+                  </p>
+                  <p style={{ fontSize: "8pt" }}>
+                    If you want to tag your address please feel free to open a ticket in discord or do a pull request in Github. 
                   </p>
                 </div>
                 <div className="d-flex justify-content-center mt-4">
