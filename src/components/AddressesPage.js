@@ -8,31 +8,18 @@ import { getCoinSupply } from "../htn-api-client";
 
 const shiftSize = 7;
 
-const tags = new Map([
-  ['hoosat:qzm5vg7uv66ze6mv8d32xhv50sxwhthkz9ly7049e87hr2rm7wr6zjxytztv7', 'Burn Address'],
-  ['hoosat:qp4ad2eh72xc8dtjjyz4llxzq9utn6k26uyl644xxw70wskdfl85zsqj9k4vz', 'Developer fee'],
-  ['hoosat:qpfmzu6566ejkcfgktrcm2v3e3w9m7u4gandyy2aulhzugcps3ln7dcq87qz2', 'Xeggex'],
-  ['hoosat:qrnee763akkhthsncnu58d2rxtuv69cc7qz2ep7jfmjekx76xch4wuljukd0d', 'Xeggex'],
-  ['hoosat:qrdxuq7fu9gvegr06kyhlcnq8up7edxvphd0rttv3xm6d8rzylrpcsnhvswhk', 'Xeggex'],
-  ['hoosat:qpe6t74h77zhdkkk25v7feak5psjc2lcn7lpgax0yez0v9tvszrxcf9ztp73r', 'Xeggex'],
-  ['hoosat:qr7hwcafg74s3ea444gn98s2mcnql0gux0cpzxx7wkgnzphx59yesty5cm4zg', 'Xeggex'],
-  ['hoosat:qqtd00a8sa6nk0zcfszf7ux9fq50ewctt94jr5mtvpu3d53vafm77q2fypnq4', 'Xeggex'],
-  ['hoosat:qzfrxw78cgrlert5j53em8x26u6lrtglt358ejrlmsh0r9f4xu3csgv5muqlq', 'Xeggex'],
-  ['hoosat:qpa9facnkv5qdhtlclspwexsgrc2e3ap77wl46rf5rhlrymfsdcgg27xwpvck', 'Xeggex'],
-  ['hoosat:qqlzgpq9yltj04egveu6h2u7523de5r8z7jgl24636mweyzym0qwxmqt4zhlr', 'Xeggex'],
-  ['hoosat:qpz9j9gactugfznma0as6lg7a3tw6685e6jl45x29n9rr5yykynacwcnr9tmj', 'Xeggex'],
-  ['hoosat:qpm3rz3djh3zqmr263rz80jvkrct79t2r0na5gemh8yga0l8kmmtug68fjay6', 'Xeggex'],
-  ['hoosat:qp22dkntsqmj7uucfw5xvxfj6d9jjjrugdhq93p69vy3kpvp9qpzq6xx00e53', 'Xeggex'],
-  ['hoosat:qqx0d54kyzqml9jhdmhldgrakxrfjf08h8w0mgtf2q0ufnf2enupugmn6dmv0', 'Xeggex'],
-  ['hoosat:qphl6ujcj9n4td9g0na9puuuhrlnc59edlgg56dag4edlparzqjy5fh52fxjx', 'Xeggex'],
-  ['hoosat:qzs4g22nvzl66lnt74wcy9lvu4kk4ka0w9hdhxyt5aem24r7q5v45wlqzxkwv', 'Kenz'],
-  ['hoosat:qpndzp0qdy882xt5n0ckq5ls0tqk7545mg7z984yhzgle7g599kkqawrxywsw', 'JoesJules'],
-  ['hoosat:qq96y2ew87phurzktjmttsmeh6eaymgndaatnsw7ze6pxf7xga3tuhzt9t8jv', 'S.I.G '],
-  ['hoosat:qr97kz9ujwylwxd8jkh9zs0nexlkkuu0v3aj0a6htvapan0a0arjugmlqf5ur', 'Mutiq'],
-  ['hoosat:qqdythqca8axcrvl7k0ep62yyzprcv8qw4xvlyvwnq7srx3angqrk92n74kut', 'OWL DICK'],
-  ['hoosat:qrhed37kge64z6agkq82l7xce423ugdf308ehtsh72y2nee7x2kvzxv6xqwd4', 'M4P PPLNSBF5'],
-  ['hoosat:qpuvlmta9s07znc3hf0j4jvuwkgxzus5aen7echhr4mg5y4naxcxyuhetmvq9', 'M4P PPLNSBF70'],
-]);
+  const tags = new Map([
+    ['hoosat:qzm5vg7uv66ze6mv8d32xhv50sxwhthkz9ly7049e87hr2rm7wr6zjxytztv7', 'Burn Address'],
+    ['hoosat:qp4ad2eh72xc8dtjjyz4llxzq9utn6k26uyl644xxw70wskdfl85zsqj9k4vz', 'Developer fee'],
+    ['hoosat:qpfmzu6566ejkcfgktrcm2v3e3w9m7u4gandyy2aulhzugcps3ln7dcq87qz2', 'Xeggex'],
+    ['hoosat:qzs4g22nvzl66lnt74wcy9lvu4kk4ka0w9hdhxyt5aem24r7q5v45wlqzxkwv', 'Kenz'],
+    ['hoosat:qpndzp0qdy882xt5n0ckq5ls0tqk7545mg7z984yhzgle7g599kkqawrxywsw', 'JoesJules'],
+    ['hoosat:qq96y2ew87phurzktjmttsmeh6eaymgndaatnsw7ze6pxf7xga3tuhzt9t8jv', 'S.I.G '],
+    ['hoosat:qr97kz9ujwylwxd8jkh9zs0nexlkkuu0v3aj0a6htvapan0a0arjugmlqf5ur', 'Mutiq'],
+    ['hoosat:qqdythqca8axcrvl7k0ep62yyzprcv8qw4xvlyvwnq7srx3angqrk92n74kut', 'OWL DICK'],
+    ['hoosat:qrhed37kge64z6agkq82l7xce423ugdf308ehtsh72y2nee7x2kvzxv6xqwd4', 'M4P PPLNSBF5'],
+    ['hoosat:qpuvlmta9s07znc3hf0j4jvuwkgxzus5aen7echhr4mg5y4naxcxyuhetmvq9', 'M4P   '],
+  ]);
 
 const AddressesPage = () => {
   const [circCoins, setCircCoins] = useState(0);
@@ -145,8 +132,6 @@ const AddressesPage = () => {
     fetchCircCoins();
   }, []);
 
-  
-
   useEffect(() => {
     const fetchAddressBalancesForPage = async () => {
       try {
@@ -155,14 +140,14 @@ const AddressesPage = () => {
         const rows = data.trim().split("\n").slice(1);
         const parsedAddresses = rows.map((row, index) => {
           const [address, balance] = row.split(",");
-          return { index, address, balance: parseFloat(balance) / 100000000 };
+          return { index: index * currentPage, address, balance: parseFloat(balance) / 100000000 };
         });
         const yesterdayBalancesMap = new Map(yAddresses.map((item) => [item.address, item.balance]));
         const balanceChanges = parsedAddresses.map((address, index) => {
           const yesterdayBalance = yesterdayBalancesMap.get(address.address);
-          const tag = tags.get(address.address); 
+          const tag = tags.get(address.address);
           let change = yesterdayBalance !== undefined ? address.balance - yesterdayBalance : 0;
-          return { index, address: address.address, balance: address.balance, change: change, tag: tag };
+          return { index: (currentPage - 1) * rowsPerPage + index, address: address.address, balance: address.balance, change: change, tag: tag };
         });
         setAddresses(balanceChanges);
         setLoading(false);
@@ -179,6 +164,22 @@ const AddressesPage = () => {
   }, [yAddresses, currentPage, rowsPerPage])
 
   useEffect(() => {
+    const addTagAddressesFromFile = async (tag) => {
+      try {
+        const response = await fetch(`https://shitlist.hoosat.fi/tags/${tag}.csv`);
+        const addressesResponse = await response.text(); 
+        const addressesRows = addressesResponse.trim().split("\n")
+        const parsedAddresses = addressesRows.map((row, _) => {
+          return row
+        })
+        parsedAddresses.forEach(address => {
+          tags.set(address, tag.charAt(0).toUpperCase() + tag.slice(1));
+        });
+        console.log(tags);
+      } catch (error) {
+        console.error('Error fetching the CSV file:', error.message);
+      }
+    }
     const fetchYesterdaysCSV = async () => {
       try {
         const responseYesterdays = await fetch("https://shitlist.hoosat.fi/balances-yesterday.csv");
@@ -196,6 +197,7 @@ const AddressesPage = () => {
         setLoading(false);
       }
     };
+    addTagAddressesFromFile("xeggex");
     fetchYesterdaysCSV();
   }, []);
 
