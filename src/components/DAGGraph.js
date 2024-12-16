@@ -16,8 +16,8 @@ const DAGGraph = (props) => {
     const graph = new dagreD3.graphlib.Graph().setGraph({
       rankdir: 'LR',  // Direction for rank nodes. Can be TB, BT, LR, or RL, where T = top, B = bottom, L = left, and R = right.
       ranksep: 75,    // Number of pixels between each rank in the layout.
-      nodesep: 5,     // Number of pixels that separate nodes horizontally in the layout.
-      edgesep: 15,    // Number of pixels that separate edges horizontally in the layout.
+      nodesep: 0,     // Number of pixels that separate nodes horizontally in the layout.
+      edgesep: 0,    // Number of pixels that separate edges horizontally in the layout.
     });
 
     graph.setDefaultNodeLabel(() => ({}));
@@ -109,13 +109,22 @@ const DAGGraph = (props) => {
     const graphWidth = graph.graph().width;
     const graphHeight = graph.graph().height;
 
-    let leftShift = svgWidth / 24;
-    if (graphWidth > svgWidth) {
-      leftShift = (graphWidth - svgWidth) + leftShift;
+    let scaleFactor = 1;
+    if (graphHeight > svgHeight) {
+      scaleFactor = svgHeight / graphHeight; 
+      scaleFactor *= 0.95
     }
+    const scaledGraphWidth = graphWidth * scaleFactor;
+    const scaledGraphHeight = graphHeight * scaleFactor;
+
+    let leftShift = svgWidth / 24;
+    if (scaledGraphWidth > svgWidth) {
+      leftShift = (scaledGraphWidth - svgWidth) + leftShift;
+    }
+    leftShift = Math.max(0, leftShift);
     const xCenterOffset = -leftShift;
-    const yCenterOffset = (svgHeight - graphHeight) / 2;
-    g.attr('transform', `translate(${xCenterOffset.toFixed(2)}, ${yCenterOffset.toFixed(2)})`);
+    const yCenterOffset = (svgHeight - scaledGraphHeight) / 2;
+    g.attr('transform', `translate(${xCenterOffset.toFixed(2)}, ${yCenterOffset.toFixed(2)}) scale(${scaleFactor.toFixed(2)})`);
     svg.attr('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
 
   }, [props.data]);

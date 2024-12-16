@@ -31,6 +31,7 @@ function Dashboard() {
 
   const getDAGData = async (loadVerboseForThisBlock) => {
     try {
+      const maxBlocks = 30;
       if (loadVerboseForThisBlock.block_hash !== undefined && (ghostDAG.length == 0 || ghostDAG[ghostDAG.length - 1].id !== loadVerboseForThisBlock.block_hash)) {
         let tries = 3;
         do {
@@ -47,14 +48,14 @@ function Dashboard() {
             if (blocks.length === 0) {
               newBlock.blueparents = [mockData[mockData.length-1].id]
               let newGhostDAG = [...mockData, newBlock];
-              setGhostDAG(newGhostDAG.slice(-60));
+              setGhostDAG(newGhostDAG.slice(-maxBlocks));
               return
-            } else if (blocks.length > 0 && blocks.length < 60) {
+            } else if (blocks.length > 0 && blocks.length < maxBlocks) {
               blocks[0].blueparents = [mockData[mockData.length - 1].id]
               let newGhostDAG = [...mockData, ...blocks, newBlock];
-              setGhostDAG(newGhostDAG.slice(-60));
+              setGhostDAG(newGhostDAG.slice(-maxBlocks));
               return
-            } else if(blocks.length >= 60) {
+            } else if(blocks.length >= maxBlocks) {
               // Check that newblock has last block as parent. 
               const lastBlock = blocks[blocks.length - 1];
               let lastBlockIsParentOfNewBlock = false;
@@ -72,13 +73,13 @@ function Dashboard() {
               }
               if (lastBlockIsParentOfNewBlock) {
                 let newGhostDAG = [...blocks, newBlock];
-                setGhostDAG(newGhostDAG.slice(-60));
+                setGhostDAG(newGhostDAG.slice(-maxBlocks));
                 return
               } else {
                 // Do a dirty fix and tie them together, it's just animation. We have just missed block fetch, even if we tried 3 times. 
                 newBlock.blueparents = [...newBlock.blueparents, lastBlock.id]
                 let newGhostDAG = [...blocks, newBlock];
-                setGhostDAG(newGhostDAG.slice(-60));
+                setGhostDAG(newGhostDAG.slice(-maxBlocks));
                 return
               }
             }
