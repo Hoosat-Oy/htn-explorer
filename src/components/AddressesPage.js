@@ -13,7 +13,7 @@ const shiftSize = 7;
     ['hoosat:qp4ad2eh72xc8dtjjyz4llxzq9utn6k26uyl644xxw70wskdfl85zsqj9k4vz', 'Developer fee'],
     ['hoosat:qpfmzu6566ejkcfgktrcm2v3e3w9m7u4gandyy2aulhzugcps3ln7dcq87qz2', 'Xeggex'],
     ['hoosat:qzs4g22nvzl66lnt74wcy9lvu4kk4ka0w9hdhxyt5aem24r7q5v45wlqzxkwv', 'Kenz'],
-    ['hoosat:qpndzp0qdy882xt5n0ckq5ls0tqk7545mg7z984yhzgle7g599kkqawrxywsw', 'JoesJules'],
+    ['hoosat:qqfyxz4lrve2y2wzr6zr4qusrtryln24fzd0hpqkwqrlx9qj2sedq92k4my7k', 'Búho'],
     ['hoosat:qq96y2ew87phurzktjmttsmeh6eaymgndaatnsw7ze6pxf7xga3tuhzt9t8jv', 'S.I.G '],
     ['hoosat:qr97kz9ujwylwxd8jkh9zs0nexlkkuu0v3aj0a6htvapan0a0arjugmlqf5ur', 'Mutiq'],
     ['hoosat:qqdythqca8axcrvl7k0ep62yyzprcv8qw4xvlyvwnq7srx3angqrk92n74kut', 'OWL DICK'],

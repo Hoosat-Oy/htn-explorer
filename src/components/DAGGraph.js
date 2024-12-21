@@ -15,9 +15,13 @@ const DAGGraph = (props) => {
 
     const graph = new dagreD3.graphlib.Graph().setGraph({
       rankdir: 'LR',  // Direction for rank nodes. Can be TB, BT, LR, or RL, where T = top, B = bottom, L = left, and R = right.
-      ranksep: 75,    // Number of pixels between each rank in the layout.
+      ranksep: 30,    // Number of pixels between each rank in the layout.
       nodesep: 0,     // Number of pixels that separate nodes horizontally in the layout.
-      edgesep: 0,    // Number of pixels that separate edges horizontally in the layout.
+      edgesep: 15,    // Number of pixels that separate edges horizontally in the layout.
+      align: 'DR',    // Alignment of nodes in the same rank. Options: UL (Up-Left), UR (Up-Right), DL (Down-Left), DR (Down-Right).
+      ranker: 'tight-tree',
+      marginx: 15,
+      acyclicer: 'greedy',
     });
 
     graph.setDefaultNodeLabel(() => ({}));
