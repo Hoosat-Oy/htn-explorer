@@ -27,7 +27,7 @@ const tags = new Map([
   ],
   [
     "hoosat:qqfyxz4lrve2y2wzr6zr4qusrtryln24fzd0hpqkwqrlx9qj2sedq92k4my7k",
-    "Búho",
+    "Gran Búho Verde",
   ],
   [
     "hoosat:qq96y2ew87phurzktjmttsmeh6eaymgndaatnsw7ze6pxf7xga3tuhzt9t8jv",
