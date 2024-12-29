@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import * as d3 from "d3";
 import * as dagreD3 from "dagre-d3";
 
-const DAGGraph = (props) => {
+const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
   const svgRef = useRef(null);
   const navigate = useNavigate();
 
@@ -16,9 +16,8 @@ const DAGGraph = (props) => {
     const graph = new dagreD3.graphlib.Graph().setGraph({
       rankdir: "LR",
       ranksep: 30,
-      nodesep: 0,
+      nodesep: 10,
       edgesep: 15,
-      align: "DR",
       ranker: "tight-tree",
       marginx: 15,
       acyclicer: "greedy",
@@ -27,39 +26,38 @@ const DAGGraph = (props) => {
     graph.setDefaultNodeLabel(() => ({}));
 
     // Add nodes
-    props.data.forEach((block) => {
-      if (!block.id) {
-        console.error("Block ID is undefined");
+    DAG.forEach((block) => {
+      if (!block.hash) {
         return;
       }
 
-      const labelText = block.id;
+      const labelText = block.hash;
       const maxLabelLength = 8;
       const shortLabel =
         labelText.length > maxLabelLength
           ? labelText.slice(0, maxLabelLength - 3) + "..."
           : labelText;
 
-      graph.setNode(block.id, {
-        hash: block.id,
-        width: 60,
-        height: 60,
+      graph.setNode(block.hash, {
+        hash: block.hash,
+        width: 30,
+        height: 30,
         shape: "rect",
         style: block.isChain
           ? "fill: #116466; stroke: #116466; cursor: pointer;"
           : "fill: #661311; stroke: #661311; cursor: pointer;",
         label: shortLabel,
-        labelStyle: "font-size: 20px; fill: #fff;",
+        labelStyle: "font-size: 12px; fill: #fff;",
       });
     });
 
     // Add edges
-    props.data.forEach((block) => {
+    DAG.forEach((block) => {
       if (block.redparents) {
         block.redparents.forEach((parent) => {
-          if (graph.hasNode(parent) && graph.hasNode(block.id)) {
-            if (!graph.hasEdge(parent, block.id)) {
-              graph.setEdge(parent, block.id, {
+          if (graph.hasNode(parent) && graph.hasNode(block.hash)) {
+            if (!graph.hasEdge(parent, block.hash)) {
+              graph.setEdge(parent, block.hash, {
                 style: "stroke: #5E1210; fill: none; stroke-width: 2px;",
                 arrowheadStyle: "fill: #5E1210; stroke-width: 2px;",
               });
@@ -69,12 +67,19 @@ const DAGGraph = (props) => {
       }
       if (block.blueparents) {
         block.blueparents.forEach((parent) => {
-          if (graph.hasNode(parent) && graph.hasNode(block.id)) {
-            if (!graph.hasEdge(parent, block.id)) {
-              graph.setEdge(parent, block.id, {
-                style: "stroke: #105D5E; fill: none; stroke-width: 2px;",
-                arrowheadStyle: "fill: #105D5E; stroke-width: 2px;",
-              });
+          if (graph.hasNode(parent) && graph.hasNode(block.hash)) {
+            if (!graph.hasEdge(parent, block.hash)) {
+              if (parent == block.selectedParent) {
+                graph.setEdge(parent, block.hash, {
+                  style: "stroke: #105D5E; fill: none; stroke-width: 2px;",
+                  arrowheadStyle: "fill: #105D5E; stroke-width: 2px;",
+                });
+              } else {
+                graph.setEdge(parent, block.hash, {
+                  style: "stroke: #17888A; fill: none; stroke-width: 2px;",
+                  arrowheadStyle: "fill: #17888A; stroke-width: 2px;",
+                });
+              }
             }
           }
         });
@@ -111,29 +116,35 @@ const DAGGraph = (props) => {
     const svgWidth = svg.node().getBoundingClientRect().width;
     const svgHeight = svg.node().getBoundingClientRect().height;
 
-    var scale = Math.min(svgWidth / graphWidth, svgHeight / graphHeight, 1);
-    console.log(`scale ${scale}`);
-    while (scale < 0.7 && scale > 0) {
+    var scaleVertical = Math.min(svgWidth / graphWidth, 1);
+    var scaleHorizontal = Math.min(svgHeight / graphHeight, 1);
+    console.log(`scale ${scaleVertical}`);
+    var removed = 0;
+    while (scaleVertical < 0.7 && scaleVertical > 0) {
       graph.removeNode(graph.nodes().shift());
+      removed += 1;
       render(g, graph);
       graphWidth = graph.graph().width + 25;
       graphHeight = graph.graph().height + 50;
-      scale = Math.min(svgWidth / graphWidth, svgHeight / graphHeight, 1);
-      console.log(`rerender scale ${scale}`);
+      scaleVertical = Math.min(svgWidth / graphWidth, 1);
+      scaleHorizontal = Math.min(svgHeight / graphHeight, 1);
+      console.log(`rerender scale ${scaleVertical}`);
     }
+    setRemoveFromDAG(removed);
+    const scale = Math.min(scaleHorizontal, scaleVertical, 1);
 
     const xOffset = (svgWidth - graphWidth * scale) / 2;
     const yOffset = (svgHeight - graphHeight * scale) / 2;
 
     g.attr("transform", `translate(${xOffset}, ${yOffset}) scale(${scale})`);
     svg.attr("viewBox", `0 0 ${svgWidth} ${svgHeight}`);
-  }, [props.data]);
+  }, [DAG]);
 
   return (
     <div
       style={{
         width: "calc(100% - 25px)",
-        height: "450px",
+        height: "800px",
         overflow: "auto",
         marginRight: "25px",
         marginTop: "25px",

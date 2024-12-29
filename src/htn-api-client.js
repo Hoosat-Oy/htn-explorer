@@ -9,6 +9,18 @@ export async function getBlock(hash) {
   return res;
 }
 
+export async function getBlocks(hash, includeBlocks, includeTransactions) {
+  const res = await fetch(
+    `${API_BASE}blocks?lowHash=${hash}&includeBlocks=${includeBlocks}&includeTransactions=${includeTransactions}`,
+    {}
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      return data;
+    });
+  return res;
+}
+
 export async function getInfo() {
   const res = await fetch(`${API_BASE}info/htnd`, {})
     .then((response) => response.json())
@@ -17,7 +29,6 @@ export async function getInfo() {
     });
   return res;
 }
-
 
 export async function getTransaction(hash) {
   const res = await fetch(`${API_BASE}transactions/${hash}`, {})
@@ -83,12 +94,15 @@ export async function getHalving() {
 }
 
 export async function getTransactionsFromAddress(addr, limit = 20, offset = 0) {
-  const res = await fetch(`${API_BASE}addresses/${addr}/full-transactions?limit=${limit}&offset=${offset}`, {
-    headers: {
-      "content-type": "application/json",
-    },
-    method: "GET",
-  })
+  const res = await fetch(
+    `${API_BASE}addresses/${addr}/full-transactions?limit=${limit}&offset=${offset}`,
+    {
+      headers: {
+        "content-type": "application/json",
+      },
+      method: "GET",
+    }
+  )
     .then((response) => response.json())
     .then((data) => {
       return data;

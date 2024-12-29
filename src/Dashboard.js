@@ -22,7 +22,7 @@ import MarketDataBox from "./components/MarketDataBox";
 import TxOverview from "./components/TxOverview";
 import DAGGraph from "./components/DAGGraph";
 import LastBlocksContext from "./components/LastBlocksContext";
-import { getBlock } from "./htn-api-client";
+import { getBlock, getBlocks } from "./htn-api-client";
 
 function Dashboard() {
   const [show, setShow] = useState(false);
@@ -36,79 +36,107 @@ function Dashboard() {
   const [address] = useState("hoosat:");
 
   const [ghostDAG, setGhostDAG] = useState([]);
+  const [removeFromGhostDAG, setRemoveFromGhostDAG] = useState(0);
 
-  const getDAGData = async (loadVerboseForThisBlock) => {
-    try {
-      const maxBlocks = 40;
-      if (
-        loadVerboseForThisBlock.block_hash !== undefined &&
-        (ghostDAG.length == 0 ||
-          ghostDAG[ghostDAG.length - 1].id !==
-            loadVerboseForThisBlock.block_hash)
-      ) {
-        let tries = 3;
-        do {
-          // Retrieve the latest block verbosedata.
-          const block = await getBlock(loadVerboseForThisBlock.block_hash);
-          if (block) {
-            let newBlock = {
-              id: loadVerboseForThisBlock.block_hash,
-              isChain: block.verboseData.isChainBlock === true ? true : false,
-              blueparents: block.verboseData.mergeSetBluesHashes || [],
-              redparents: block.verboseData.mergeSetRedsHashes || [],
-            };
-            let blocks = ghostDAG;
-            // Check that newblock has last block as parent.
-            if (blocks.length > 0) {
-              const lastBlock = blocks[blocks.length - 1];
-              let lastBlockIsParentOfNewBlock = false;
-              for (let i = 0; i < newBlock.blueparents.length; i++) {
-                if (lastBlock.id === newBlock.blueparents[i]) {
-                  lastBlockIsParentOfNewBlock = true;
-                  break;
-                }
-              }
-              for (let i = 0; i < newBlock.redparents.length; i++) {
-                if (lastBlock.id === newBlock.redparents[i]) {
-                  lastBlockIsParentOfNewBlock = true;
-                  break;
-                }
-              }
-              if (lastBlockIsParentOfNewBlock) {
-                let newGhostDAG = [...blocks, newBlock];
-                setGhostDAG(newGhostDAG.slice(-maxBlocks));
-                return;
-              } else {
-                // Do a dirty fix and tie them together, it's just animation. We have just missed block fetch, even if we tried 3 times.
-                newBlock.blueparents = [...newBlock.blueparents, lastBlock.id];
-                let newGhostDAG = [...blocks, newBlock];
-                setGhostDAG(newGhostDAG.slice(-maxBlocks));
-                return;
-              }
-            } else {
-              setGhostDAG([newBlock]);
-            }
-          }
-          console.log(
-            `Error fetching block ${loadVerboseForThisBlock.block_hash}, tries left ${tries}`
-          );
-          tries = tries - 1;
-        } while (tries > 0);
-      }
-    } catch (error) {
-      console.error(
-        `Error fetching block ${loadVerboseForThisBlock.block_hash}:`,
-        error
-      );
-    }
+  const removeFromGhostDAGData = async () => {
+    console.log(`Removing from GhostDAG ${removeFromGhostDAG} blocks`);
+    setGhostDAG(ghostDAG.slice(removeFromGhostDAG));
   };
 
   useEffect(() => {
-    if (blocks && blocks.length > 0) {
-      const loadVerboseForThisBlock = blocks[blocks.length - 1]; // Get the most recent block
-      getDAGData(loadVerboseForThisBlock); // Only fetch and add the latest block to DAG
+    removeFromGhostDAGData();
+  }, [removeFromGhostDAG]);
+
+  const updateDAGData = async (blocksdata) => {
+    var low_hash =
+      ghostDAG.length > 0 ? ghostDAG[0].hash : blocksdata[0].block_hash;
+    const { _, blocks } = await getBlocks(low_hash, true, false);
+    console.log(`Updating blocks low_hash: ${blocks[0].verboseData.hash}`);
+    var updatedDAG = [];
+    for (var i = 0; i < blocks.length; i++) {
+      updatedDAG.push({
+        hash: blocks[i].verboseData.hash,
+        isChain: blocks[i].verboseData.isChainBlock === true ? true : false,
+        selectedParent: blocks[i].verboseData.selectedParentHash,
+        blueparents: blocks[i].verboseData.mergeSetBluesHashes || [],
+        redparents: blocks[i].verboseData.mergeSetRedsHashes || [],
+      });
     }
-    getDAGData(blocks);
+    setGhostDAG(updatedDAG);
+  };
+
+  // const getDAGData = async (loadVerboseForThisBlock) => {
+  //   try {
+  //     const maxBlocks = 40;
+  //     if (
+  //       loadVerboseForThisBlock.block_hash !== undefined &&
+  //       (ghostDAG.length == 0 ||
+  //         ghostDAG[ghostDAG.length - 1].id !==
+  //           loadVerboseForThisBlock.block_hash)
+  //     ) {
+  //       let tries = 3;
+  //       do {
+  //         // Retrieve the latest block verbosedata.
+  //         const block = await getBlock(loadVerboseForThisBlock.block_hash);
+  //         if (block) {
+  //           let newBlock = {
+  //             id: loadVerboseForThisBlock.block_hash,
+  //             isChain: block.verboseData.isChainBlock === true ? true : false,
+  //             blueparents: block.verboseData.mergeSetBluesHashes || [],
+  //             redparents: block.verboseData.mergeSetRedsHashes || [],
+  //           };
+  //           let blocks = ghostDAG;
+  //           // Check that newblock has last block as parent.
+  //           if (blocks.length > 0) {
+  //             const lastBlock = blocks[blocks.length - 1];
+  //             let lastBlockIsParentOfNewBlock = false;
+  //             for (let i = 0; i < newBlock.blueparents.length; i++) {
+  //               if (lastBlock.id === newBlock.blueparents[i]) {
+  //                 lastBlockIsParentOfNewBlock = true;
+  //                 break;
+  //               }
+  //             }
+  //             for (let i = 0; i < newBlock.redparents.length; i++) {
+  //               if (lastBlock.id === newBlock.redparents[i]) {
+  //                 lastBlockIsParentOfNewBlock = true;
+  //                 break;
+  //               }
+  //             }
+  //             if (lastBlockIsParentOfNewBlock) {
+  //               let newGhostDAG = [...blocks, newBlock];
+  //               setGhostDAG(newGhostDAG.slice(-maxBlocks));
+  //               return;
+  //             } else {
+  //               // Do a dirty fix and tie them together, it's just animation. We have just missed block fetch, even if we tried 3 times.
+  //               newBlock.blueparents = [...newBlock.blueparents, lastBlock.id];
+  //               let newGhostDAG = [...blocks, newBlock];
+  //               setGhostDAG(newGhostDAG.slice(-maxBlocks));
+  //               return;
+  //             }
+  //           } else {
+  //             setGhostDAG([newBlock]);
+  //           }
+  //         }
+  //         console.log(
+  //           `Error fetching block ${loadVerboseForThisBlock.block_hash}, tries left ${tries}`
+  //         );
+  //         tries = tries - 1;
+  //       } while (tries > 0);
+  //     }
+  //   } catch (error) {
+  //     console.error(
+  //       `Error fetching block ${loadVerboseForThisBlock.block_hash}:`,
+  //       error
+  //     );
+  //   }
+  // };
+
+  useEffect(() => {
+    if (blocks && blocks.length > 0) {
+      //const loadVerboseForThisBlock = blocks[blocks.length - 1];
+      //getDAGData(loadVerboseForThisBlock);
+      updateDAGData(blocks);
+    }
   }, [blocks]);
 
   useEffect(() => {
@@ -191,9 +219,6 @@ function Dashboard() {
           </Row>
         </Container>
       </div>
-      <div className="row3">
-        <DAGGraph data={ghostDAG} />
-      </div>
       <div className="row2">
         <Container className="secondRow webpage" fluid>
           <Row>
@@ -214,6 +239,9 @@ function Dashboard() {
             </Col>
           </Row>
         </Container>
+      </div>
+      <div className="row3">
+        <DAGGraph DAG={ghostDAG} setRemoveFromDAG={setRemoveFromGhostDAG} />
       </div>
       <div className="row4">
         <Container className="fourthRow webpage" fluid>
