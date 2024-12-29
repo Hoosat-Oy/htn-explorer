@@ -48,8 +48,7 @@ function Dashboard() {
   }, [removeFromGhostDAG]);
 
   const updateDAGData = async (blocksdata) => {
-    var low_hash =
-      ghostDAG.length > 0 ? ghostDAG[0].hash : blocksdata[0].block_hash;
+    var low_hash = blocksdata[0].block_hash;
     const { _, blocks } = await getBlocks(low_hash, true, false);
     console.log(`Updating blocks low_hash: ${blocks[0].verboseData.hash}`);
     var updatedDAG = [];

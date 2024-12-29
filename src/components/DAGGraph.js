@@ -118,19 +118,19 @@ const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
 
     var scaleVertical = Math.min(svgWidth / graphWidth, 1);
     var scaleHorizontal = Math.min(svgHeight / graphHeight, 1);
-    console.log(`scale ${scaleVertical}`);
-    var removed = 0;
-    while (scaleVertical < 0.7 && scaleVertical > 0) {
-      graph.removeNode(graph.nodes().shift());
-      removed += 1;
-      render(g, graph);
-      graphWidth = graph.graph().width + 25;
-      graphHeight = graph.graph().height + 50;
-      scaleVertical = Math.min(svgWidth / graphWidth, 1);
-      scaleHorizontal = Math.min(svgHeight / graphHeight, 1);
-      console.log(`rerender scale ${scaleVertical}`);
-    }
-    setRemoveFromDAG(removed);
+    // console.log(`scale ${scaleVertical}`);
+    // var removed = 0;
+    // while (scaleVertical < 0.7 && scaleVertical > 0) {
+    //   graph.removeNode(graph.nodes().shift());
+    //   removed += 1;
+    //   render(g, graph);
+    //   graphWidth = graph.graph().width + 25;
+    //   graphHeight = graph.graph().height + 50;
+    //   scaleVertical = Math.min(svgWidth / graphWidth, 1);
+    //   scaleHorizontal = Math.min(svgHeight / graphHeight, 1);
+    //   console.log(`rerender scale ${scaleVertical}`);
+    // }
+    // setRemoveFromDAG(removed);
     const scale = Math.min(scaleHorizontal, scaleVertical, 1);
 
     const xOffset = (svgWidth - graphWidth * scale) / 2;
