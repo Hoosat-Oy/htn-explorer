@@ -5,10 +5,26 @@ import { useEffect, useState, useCallback } from "react";
 import { numberWithCommas } from "../helper";
 import { getCoinSupply, getHalving, getBlockdagInfo } from "../htn-api-client";
 
+function formatDuration(period) {
+  const duration = moment.duration(period);
+
+  const days = Math.floor(duration.asDays());
+  const hours = duration.hours();
+  const minutes = duration.minutes();
+
+  let result = [];
+  if (days > 0) result.push(`${days} day${days > 1 ? "s" : ""}`);
+  if (hours > 0) result.push(`${hours} hour${hours > 1 ? "s" : ""}`);
+  if (minutes > 0) result.push(`${minutes} minute${minutes > 1 ? "s" : ""}`);
+
+  return result.length > 0 ? result.join(", ") : "less than a minute";
+}
+
 const CBox = () => {
   const [circCoins, setCircCoins] = useState("-");
   const [blockReward, setBlockReward] = useState("-");
   const [halvingDate, setHalvingDate] = useState("-");
+  const [timeToHalving, setTimeToHalving] = useState("-");
   const [halvingAmount, setHalvingAmount] = useState("-");
 
   const initBox = useCallback(() => {
@@ -18,7 +34,14 @@ const CBox = () => {
       getBlockReward(dag_info);
 
       getHalving().then((d) => {
-        setHalvingDate(moment(d.nextHalvingTimestamp * 1000).format("YYYY-MM-DD HH:mm"));
+        const currentTimestamp = Date.now();
+        const halvingTimestamp = d.nextHalvingTimestamp * 1000;
+        const timeDifference = halvingTimestamp - currentTimestamp;
+        const duration = moment.duration(timeDifference, "milliseconds");
+        const timeToHalving = formatDuration(timeDifference);
+
+        setHalvingDate(moment(halvingTimestamp).format("YYYY-MM-DD HH:mm"));
+        setTimeToHalving(timeToHalving);
         setHalvingAmount(d.nextHalvingAmount.toFixed(2));
       });
 
@@ -49,7 +72,6 @@ const CBox = () => {
         } else {
           setBlockReward(d.blockreward.toFixed(2));
         }
-        
       })
       .catch((err) => console.log("Error", err));
   }
@@ -75,7 +97,11 @@ const CBox = () => {
         <table style={{ fontSize: "1rem" }}>
           <tbody>
             <tr>
-              <td colSpan="2" className="text-center" style={{ fontSize: "4rem" }}>
+              <td
+                colSpan="2"
+                className="text-center"
+                style={{ fontSize: "4rem" }}
+              >
                 <FontAwesomeIcon icon={faCoins} />
                 <div id="light1" className="cardLight" />
               </td>
@@ -93,31 +119,36 @@ const CBox = () => {
             </tr>
             <tr>
               <td className="cardBoxElement align-top">
-                Max <span className="approx">(approx.)</span>
+                Max <span className="aptimeToHalvingprox">(approx.)</span>
               </td>
               <td className="pt-1">17,100,000,000 HTN</td>
             </tr>
             <tr>
               <td className="cardBoxElement align-top">Mined</td>
-              <td className="pt-1">{((circCoins / 17100000000) * 100).toFixed(2)} %</td>
+              <td className="pt-1">
+                {((circCoins / 17100000000) * 100).toFixed(2)} %
+              </td>
             </tr>
             <tr>
               <td className="cardBoxElement align-top">Block reward</td>
               <td className="pt-1">{blockReward} HTN</td>
             </tr>
             <tr>
-              <td className="cardBoxElement align-top">
-                Reward reduction
-                {/* <OverlayTrigger overlay={<Tooltip id="halvinginfo">Here is some information about the chromatic halving..</Tooltip>}>
-                                <span>
-                                <FaInfoCircle />
-                                </span>
-                            </OverlayTrigger> */}
-              </td>
+              <td className="cardBoxElement align-top">Reward reduction</td>
               <td className="pt-1">
                 {halvingDate}
                 <br />
-                <div className="text-end w-100 pe-3 pt-1" style={{ fontSize: "small" }}>
+                <div
+                  className="text-end w-100 nowrap"
+                  style={{ fontSize: "small" }}
+                >
+                  {timeToHalving}
+                </div>
+
+                <div
+                  className="text-end w-100 pe-3 pt-1"
+                  style={{ fontSize: "small" }}
+                >
                   to {halvingAmount} HTN
                 </div>
               </td>
