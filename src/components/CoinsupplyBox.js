@@ -42,7 +42,7 @@ const CBox = () => {
 
         setHalvingDate(moment(halvingTimestamp).format("YYYY-MM-DD HH:mm"));
         setTimeToHalving(timeToHalving);
-        setHalvingAmount(d.nextHalvingAmount.toFixed(2));
+        setHalvingAmount((d.nextHalvingAmount * 0.95).toFixed(2));
       });
 
       setCircCoins(Math.round(coinSupplyResp.circulatingSupply / 100000000));
