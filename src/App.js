@@ -1,18 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "font-awesome/css/font-awesome.min.css";
 import { useEffect, useRef, useState } from "react";
-import {
-  Button,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  Nav,
-  Navbar,
-  OverlayTrigger,
-  Row,
-  Tooltip,
-} from "react-bootstrap";
+import { Button, Col, Container, Form, InputGroup, Nav, Navbar, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
 import { BiDonateHeart } from "react-icons/bi";
 import { FaGithub } from "react-icons/fa";
 import { SiFastapi } from "react-icons/si";
@@ -55,9 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 const socketAddress =
-  process.env.REACT_APP_SOCKET === undefined
-    ? process.env.REACT_APP_SOCKET
-    : "wss://socket.network.hoosat.fi";
+  process.env.REACT_APP_SOCKET === undefined ? process.env.REACT_APP_SOCKET : "wss://socket.network.hoosat.fi";
 console.log(socketAddress);
 const socket = io(socketAddress, {
   path: "/ws/socket.io",
@@ -144,7 +131,7 @@ function App() {
     socket.emit("join-room", "bluescore");
 
     socket.on("new-block", (d) => {
-      setBlocks([...blocksRef.current, d].slice(-60));
+      setBlocks([...blocksRef.current, d].slice(-30));
     });
 
     return () => {
@@ -156,11 +143,7 @@ function App() {
   }, []);
 
   const closeMenuIfNeeded = () => {
-    if (
-      document
-        .getElementById("responsive-navbar-nav")
-        .classList.contains("show")
-    ) {
+    if (document.getElementById("responsive-navbar-nav").classList.contains("show")) {
       document.getElementsByClassName("navbar-toggler")[0].click();
     }
   };
@@ -208,56 +191,32 @@ function App() {
                 <Navbar.Collapse id="responsive-navbar-nav">
                   <Nav className="me-auto">
                     <Nav.Item>
-                      <a
-                        className="nav-link fs-5"
-                        onClick={closeMenuIfNeeded}
-                        href={process.env.REACT_APP_HOMEPAGE}
-                      >
+                      <a className="nav-link fs-5" onClick={closeMenuIfNeeded} href={process.env.REACT_APP_HOMEPAGE}>
                         Home
                       </a>
                     </Nav.Item>
                     <Nav.Item>
-                      <NavLink
-                        className="nav-link fs-5"
-                        onClick={closeMenuIfNeeded}
-                        to={"/"}
-                      >
+                      <NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/"}>
                         Explorer Dashboard
                       </NavLink>
                     </Nav.Item>
                     <Nav.Item>
-                      <NavLink
-                        className="nav-link fs-5"
-                        onClick={closeMenuIfNeeded}
-                        to={"/blocks"}
-                      >
+                      <NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/blocks"}>
                         Blocks
                       </NavLink>
                     </Nav.Item>
                     <Nav.Item>
-                      <NavLink
-                        className="nav-link fs-5"
-                        onClick={closeMenuIfNeeded}
-                        to={"/txs"}
-                      >
+                      <NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/txs"}>
                         Transactions
                       </NavLink>
                     </Nav.Item>
                     <Nav.Item>
-                      <NavLink
-                        className="nav-link fs-5"
-                        onClick={closeMenuIfNeeded}
-                        to={"/addresses"}
-                      >
+                      <NavLink className="nav-link fs-5" onClick={closeMenuIfNeeded} to={"/addresses"}>
                         Top Addresses
                       </NavLink>
                     </Nav.Item>
                     <Nav.Item>
-                      <a
-                        className="nav-link fs-5"
-                        onClick={closeMenuIfNeeded}
-                        href={"https://wallet.hoosat.fi"}
-                      >
+                      <a className="nav-link fs-5" onClick={closeMenuIfNeeded} href={"https://wallet.hoosat.fi"}>
                         Web Wallet
                       </a>
                     </Nav.Item>
@@ -281,11 +240,7 @@ function App() {
                           type="text"
                           placeholder="Search for hoosat:address or block"
                         />
-                        <Button
-                          type="submit"
-                          className="shadow-none searchButton"
-                          variant="dark"
-                        >
+                        <Button type="submit" className="shadow-none searchButton" variant="dark">
                           <i className="fa fa-search" />
                         </Button>
                       </InputGroup>
@@ -308,10 +263,7 @@ function App() {
             {/* <div className="alpha">ALPHA VERSION</div> */}
           </div>
           <div className="text-light footerfull d-flex flex-row justify-content-center px-0">
-            <Container
-              className="footer webpage px-sm-5 py-3 text-center madewith"
-              fluid
-            >
+            <Container className="footer webpage px-sm-5 py-3 text-center madewith" fluid>
               <Row className="d-none d-sm-block">
                 <Col>
                   Made with{" "}
@@ -320,10 +272,7 @@ function App() {
                   </font>{" "}
                   by Kaspa developers & Hoosat Oy
                   <span className="ms-3">
-                    <OverlayTrigger
-                      placement="left"
-                      overlay={<Tooltip id="github">Source code</Tooltip>}
-                    >
+                    <OverlayTrigger placement="left" overlay={<Tooltip id="github">Source code</Tooltip>}>
                       <a
                         className="blockinfo-link"
                         href={process.env.REACT_APP_GITHUB}
@@ -333,10 +282,7 @@ function App() {
                         <FaGithub size="1.3rem" />
                       </a>
                     </OverlayTrigger>
-                    <OverlayTrigger
-                      placement="right"
-                      overlay={<Tooltip id="donate">Donation address</Tooltip>}
-                    >
+                    <OverlayTrigger placement="right" overlay={<Tooltip id="donate">Donation address</Tooltip>}>
                       <Link
                         className="blockinfo-link ms-3"
                         to="/addresses/hoosat:qq5gtjz7xhghcyauyhwmy9a696ym7nhaj857t32l25qqysyzz27lzy9esv046"
@@ -344,10 +290,7 @@ function App() {
                         <BiDonateHeart size="1.3rem" />
                       </Link>
                     </OverlayTrigger>
-                    <OverlayTrigger
-                      placement="right"
-                      overlay={<Tooltip id="github">REST-API server</Tooltip>}
-                    >
+                    <OverlayTrigger placement="right" overlay={<Tooltip id="github">REST-API server</Tooltip>}>
                       <a
                         className="blockinfo-link ms-3"
                         href={process.env.REACT_APP_API}
@@ -359,9 +302,7 @@ function App() {
                     </OverlayTrigger>
                   </span>
                   <span className="px-3 build">|</span>
-                  <span className="build">
-                    Build version: {buildVersion.substring(0, 8)}
-                  </span>
+                  <span className="build">Build version: {buildVersion.substring(0, 8)}</span>
                 </Col>
               </Row>
               <Row className="d-sm-none px-0">
@@ -376,10 +317,7 @@ function App() {
               <Row className="py-1 d-sm-none px-0">
                 <Col>
                   <span className="ms-2">
-                    <OverlayTrigger
-                      placement="left"
-                      overlay={<Tooltip id="github">Source code</Tooltip>}
-                    >
+                    <OverlayTrigger placement="left" overlay={<Tooltip id="github">Source code</Tooltip>}>
                       <a
                         className="blockinfo-link"
                         href={process.env.REACT_APP_GITHUB}
@@ -389,10 +327,7 @@ function App() {
                         <FaGithub size="1.1rem" />
                       </a>
                     </OverlayTrigger>
-                    <OverlayTrigger
-                      placement="right"
-                      overlay={<Tooltip id="donate">Donation address</Tooltip>}
-                    >
+                    <OverlayTrigger placement="right" overlay={<Tooltip id="donate">Donation address</Tooltip>}>
                       <Link
                         className="blockinfo-link ms-2"
                         to="/addresses/hoosat:qqkqkzjvr7zwxxmjxjkmxxdwju9kjs6e9u82uh59z07vgaks6gg62v8707g73"
@@ -400,10 +335,7 @@ function App() {
                         <BiDonateHeart size="1.1rem" />
                       </Link>
                     </OverlayTrigger>
-                    <OverlayTrigger
-                      placement="right"
-                      overlay={<Tooltip id="github">REST-API server</Tooltip>}
-                    >
+                    <OverlayTrigger placement="right" overlay={<Tooltip id="github">REST-API server</Tooltip>}>
                       <a
                         className="blockinfo-link ms-2"
                         href={process.env.REACT_APP_API}
@@ -418,9 +350,7 @@ function App() {
               </Row>
               <Row className="d-sm-none px-0">
                 <Col>
-                  <span className="build">
-                    Build version: {buildVersion.substring(0, 8)}
-                  </span>
+                  <span className="build">Build version: {buildVersion.substring(0, 8)}</span>
                 </Col>
               </Row>
             </Container>
