@@ -12,7 +12,7 @@ const BlockDAGBox = () => {
   const [difficulty, setDifficulty] = useState();
   const [headerCount, setHeaderCount] = useState("");
   const [virtualDaaScore, setVirtualDaaScore] = useState("");
-  const [hashrate, setHashrate] = useState("");
+  const [hashrate, setHashrate] = useState(0);
   const [nextHardForkTime, setNextHardForkTime] = useState("");
   const [nextHardForkTimeTo, setNextHardForkTimeTo] = useState("");
   const [mempoolSize, setMempoolSize] = useState();
@@ -192,6 +192,7 @@ const BlockDAGBox = () => {
       index++;
     }
 
+    console.log(`${hashrate.toFixed(2)} ${units[index]}`);
     return `${hashrate.toFixed(2)} ${units[index]}`;
   };
 
@@ -236,7 +237,7 @@ const BlockDAGBox = () => {
             <tr>
               <td className="cardBoxElement">Hashrate</td>
               <td className="pt-1" id="hashrate">
-                {Number(formatHashrate(hashrate))}
+                {formatHashrate(hashrate)}
               </td>
             </tr>
             <tr>
