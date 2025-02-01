@@ -68,13 +68,13 @@ const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
             if (!graph.hasEdge(parent, block.hash)) {
               if (parent == block.selectedParent) {
                 graph.setEdge(parent, block.hash, {
-                  style: "stroke: #105D5E; fill: none; stroke-width: 2px;",
-                  arrowheadStyle: "fill: #105D5E; stroke-width: 2px;",
+                  style: "stroke: #17888A; fill: none; stroke-width: 2px;",
+                  arrowheadStyle: "fill: #17888A; stroke-width: 2px;",
                 });
               } else {
                 graph.setEdge(parent, block.hash, {
-                  style: "stroke: #17888A; fill: none; stroke-width: 2px;",
-                  arrowheadStyle: "fill: #17888A; stroke-width: 2px;",
+                  style: "stroke: #3f4d46; fill: none; stroke-width: 2px;",
+                  arrowheadStyle: "fill: #3f4d46; stroke-width: 2px;",
                 });
               }
             }
