@@ -15,12 +15,12 @@ const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
 
     const graph = new dagreD3.graphlib.Graph().setGraph({
       rankdir: "LR",
-      ranksep: 30,
-      nodesep: 10,
-      edgesep: 15,
-      ranker: "tight-tree",
-      marginx: 15,
-      acyclicer: "greedy",
+      ranksep: 200,
+      nodesep: 5,
+      edgesep: 0,
+      ranker: "network-simplex",
+      marginx: 0,
+      marginy: 0,
     });
 
     graph.setDefaultNodeLabel(() => ({}));
@@ -33,10 +33,7 @@ const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
 
       const labelText = block.hash;
       const maxLabelLength = 8;
-      const shortLabel =
-        labelText.length > maxLabelLength
-          ? labelText.slice(0, maxLabelLength - 3) + "..."
-          : labelText;
+      const shortLabel = labelText.length > maxLabelLength ? labelText.slice(0, maxLabelLength - 3) + "..." : labelText;
 
       graph.setNode(block.hash, {
         hash: block.hash,
@@ -151,12 +148,7 @@ const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
         marginBottom: "25px",
       }}
     >
-      <svg
-        ref={svgRef}
-        width="100%"
-        height="100%"
-        style={{ background: "rgb(44, 53, 49)" }}
-      ></svg>
+      <svg ref={svgRef} width="100%" height="100%" style={{ background: "rgb(44, 53, 49)" }}></svg>
     </div>
   );
 };
