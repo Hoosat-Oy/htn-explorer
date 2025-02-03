@@ -6,7 +6,7 @@ import { getBlockdagInfo, getInfo } from "../htn-api-client";
 const BPS = 1;
 
 const BlockDAGBox = () => {
-  const [nextHFDAAScore, setNextHFDAAScore] = useState(21821800);
+  const [nextHFDAAScore, setNextHFDAAScore] = useState(29335426);
   const [showHF, setShowHF] = useState(false);
   const [blockCount, setBlockCount] = useState();
   const [difficulty, setDifficulty] = useState();
@@ -44,6 +44,8 @@ const BlockDAGBox = () => {
       setShowHF(true);
       setNextHardForkTime(hardForkTime);
       setNextHardForkTimeTo(formattedTimeToFork);
+    } else {
+      setShowHF(false);
     }
   };
   useEffect(() => {
@@ -66,6 +68,8 @@ const BlockDAGBox = () => {
         setShowHF(true);
         setNextHardForkTime(hardForkTime);
         setNextHardForkTimeTo(formattedTimeToFork);
+      } else {
+        setShowHF(false);
       }
     }, 60000);
     return async () => {

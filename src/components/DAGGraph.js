@@ -18,7 +18,7 @@ const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
       ranksep: 200,
       nodesep: 5,
       edgesep: 0,
-      ranker: "network-simplex",
+      ranker: "longest-path",
       marginx: 0,
       marginy: 0,
     });
