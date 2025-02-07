@@ -193,7 +193,15 @@ const BlockInfo = () => {
                       Is Chain Block
                     </Col>
                     <Col className="blockinfo-value" lg={10}>
-                      {!!blockInfo.verboseData.isChainBlock ? "true" : "false"}
+                      <span data-tooltip-id="is-chain-block-tooltip">
+                        {!!blockInfo.verboseData.isChainBlock ? "true" : "false"}
+                      </span>
+                      <Tooltip
+                        id="is-chain-block-tooltip"
+                        place="top"
+                        style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                        content="Chain block true means the block is a blue block, part of the main chain. Chain block false means the block is an orphan, also known as a red block, but it is still included in the chain due to GhostDAG. To calculate the reward for any mined block (B), find the chain block (C) that merged it. If B is in C's MergesetReds, there is no reward. If B is in MergesetBlues, the reward is in the corresponding coinbase output."
+                      />
                     </Col>
                   </Row>
                   <Row className="blockinfo-row">
