@@ -6,7 +6,15 @@ import { useParams } from "react-router";
 import { Link, useSearchParams } from "react-router-dom";
 import Toggle from "react-toggle";
 import usePrevious, { floatToStr, numberWithCommas } from "../helper";
-import { getAddressBalance, getAddressTxCount, getAddressUtxos, getBlock, getBlockdagInfo, getTransactions, getTransactionsFromAddress } from "../htn-api-client.js";
+import {
+  getAddressBalance,
+  getAddressTxCount,
+  getAddressUtxos,
+  getBlock,
+  getBlockdagInfo,
+  getTransactions,
+  getTransactionsFromAddress,
+} from "../htn-api-client.js";
 import BlueScoreContext from "./BlueScoreContext";
 import CopyButton from "./CopyButton.js";
 import PriceContext from "./PriceContext.js";
@@ -14,6 +22,7 @@ import UtxoPagination from "./UtxoPagination.js";
 
 import QRCodeStyling from "qr-code-styling";
 import QrButton from "./QrButton";
+import { Tooltip } from "react-tooltip";
 
 const AddressInfoPage = () => {
   const { addr } = useParams();
@@ -82,7 +91,7 @@ const AddressInfo = () => {
       }
     }
   };
-  
+
   const getAmountFromOutputs = (outputs, index) => {
     if (outputs[index] && outputs[index].index == index) {
       return outputs[index].amount / 100000000;
@@ -95,15 +104,14 @@ const AddressInfo = () => {
         }
       }
     }
-    
   };
 
   const calculationFailed = (balance) => {
-    if(balance === "0") {
-      return "Calculation failed"
-    } 
+    if (balance === "0") {
+      return "Calculation failed";
+    }
     return balance;
-  }
+  };
 
   const getAmount = (outputs, inputs) => {
     var balance = 0;
@@ -118,7 +126,7 @@ const AddressInfo = () => {
         if (outputs !== undefined && outputs.length > 0) {
           if (getAddrFromOutputs(outputs, inputs[i].previous_outpoint_index) === addr) {
             let amount = getAmountFromOutputs(outputs, inputs[i].previous_outpoint_index);
-            balance -= amount
+            balance -= amount;
           }
         }
       }
@@ -298,7 +306,13 @@ const AddressInfo = () => {
         <Row>
           <Col sm={6} md={4}>
             <div className="addressinfo-header mt-4">balance</div>
-            <div className="utxo-value d-flex">{addressBalance !== undefined ? <div className="utxo-amount">+{numberWithCommas(addressBalance / 100000000)} HTN</div> : <Spinner animation="border" variant="primary" />}</div>
+            <div className="utxo-value d-flex">
+              {addressBalance !== undefined ? (
+                <div className="utxo-amount">+{numberWithCommas(addressBalance / 100000000)} HTN</div>
+              ) : (
+                <Spinner animation="border" variant="primary" />
+              )}
+            </div>
           </Col>
           <Col sm={6} md={4}>
             <div className="addressinfo-header mt-4 ms-sm-5">UTXOs count</div>
@@ -314,7 +328,9 @@ const AddressInfo = () => {
             <div className="utxo-value">{numberWithCommas(((addressBalance / 100000000) * price).toFixed(2))} USD</div>
           </Col>
           <Col sm={6} md={4}>
-            <div className="addressinfo-header addressinfo-header-border mt-4 mt-sm-4 pt-sm-4 ms-sm-5">Transactions count</div>
+            <div className="addressinfo-header addressinfo-header-border mt-4 mt-sm-4 pt-sm-4 ms-sm-5">
+              Transactions count
+            </div>
             <div className="utxo-value ms-sm-5">
               {txCount !== null ? numberWithCommas(txCount) : <Spinner animation="border" variant="primary" />}
               {errorLoadingUtxos && <BiGhost className="error-icon" />}
@@ -359,7 +375,11 @@ const AddressInfo = () => {
             </Col>
             <Col xs={12} md={6} className="d-flex flex-row justify-content-end ms-auto">
               {console.log("txc", txCount)}
-              {txCount !== null ? <UtxoPagination active={activeTx} total={Math.ceil(txCount / 20)} setActive={setActiveTx} /> : <Spinner className="m-3" animation="border" variant="primary" />}
+              {txCount !== null ? (
+                <UtxoPagination active={activeTx} total={Math.ceil(txCount / 20)} setActive={setActiveTx} />
+              ) : (
+                <Spinner className="m-3" animation="border" variant="primary" />
+              )}
             </Col>
           </Row>
           {txCount === 0 && (
@@ -390,16 +410,22 @@ const AddressInfo = () => {
                       <div className="utxo-value">
                         <Link className="blockinfo-link" to={`/txs/${x.transaction_id}`}>
                           {getAmount(x.outputs, x.inputs) > 0 ? (
-                            <span className="utxo-amount">+{numberWithCommas(floatToStr(getAmount(x.outputs, x.inputs)))}&nbsp;HTN</span>
+                            <span className="utxo-amount">
+                              +{numberWithCommas(floatToStr(getAmount(x.outputs, x.inputs)))}&nbsp;HTN
+                            </span>
                           ) : (
-                            <span className="utxo-amount-minus">{calculationFailed(numberWithCommas(floatToStr(getAmount(x.outputs, x.inputs))))}&nbsp;HTN</span>
+                            <span className="utxo-amount-minus">
+                              {calculationFailed(numberWithCommas(floatToStr(getAmount(x.outputs, x.inputs))))}&nbsp;HTN
+                            </span>
                           )}
                         </Link>
                       </div>
                     </Col>
                     <Col sm={6} md={2}>
                       <div className="utxo-header mt-3">value</div>
-                      <div className="utxo-value">{numberWithCommas((getAmount(x.outputs, x.inputs) * price).toFixed(2))} $</div>
+                      <div className="utxo-value">
+                        {numberWithCommas((getAmount(x.outputs, x.inputs) * price).toFixed(2))} $
+                      </div>
                     </Col>
                   </Row>
                   {!!detailedView && (
@@ -413,14 +439,41 @@ const AddressInfo = () => {
                                   <>
                                     <Row id={`N${x.previous_outpoint_hash}${x.previous_outpoint_index}`}>
                                       <Col xs={7} className="adressinfo-tx-overflow pb-0">
-                                        <Link className="blockinfo-link" to={`/addresses/${getAddrFromOutputs(txsInpCache[x.previous_outpoint_hash]["outputs"], x.previous_outpoint_index)}`}>
-                                          <span className={getAddrFromOutputs(txsInpCache[x.previous_outpoint_hash]["outputs"], x.previous_outpoint_index) === addr ? "highlight-addr" : ""}>
-                                            {getAddrFromOutputs(txsInpCache[x.previous_outpoint_hash]["outputs"], x.previous_outpoint_index)}
+                                        <Link
+                                          className="blockinfo-link"
+                                          to={`/addresses/${getAddrFromOutputs(
+                                            txsInpCache[x.previous_outpoint_hash]["outputs"],
+                                            x.previous_outpoint_index
+                                          )}`}
+                                        >
+                                          <span
+                                            className={
+                                              getAddrFromOutputs(
+                                                txsInpCache[x.previous_outpoint_hash]["outputs"],
+                                                x.previous_outpoint_index
+                                              ) === addr
+                                                ? "highlight-addr"
+                                                : ""
+                                            }
+                                          >
+                                            {getAddrFromOutputs(
+                                              txsInpCache[x.previous_outpoint_hash]["outputs"],
+                                              x.previous_outpoint_index
+                                            )}
                                           </span>
                                         </Link>
                                       </Col>
                                       <Col xs={5}>
-                                        <span className="block-utxo-amount-minus">-{numberWithCommas(getAmountFromOutputs(txsInpCache[x.previous_outpoint_hash]["outputs"], x.previous_outpoint_index))}&nbsp;HTN</span>
+                                        <span className="block-utxo-amount-minus">
+                                          -
+                                          {numberWithCommas(
+                                            getAmountFromOutputs(
+                                              txsInpCache[x.previous_outpoint_hash]["outputs"],
+                                              x.previous_outpoint_index
+                                            )
+                                          )}
+                                          &nbsp;HTN
+                                        </span>
                                       </Col>
                                     </Row>
                                   </>
@@ -440,11 +493,15 @@ const AddressInfo = () => {
                             <Row>
                               <Col xs={7} className="pb-1 adressinfo-tx-overflow">
                                 <Link className="blockinfo-link" to={`/addresses/${x.script_public_key_address}`}>
-                                  <span className={x.script_public_key_address === addr ? "highlight-addr" : ""}>{x.script_public_key_address}</span>
+                                  <span className={x.script_public_key_address === addr ? "highlight-addr" : ""}>
+                                    {x.script_public_key_address}
+                                  </span>
                                 </Link>
                               </Col>
                               <Col xs={5}>
-                                <span className="block-utxo-amount">+{numberWithCommas(x.amount / 100000000)}&nbsp;HTN</span>
+                                <span className="block-utxo-amount">
+                                  +{numberWithCommas(x.amount / 100000000)}&nbsp;HTN
+                                </span>
                               </Col>
                             </Row>
                           ))}
@@ -452,10 +509,55 @@ const AddressInfo = () => {
                       </Col>
                       <Col md={12}>
                         <div className="utxo-header">Details</div>
-                        <div className="utxo-value mt-2 d-flex flex-row flex-wrap" style={{ marginBottom: "-1rem", textDecoration: "none" }}>
-                          {x.is_accepted ? <div className="accepted-true me-3 mb-3">accepted</div> : <span className="accepted-false">Confirming</span>}
-                          {x.is_accepted && blueScore !== 0 && blueScore - x.accepting_block_blue_score < 86400 && <div className="confirmations mb-3">{blueScore - x.accepting_block_blue_score}&nbsp;confirmations</div>}
-                          {x.is_accepted && blueScore !== 0 && blueScore - x.accepting_block_blue_score >= 86400 && <div className="confirmations mb-3">confirmed</div>}
+                        <div
+                          className="utxo-value mt-2 d-flex flex-row flex-wrap"
+                          style={{ marginBottom: "-1rem", textDecoration: "none" }}
+                        >
+                          {x.is_accepted ? (
+                            <div className="accepted-true me-3 mb-3">
+                              <span data-tooltip-id="accepted-tooltip">accepted</span>
+                              <Tooltip
+                                id="accepted-tooltip"
+                                place="top"
+                                style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                                content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
+                              />
+                            </div>
+                          ) : (
+                            <div className="accepted-false me-3 mb-3">
+                              <span data-tooltip-id="accepted-tooltip">not accepted</span>
+                              <Tooltip
+                                id="accepted-tooltip"
+                                place="top"
+                                style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                                content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
+                              />
+                            </div>
+                          )}
+                          {x.is_accepted && blueScore !== 0 && blueScore - x.accepting_block_blue_score < 86400 && (
+                            <div className="confirmations mb-3">
+                              <span data-tooltip-id="confirmations-tooltip">
+                                {blueScore - x.accepting_block_blue_score}&nbsp;confirmations
+                              </span>
+                              <Tooltip
+                                id="confirmations-tooltip"
+                                place="top"
+                                style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                                content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
+                              />
+                            </div>
+                          )}
+                          {x.is_accepted && blueScore !== 0 && blueScore - x.accepting_block_blue_score >= 86400 && (
+                            <div className="confirmations mb-3">
+                              <span data-tooltip-id="confirmations-tooltip">confirmed</span>
+                              <Tooltip
+                                id="confirmations-tooltip"
+                                place="top"
+                                style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                                content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
+                              />
+                            </div>
+                          )}
                         </div>
                       </Col>
                     </Row>
@@ -482,7 +584,12 @@ const AddressInfo = () => {
                   </div>
                 </Col>
                 <Col xs={12} sm={6} className="d-flex flex-row justify-content-end">
-                  <UtxoPagination className="ms-auto" active={activeTx} total={Math.ceil(txCount / 20)} setActive={setActiveTx} />
+                  <UtxoPagination
+                    className="ms-auto"
+                    active={activeTx}
+                    total={Math.ceil(txCount / 20)}
+                    setActive={setActiveTx}
+                  />
                 </Col>
               </Row>
             </>
@@ -514,7 +621,9 @@ const AddressInfo = () => {
                 <>
                   <Row className="utxo-value text-primary mt-3">
                     <Col sm={7} md={7}>
-                      {moment((currentEpochTime - (currentDaaScore - x.utxoEntry.blockDaaScore)) * 1000).format("YYYY-MM-DD HH:mm:ss")}
+                      {moment((currentEpochTime - (currentDaaScore - x.utxoEntry.blockDaaScore)) * 1000).format(
+                        "YYYY-MM-DD HH:mm:ss"
+                      )}
                     </Col>
                   </Row>
                   <Row className="utxo-border pb-4 mb-4">
@@ -534,7 +643,9 @@ const AddressInfo = () => {
                     </Col>
                     <Col sm={6} md={4}>
                       <div className="utxo-header mt-3">value</div>
-                      <div className="utxo-value">{numberWithCommas(((x.utxoEntry.amount / 100000000) * price).toFixed(2))} $</div>
+                      <div className="utxo-value">
+                        {numberWithCommas(((x.utxoEntry.amount / 100000000) * price).toFixed(2))} $
+                      </div>
                     </Col>
                     <Col sm={6} md={4}>
                       <div className="utxo-header mt-3">index</div>

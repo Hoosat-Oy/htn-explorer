@@ -121,7 +121,15 @@ const BlockInfo = () => {
                 <div className="blockinfo-header">
                   <h4 className="d-flex flex-row align-items-center">
                     block details
-                    {blockInfo.verboseData.isChainBlock !== null && <>{isBlueBlock === null ? <Spinner className="ms-3" animation="grow" /> : <BlockLamp isBlue={isBlueBlock} />}</>}
+                    {blockInfo.verboseData.isChainBlock !== null && (
+                      <>
+                        {isBlueBlock === null ? (
+                          <Spinner className="ms-3" animation="grow" />
+                        ) : (
+                          <BlockLamp isBlue={isBlueBlock} />
+                        )}
+                      </>
+                    )}
                   </h4>
                 </div>
                 {/* <font className="blockinfo-header-id">{id.substring(0, 20)}...</font> */}
@@ -168,7 +176,8 @@ const BlockInfo = () => {
                       Timestamp
                     </Col>
                     <Col className="blockinfo-value" lg={10}>
-                      {moment(parseInt(blockInfo.header.timestamp)).format("YYYY-MM-DD HH:mm:ss")} ({blockInfo.header.timestamp})
+                      {moment(parseInt(blockInfo.header.timestamp)).format("YYYY-MM-DD HH:mm:ss")} (
+                      {blockInfo.header.timestamp})
                     </Col>
                   </Row>
                   <Row className="blockinfo-row">
@@ -326,20 +335,47 @@ const BlockInfo = () => {
                                   {!!txInfo && txInfo[txInput.previousOutpoint.transactionId] ? (
                                     <>
                                       <Col xs={12} sm={8} md={9} lg={9} xl={8} xxl={7} className="text-truncate">
-                                        <Link to={`/addresses/${getAddrFromOutputs(txInfo[txInput.previousOutpoint.transactionId]["outputs"], txInput.previousOutpoint.index || 0)}`} className="blockinfo-link">
-                                          {getAddrFromOutputs(txInfo[txInput.previousOutpoint.transactionId]["outputs"], txInput.previousOutpoint.index || 0)}
+                                        <Link
+                                          to={`/addresses/${getAddrFromOutputs(
+                                            txInfo[txInput.previousOutpoint.transactionId]["outputs"],
+                                            txInput.previousOutpoint.index || 0
+                                          )}`}
+                                          className="blockinfo-link"
+                                        >
+                                          {getAddrFromOutputs(
+                                            txInfo[txInput.previousOutpoint.transactionId]["outputs"],
+                                            txInput.previousOutpoint.index || 0
+                                          )}
                                         </Link>
-                                        <CopyButton text={getAddrFromOutputs(txInfo[txInput.previousOutpoint.transactionId]["outputs"], txInput.previousOutpoint.index || 0)} />
+                                        <CopyButton
+                                          text={getAddrFromOutputs(
+                                            txInfo[txInput.previousOutpoint.transactionId]["outputs"],
+                                            txInput.previousOutpoint.index || 0
+                                          )}
+                                        />
                                       </Col>
                                       <Col className="block-utxo-amount-minus" xs={12} sm={4} md={2}>
-                                        -{numberWithCommas(getAmountFromOutputs(txInfo[txInput.previousOutpoint.transactionId]["outputs"], txInput.previousOutpoint.index || 0))}&nbsp;HTN
+                                        -
+                                        {numberWithCommas(
+                                          getAmountFromOutputs(
+                                            txInfo[txInput.previousOutpoint.transactionId]["outputs"],
+                                            txInput.previousOutpoint.index || 0
+                                          )
+                                        )}
+                                        &nbsp;HTN
                                       </Col>
                                     </>
                                   ) : (
                                     <>
                                       <Col xs={12} sm={8} md={9} lg={9} xl={8} xxl={7} className="text-truncate">
-                                        <a className="blockinfo-link" href={`https://explorer.hoosat.fi/tx/${txInput.previousOutpoint.transactionId}`} target="_blank" rel="noreferrer">
-                                          TX #{txInput.previousOutpoint.index || 0} {txInput.previousOutpoint.transactionId}
+                                        <a
+                                          className="blockinfo-link"
+                                          href={`https://explorer.hoosat.fi/tx/${txInput.previousOutpoint.transactionId}`}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                        >
+                                          TX #{txInput.previousOutpoint.index || 0}{" "}
+                                          {txInput.previousOutpoint.transactionId}
                                         </a>
                                       </Col>
                                       <Col className="me-auto" xs={12} sm={4} md={2}></Col>
@@ -365,7 +401,10 @@ const BlockInfo = () => {
                               {(tx.outputs || []).map((txOutput) => (
                                 <Row>
                                   <Col xs={12} sm={8} md={9} lg={9} xl={8} xxl={7} className="text-truncate">
-                                    <Link to={`/addresses/${txOutput.verboseData.scriptPublicKeyAddress}`} className="blockinfo-link">
+                                    <Link
+                                      to={`/addresses/${txOutput.verboseData.scriptPublicKeyAddress}`}
+                                      className="blockinfo-link"
+                                    >
                                       {txOutput.verboseData.scriptPublicKeyAddress}
                                     </Link>
 
@@ -382,23 +421,83 @@ const BlockInfo = () => {
                         <Col sm={5} md={4}>
                           <div className="utxo-header mt-3">tx amount</div>
                           <div className="utxo-value d-flex flex-row">
-                            <div className="utxo-amount">{numberWithCommas(tx.outputs.reduce((a, b) => (a || 0) + parseInt(b.amount), 0) / 100000000)} HTN</div>
+                            <div className="utxo-amount">
+                              {numberWithCommas(
+                                tx.outputs.reduce((a, b) => (a || 0) + parseInt(b.amount), 0) / 100000000
+                              )}{" "}
+                              HTN
+                            </div>
                           </div>
                         </Col>
                         <Col sm={3} md={2}>
                           <div className="utxo-header mt-3">tx value</div>
-                          <div className="utxo-value">{((tx.outputs.reduce((a, b) => (a || 0) + parseInt(b.amount), 0) / 100000000) * price).toFixed(2)} $</div>
+                          <div className="utxo-value">
+                            {(
+                              (tx.outputs.reduce((a, b) => (a || 0) + parseInt(b.amount), 0) / 100000000) *
+                              price
+                            ).toFixed(2)}{" "}
+                            $
+                          </div>
                         </Col>
                         <Col sm={4} md={6}>
                           <div className="utxo-header mt-3">details</div>
                           <div className="utxo-value d-flex flex-row flex-wrap">
-                            {!!txInfo && txInfo[tx.verboseData.transactionId] ? txInfo[tx.verboseData.transactionId]?.is_accepted ? <div className="accepted-true mb-3 me-3">accepted</div> : <span className="accepted-false">Confirming</span> : <>-</>}
-                            {!!txInfo && !!txInfo[tx.verboseData.transactionId]?.is_accepted && blueScore !== 0 && blueScore - txInfo[tx.verboseData.transactionId].accepting_block_blue_score < 86400 && (
-                              <div className="confirmations mb-3">{blueScore - txInfo[tx.verboseData.transactionId].accepting_block_blue_score}&nbsp;confirmations</div>
+                            {!!txInfo && txInfo[tx.verboseData.transactionId] ? (
+                              txInfo[tx.verboseData.transactionId]?.is_accepted ? (
+                                <div className="accepted-true me-3 mb-3">
+                                  <span data-tooltip-id="accepted-tooltip">accepted</span>
+                                  <Tooltip
+                                    id="accepted-tooltip"
+                                    place="top"
+                                    style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                                    content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
+                                  />
+                                </div>
+                              ) : (
+                                <div className="accepted-false me-3 mb-3">
+                                  <span data-tooltip-id="accepted-tooltip">not accepted</span>
+                                  <Tooltip
+                                    id="accepted-tooltip"
+                                    place="top"
+                                    style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                                    content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
+                                  />
+                                </div>
+                              )
+                            ) : (
+                              <>-</>
                             )}
-                            {!!txInfo && !!txInfo[tx.verboseData.transactionId]?.is_accepted && blueScore !== 0 && blueScore - txInfo[tx.verboseData.transactionId].accepting_block_blue_score >= 86400 && (
-                              <div className="confirmations mb-3">finalized</div>
-                            )}
+                            {!!txInfo &&
+                              !!txInfo[tx.verboseData.transactionId]?.is_accepted &&
+                              blueScore !== 0 &&
+                              blueScore - txInfo[tx.verboseData.transactionId].accepting_block_blue_score < 86400 && (
+                                <div className="confirmations mb-3">
+                                  <span data-tooltip-id="confirmations-tooltip">
+                                    {blueScore - txInfo[tx.verboseData.transactionId].accepting_block_blue_score}
+                                    &nbsp;confirmations
+                                  </span>
+                                  <Tooltip
+                                    id="confirmations-tooltip"
+                                    place="top"
+                                    style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                                    content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
+                                  />
+                                </div>
+                              )}
+                            {!!txInfo &&
+                              !!txInfo[tx.verboseData.transactionId]?.is_accepted &&
+                              blueScore !== 0 &&
+                              blueScore - txInfo[tx.verboseData.transactionId].accepting_block_blue_score >= 86400 && (
+                                <div className="confirmations mb-3">
+                                  <span data-tooltip-id="confirmations-tooltip">confirmed</span>
+                                  <Tooltip
+                                    id="confirmations-tooltip"
+                                    place="top"
+                                    style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                                    content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
+                                  />
+                                </div>
+                              )}
                           </div>
                         </Col>
                       </Row>

@@ -7,6 +7,7 @@ import { numberWithCommas } from "../helper.js";
 import { getTransaction, getTransactions } from "../htn-api-client.js";
 import BlueScoreContext from "./BlueScoreContext.js";
 import CopyButton from "./CopyButton.js";
+import { Tooltip } from "react-tooltip";
 
 const getOutputFromIndex = (outputs, index) => {
   return outputs[index];
@@ -165,7 +166,15 @@ const TransactionInfo = () => {
                       <Col className="blockinfo-value-mono" lg={10}>
                         {txInfo && additionalTxInfo && (
                           <>
-                            {(txInfo.inputs.map((tx_input) => getOutputFromIndex(additionalTxInfo[tx_input.previous_outpoint_hash]?.outputs || [], tx_input?.previous_outpoint_index)?.amount || 0).reduce((a, b) => a + b) -
+                            {(txInfo.inputs
+                              .map(
+                                (tx_input) =>
+                                  getOutputFromIndex(
+                                    additionalTxInfo[tx_input.previous_outpoint_hash]?.outputs || [],
+                                    tx_input?.previous_outpoint_index
+                                  )?.amount || 0
+                              )
+                              .reduce((a, b) => a + b) -
                               (txInfo.outputs?.map((v) => v?.amount) || [0]).reduce((a, b) => a + b)) /
                               100000000}{" "}
                             HTN
@@ -178,10 +187,61 @@ const TransactionInfo = () => {
                     <Col className="blockinfo-key" md={2}>
                       Details
                     </Col>
-                    <Col className="blockinfo-value mt-2 d-flex flex-row flex-wrap" md={10} lg={10} style={{ marginBottom: "-1rem" }}>
-                      {txInfo.is_accepted ? <div className="accepted-true me-3 mb-3">accepted</div> : <span className="accepted-false mb-2 me-">Confirming</span>}
-                      {txInfo.is_accepted && blueScore !== 0 && blueScore - txInfo.accepting_block_blue_score < 86400 && <div className="confirmations mb-3">{Math.max(blueScore - txInfo.accepting_block_blue_score, 0)}&nbsp;confirmations</div>}
-                      {txInfo.is_accepted && blueScore !== 0 && blueScore - txInfo.accepting_block_blue_score >= 86400 && <div className="confirmations mb-3">confirmed</div>}
+                    <Col
+                      className="blockinfo-value mt-2 d-flex flex-row flex-wrap"
+                      md={10}
+                      lg={10}
+                      style={{ marginBottom: "-1rem" }}
+                    >
+                      {txInfo.is_accepted ? (
+                        <div className="accepted-true me-3 mb-3">
+                          <span data-tooltip-id="accepted-tooltip">accepted</span>
+                          <Tooltip
+                            id="accepted-tooltip"
+                            place="top"
+                            style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                            content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
+                          />
+                        </div>
+                      ) : (
+                        <div className="accepted-false me-3 mb-3">
+                          <span data-tooltip-id="accepted-tooltip">not accepted</span>
+                          <Tooltip
+                            id="accepted-tooltip"
+                            place="top"
+                            style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                            content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
+                          />
+                        </div>
+                      )}
+                      {txInfo.is_accepted &&
+                        blueScore !== 0 &&
+                        blueScore - txInfo.accepting_block_blue_score < 86400 && (
+                          <div className="confirmations mb-3">
+                            <span data-tooltip-id="confirmations-tooltip">
+                              {Math.max(blueScore - txInfo.accepting_block_blue_score, 0)}&nbsp;confirmations
+                            </span>
+                            <Tooltip
+                              id="confirmations-tooltip"
+                              place="top"
+                              style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                              content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
+                            />
+                          </div>
+                        )}
+                      {txInfo.is_accepted &&
+                        blueScore !== 0 &&
+                        blueScore - txInfo.accepting_block_blue_score >= 86400 && (
+                          <div className="confirmations mb-3">
+                            <span data-tooltip-id="confirmations-tooltip">confirmed</span>
+                            <Tooltip
+                              id="confirmations-tooltip"
+                              place="top"
+                              style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                              content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
+                            />
+                          </div>
+                        )}
                     </Col>
                   </Row>
                 </Container>
@@ -190,7 +250,9 @@ const TransactionInfo = () => {
               <>
                 <Spinner animation="border" variant="primary" />
                 <h2 className="text-light">Retry {retryCnt.current}/20</h2>
-                <p className="blockinfo-row text-light">Sometimes TXs need a few seconds to be added into the database.</p>
+                <p className="blockinfo-row text-light">
+                  Sometimes TXs need a few seconds to be added into the database.
+                </p>
               </>
             )}
           </Col>
@@ -229,7 +291,14 @@ const TransactionInfo = () => {
                           <Col sm={12} md={12} lg={3}>
                             <div className="blockinfo-key mt-2">Amount</div>
                             <div className="utxo-value">
-                              <span className="utxo-amount-minus">-{getOutputFromIndex(additionalTxInfo[tx_input.previous_outpoint_hash].outputs, tx_input?.previous_outpoint_index)?.amount / 100000000}&nbsp;HTN</span>
+                              <span className="utxo-amount-minus">
+                                -
+                                {getOutputFromIndex(
+                                  additionalTxInfo[tx_input.previous_outpoint_hash].outputs,
+                                  tx_input?.previous_outpoint_index
+                                )?.amount / 100000000}
+                                &nbsp;HTN
+                              </span>
                             </div>
                           </Col>
                         )}
@@ -244,8 +313,21 @@ const TransactionInfo = () => {
                             <Col sm={12} md={12} lg={12}>
                               <div className="blockinfo-key mt-2">Address</div>
                               <div className="utxo-value-mono">
-                                <Link to={`/addresses/${getOutputFromIndex(additionalTxInfo[tx_input.previous_outpoint_hash].outputs, tx_input?.previous_outpoint_index)?.script_public_key_address}`} className="blockinfo-link">
-                                  {getOutputFromIndex(additionalTxInfo[tx_input.previous_outpoint_hash].outputs, tx_input?.previous_outpoint_index)?.script_public_key_address}
+                                <Link
+                                  to={`/addresses/${
+                                    getOutputFromIndex(
+                                      additionalTxInfo[tx_input.previous_outpoint_hash].outputs,
+                                      tx_input?.previous_outpoint_index
+                                    )?.script_public_key_address
+                                  }`}
+                                  className="blockinfo-link"
+                                >
+                                  {
+                                    getOutputFromIndex(
+                                      additionalTxInfo[tx_input.previous_outpoint_hash].outputs,
+                                      tx_input?.previous_outpoint_index
+                                    )?.script_public_key_address
+                                  }
                                 </Link>
                               </div>
                             </Col>
@@ -272,7 +354,9 @@ const TransactionInfo = () => {
                       <Col sm={6} md={6} lg={3}>
                         <div className="blockinfo-key mt-2 mt-lg-0">Amount</div>
                         <div className="utxo-value">
-                          <span className="utxo-amount">+{numberWithCommas(tx_output?.amount / 100000000)}&nbsp;HTN</span>
+                          <span className="utxo-amount">
+                            +{numberWithCommas(tx_output?.amount / 100000000)}&nbsp;HTN
+                          </span>
                         </div>
                       </Col>
                       <Col sm={12} md={12} lg={12}>
