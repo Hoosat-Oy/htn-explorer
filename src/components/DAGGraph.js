@@ -34,18 +34,19 @@ const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
       const labelText = block.hash;
       const maxLabelLength = 8;
       const shortLabel = labelText.length > maxLabelLength ? labelText.slice(0, maxLabelLength - 3) + "..." : labelText;
-
-      graph.setNode(block.hash, {
-        hash: block.hash,
-        width: 30,
-        height: 30,
-        shape: "rect",
-        style: block.isChain
-          ? "fill: #116466; stroke: #116466; cursor: pointer;"
-          : "fill: #661311; stroke: #661311; cursor: pointer;",
-        label: shortLabel,
-        labelStyle: "font-size: 12px; fill: #fff;",
-      });
+      if (block.redparents == 0) {
+        graph.setNode(block.hash, {
+          hash: block.hash,
+          width: 30,
+          height: 30,
+          shape: "rect",
+          style: block.isChain
+            ? "fill: #116466; stroke: #116466; cursor: pointer;"
+            : "fill: #661311; stroke: #661311; cursor: pointer;",
+          label: shortLabel,
+          labelStyle: "font-size: 12px; fill: #fff;",
+        });
+      }
     });
 
     // Add edges
