@@ -50,31 +50,31 @@ const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
 
     // Add edges
     DAG.forEach((block) => {
-      if (block.redparents) {
-        block.redparents.forEach((parent) => {
-          if (graph.hasNode(parent) && graph.hasNode(block.hash)) {
-            if (!graph.hasEdge(parent, block.hash)) {
-              graph.setEdge(parent, block.hash, {
-                style: "stroke: #5E1210; fill: none; stroke-width: 2px;",
-                arrowheadStyle: "fill: #5E1210; stroke-width: 2px;",
-              });
-            }
-          }
-        });
-      }
+      // if (block.redparents) {
+      //   block.redparents.forEach((parent) => {
+      //     if (graph.hasNode(parent) && graph.hasNode(block.hash)) {
+      //       if (!graph.hasEdge(parent, block.hash)) {
+      //         graph.setEdge(parent, block.hash, {
+      //           style: "stroke: #5E1210; fill: none; stroke-width: 2px;",
+      //           arrowheadStyle: "fill: #5E1210; stroke-width: 2px;",
+      //         });
+      //       }
+      //     }
+      //   });
+      // }
       if (block.blueparents) {
         block.blueparents.forEach((parent) => {
           if (graph.hasNode(parent) && graph.hasNode(block.hash)) {
             if (!graph.hasEdge(parent, block.hash)) {
-              if (parent == block.selectedParent) {
-                graph.setEdge(parent, block.hash, {
-                  style: "stroke: #17888A; fill: none; stroke-width: 2px;",
-                  arrowheadStyle: "fill: #17888A; stroke-width: 2px;",
-                });
-              } else {
+              if (parent !== block.selectedParent) {
                 graph.setEdge(parent, block.hash, {
                   style: "stroke: #3f4d46; fill: none; stroke-width: 2px;",
                   arrowheadStyle: "fill: #3f4d46; stroke-width: 2px;",
+                });
+              } else {
+                graph.setEdge(parent, block.hash, {
+                  style: "stroke: #17888A; fill: none; stroke-width: 2px;",
+                  arrowheadStyle: "fill: #17888A; stroke-width: 2px;",
                 });
               }
             }
