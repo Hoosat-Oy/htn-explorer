@@ -34,7 +34,13 @@ const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
       const labelText = block.hash;
       const maxLabelLength = 8;
       const shortLabel = labelText.length > maxLabelLength ? labelText.slice(0, maxLabelLength - 3) + "..." : labelText;
-      if (block.redparents == 0) {
+
+      const children = block.children
+        .map((childHash) => DAG.find((b) => b.hash === childHash))
+        .filter((childBlock) => childBlock !== undefined);
+
+      const isInRedparentsOfChild = children.some((child) => child.redparents && child.redparents.includes(block.hash));
+      if (!isInRedparentsOfChild) {
         graph.setNode(block.hash, {
           hash: block.hash,
           width: 30,
@@ -51,18 +57,18 @@ const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
 
     // Add edges
     DAG.forEach((block) => {
-      // if (block.redparents) {
-      //   block.redparents.forEach((parent) => {
-      //     if (graph.hasNode(parent) && graph.hasNode(block.hash)) {
-      //       if (!graph.hasEdge(parent, block.hash)) {
-      //         graph.setEdge(parent, block.hash, {
-      //           style: "stroke: #5E1210; fill: none; stroke-width: 2px;",
-      //           arrowheadStyle: "fill: #5E1210; stroke-width: 2px;",
-      //         });
-      //       }
-      //     }
-      //   });
-      // }
+      if (block.redparents) {
+        block.redparents.forEach((parent) => {
+          if (graph.hasNode(parent) && graph.hasNode(block.hash)) {
+            if (!graph.hasEdge(parent, block.hash)) {
+              graph.setEdge(parent, block.hash, {
+                style: "stroke: #5E1210; fill: none; stroke-width: 2px;",
+                arrowheadStyle: "fill: #5E1210; stroke-width: 2px;",
+              });
+            }
+          }
+        });
+      }
       if (block.blueparents) {
         block.blueparents.forEach((parent) => {
           if (graph.hasNode(parent) && graph.hasNode(block.hash)) {

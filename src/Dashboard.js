@@ -1,16 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "font-awesome/css/font-awesome.min.css";
 import { useContext, useState, useEffect } from "react";
-import {
-  Button,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  Modal,
-  Row,
-  Spinner,
-} from "react-bootstrap";
+import { Button, Col, Container, Form, InputGroup, Modal, Row, Spinner } from "react-bootstrap";
 import { useNavigate, useLocation } from "react-router";
 import "./App.scss";
 import BalanceModal from "./components/BalanceModal";
@@ -57,6 +48,7 @@ function Dashboard() {
         hash: blocks[i].verboseData.hash,
         isChain: blocks[i].verboseData.isChainBlock === true ? true : false,
         selectedParent: blocks[i].verboseData.selectedParentHash,
+        children: blocks[i].verboseData.childrenHashes || [],
         blueparents: blocks[i].verboseData.mergeSetBluesHashes || [],
         redparents: blocks[i].verboseData.mergeSetRedsHashes || [],
       });
@@ -173,20 +165,14 @@ function Dashboard() {
   return (
     <div>
       <Modal show={showLoadingModal} animation={false} centered>
-        <Modal.Body
-          className="d-flex flex-row justify-content-center"
-          style={{ backgroundColor: "#181D30" }}
-        >
+        <Modal.Body className="d-flex flex-row justify-content-center" style={{ backgroundColor: "#181D30" }}>
           <Spinner animation="border" variant="primary" size="xl" />
         </Modal.Body>
       </Modal>
       <div className="row1">
         <Container className="firstRow webpage" fluid>
           <Row>
-            <Col
-              md={12}
-              className="d-flex flex-row justify-content-start text-light d-xs-none align-items-center"
-            >
+            <Col md={12} className="d-flex flex-row justify-content-start text-light d-xs-none align-items-center">
               <img className="big-htn-icon" src="/k-icon-glow.png" alt="logo" />
               <div className="bigfont htn-badge">
                 HOOSAT
@@ -205,11 +191,7 @@ function Dashboard() {
                     type="text"
                     placeholder="Search for hoosat:address or block"
                   />
-                  <Button
-                    type="submit"
-                    className="shadow-none searchButton"
-                    variant="dark"
-                  >
+                  <Button type="submit" className="shadow-none searchButton" variant="dark">
                     <i className="fa fa-search" />
                   </Button>
                 </InputGroup>
@@ -265,12 +247,7 @@ function Dashboard() {
           </Row>
         </Container>
       </div>
-      <BalanceModal
-        handleClose={handleClose}
-        show={show}
-        address={address}
-        balance={balance}
-      />
+      <BalanceModal handleClose={handleClose} show={show} address={address} balance={balance} />
     </div>
   );
 }
