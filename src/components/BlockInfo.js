@@ -12,6 +12,7 @@ import { getBlock, getTransactions } from "../htn-api-client.js";
 import BlueScoreContext from "./BlueScoreContext.js";
 import CopyButton from "./CopyButton.js";
 import PriceContext from "./PriceContext.js";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
 const BlockLamp = (props) => {
   return (
@@ -196,7 +197,7 @@ const BlockInfo = () => {
                       <span data-tooltip-id="is-chain-block-tooltip">
                         {!!blockInfo.verboseData.isChainBlock ? "true" : "false"}
                       </span>
-                      <Tooltip
+                      <ReactTooltip
                         id="is-chain-block-tooltip"
                         place="top"
                         style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}

@@ -15,7 +15,7 @@ const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
 
     const graph = new dagreD3.graphlib.Graph().setGraph({
       rankdir: "LR",
-      ranksep: 200,
+      ranksep: 100,
       nodesep: 5,
       edgesep: 0,
       ranker: "longest-path",
@@ -108,8 +108,8 @@ const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
     render(g, graph);
 
     // Calculate scaling and translation
-    var graphWidth = graph.graph().width + 25;
-    var graphHeight = graph.graph().height + 50;
+    var graphWidth = graph.graph().width;
+    var graphHeight = graph.graph().height;
     const svgWidth = svg.node().getBoundingClientRect().width;
     const svgHeight = svg.node().getBoundingClientRect().height;
 
@@ -128,11 +128,10 @@ const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
     //   console.log(`rerender scale ${scaleVertical}`);
     // }
     // setRemoveFromDAG(removed);
-    const scale = Math.min(scaleHorizontal, scaleVertical, 1);
 
-    const xOffset = (svgWidth - graphWidth * scale) / 2;
+    const scale = Math.max(Math.min(scaleHorizontal, scaleVertical, 1), 0.75);
+    let xOffset = Math.min(svgWidth - graphWidth * scale, 0);
     const yOffset = (svgHeight - graphHeight * scale) / 2;
-
     g.attr("transform", `translate(${xOffset}, ${yOffset}) scale(${scale})`);
     svg.attr("viewBox", `0 0 ${svgWidth} ${svgHeight}`);
   }, [DAG]);
