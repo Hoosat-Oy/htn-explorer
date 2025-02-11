@@ -220,7 +220,7 @@ const BlockInfo = () => {
                   </Row>
                   <Row className="blockinfo-row">
                     <Col className="blockinfo-key" lg={2}>
-                      mergeSetBluesHashes
+                      Mergeset Blues hashes
                     </Col>
                     <Col className="blockinfo-value-mono" lg={10}>
                       <ul>
@@ -236,7 +236,7 @@ const BlockInfo = () => {
                   </Row>
                   <Row className="blockinfo-row">
                     <Col className="blockinfo-key" lg={2}>
-                      mergeSetRedsHashes
+                      Mergeset Reds hashes
                     </Col>
                     <Col className="blockinfo-value-mono" lg={10}>
                       <ul>
