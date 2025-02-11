@@ -142,17 +142,6 @@ const BlockInfo = () => {
                     <Col className="blockinfo-value-mono" lg={10}>
                       {blockInfo.verboseData.hash}
                       <CopyButton text={blockInfo.verboseData.hash} />
-                      <OverlayTrigger overlay={<Tooltip id="tooltip-kgi">Open in Kaspa Graph Inspector</Tooltip>}>
-                        <span>
-                          <BiNetworkChart
-                            className="ms-2 copy-symbol"
-                            size="20"
-                            onClick={() => {
-                              window.open(`https://explorer.hoosat.fi/?hash=${id}`, "_blank");
-                            }}
-                          />
-                        </span>
-                      </OverlayTrigger>
                     </Col>
                     {/* {isBlue ? "BLUE" : "RED"} */}
                   </Row>
@@ -207,11 +196,51 @@ const BlockInfo = () => {
                   </Row>
                   <Row className="blockinfo-row">
                     <Col className="blockinfo-key" lg={2}>
+                      Selected Parent hash
+                    </Col>
+                    <Col className="blockinfo-value-mono" lg={10}>
+                      {blockInfo.verboseData.selectedParentHash}
+                    </Col>
+                  </Row>
+                  <Row className="blockinfo-row">
+                    <Col className="blockinfo-key" lg={2}>
                       Parents
                     </Col>
                     <Col className="blockinfo-value-mono" lg={10}>
                       <ul>
                         {blockInfo.header.parents[0].parentHashes.map((x) => (
+                          <li>
+                            <Link className="blockinfo-link" to={`/blocks/${x}`}>
+                              {x}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </Col>
+                  </Row>
+                  <Row className="blockinfo-row">
+                    <Col className="blockinfo-key" lg={2}>
+                      mergeSetBluesHashes
+                    </Col>
+                    <Col className="blockinfo-value-mono" lg={10}>
+                      <ul>
+                        {(blockInfo.verboseData.mergeSetBluesHashes || []).map((x) => (
+                          <li>
+                            <Link className="blockinfo-link" to={`/blocks/${x}`}>
+                              {x}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </Col>
+                  </Row>
+                  <Row className="blockinfo-row">
+                    <Col className="blockinfo-key" lg={2}>
+                      mergeSetRedsHashes
+                    </Col>
+                    <Col className="blockinfo-value-mono" lg={10}>
+                      <ul>
+                        {(blockInfo.verboseData.mergeSetRedsHashes || []).map((x) => (
                           <li>
                             <Link className="blockinfo-link" to={`/blocks/${x}`}>
                               {x}
