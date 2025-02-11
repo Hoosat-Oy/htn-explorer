@@ -199,7 +199,9 @@ const BlockInfo = () => {
                       Selected Parent hash
                     </Col>
                     <Col className="blockinfo-value-mono" lg={10}>
-                      {blockInfo.verboseData.selectedParentHash}
+                      <Link className="blockinfo-link" to={`/blocks/${x}`}>
+                        {blockInfo.verboseData.selectedParentHash}
+                      </Link>
                     </Col>
                   </Row>
                   <Row className="blockinfo-row">
