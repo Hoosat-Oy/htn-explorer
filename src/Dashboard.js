@@ -221,9 +221,11 @@ function Dashboard() {
           </Row>
         </Container>
       </div>
+      {/* Disable until network stabilizes with orphans.
       <div className="row3">
         <DAGGraph DAG={ghostDAG} setRemoveFromDAG={setRemoveFromGhostDAG} />
-      </div>
+      </div> 
+      */}
       <div className="row4">
         <Container className="fourthRow webpage" fluid>
           <Row>
