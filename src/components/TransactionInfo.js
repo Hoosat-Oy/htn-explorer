@@ -251,7 +251,7 @@ const TransactionInfo = () => {
                 <Spinner animation="border" variant="primary" />
                 <h2 className="text-light">Retry {retryCnt.current}/60</h2>
                 <p className="blockinfo-row text-light">
-                  Sometimes TXs need a few seconds to be added into the database.
+                  Sometimes TXs need a few minutes to be added into the database.
                 </p>
               </>
             )}
