@@ -65,7 +65,7 @@ const TransactionInfo = () => {
     }
     if (txInfo?.detail === "Transaction not found") {
       retryCnt.current += 1;
-      if (retryCnt.current < 20) {
+      if (retryCnt.current < 60) {
         setTimeout(getTx, 1000);
         console.log("retry", retryCnt);
       }
@@ -249,7 +249,7 @@ const TransactionInfo = () => {
             ) : (
               <>
                 <Spinner animation="border" variant="primary" />
-                <h2 className="text-light">Retry {retryCnt.current}/20</h2>
+                <h2 className="text-light">Retry {retryCnt.current}/60</h2>
                 <p className="blockinfo-row text-light">
                   Sometimes TXs need a few seconds to be added into the database.
                 </p>
