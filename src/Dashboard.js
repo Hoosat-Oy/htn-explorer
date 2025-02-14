@@ -27,16 +27,6 @@ function Dashboard() {
   const [address] = useState("hoosat:");
 
   const [ghostDAG, setGhostDAG] = useState([]);
-  const [removeFromGhostDAG, setRemoveFromGhostDAG] = useState(0);
-
-  const removeFromGhostDAGData = async () => {
-    console.log(`Removing from GhostDAG ${removeFromGhostDAG} blocks`);
-    setGhostDAG(ghostDAG.slice(removeFromGhostDAG));
-  };
-
-  useEffect(() => {
-    removeFromGhostDAGData();
-  }, [removeFromGhostDAG]);
 
   const updateDAGData = async (blocksdata) => {
     var low_hash = blocksdata[0].block_hash;
@@ -126,7 +116,7 @@ function Dashboard() {
     if (blocks && blocks.length > 0) {
       //const loadVerboseForThisBlock = blocks[blocks.length - 1];
       //getDAGData(loadVerboseForThisBlock);
-      updateDAGData(blocks);
+      //updateDAGData(blocks);
     }
   }, [blocks]);
 
@@ -221,11 +211,7 @@ function Dashboard() {
           </Row>
         </Container>
       </div>
-      {/* Disable until network stabilizes with orphans.
-      <div className="row3">
-        <DAGGraph DAG={ghostDAG} setRemoveFromDAG={setRemoveFromGhostDAG} />
-      </div> 
-      */}
+
       <div className="row4">
         <Container className="fourthRow webpage" fluid>
           <Row>
@@ -249,6 +235,11 @@ function Dashboard() {
           </Row>
         </Container>
       </div>
+      {/* Disable until network stabilizes with orphans.
+      <div className="row3">
+        <DAGGraph DAG={ghostDAG} setRemoveFromDAG={setRemoveFromGhostDAG} />
+      </div> 
+      */}
       <BalanceModal handleClose={handleClose} show={show} address={address} balance={balance} />
     </div>
   );
