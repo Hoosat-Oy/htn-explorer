@@ -66,7 +66,7 @@ const TransactionInfo = () => {
     if (txInfo?.detail === "Transaction not found") {
       retryCnt.current += 1;
       if (retryCnt.current < 60) {
-        setTimeout(getTx, 10000);
+        setTimeout(getTx, 1000);
         console.log("retry", retryCnt);
       }
     }
