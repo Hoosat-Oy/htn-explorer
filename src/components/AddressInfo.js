@@ -274,7 +274,7 @@ const AddressInfo = () => {
     setButtonText("Fetching Transactions...");
     setIsDownloading(true);
 
-    const convertToCSV = (transactions) => {
+    const convertToCSV = (addr, transactions) => {
       const headers = [
         "Transaction ID",
         "Block Time",
@@ -287,16 +287,18 @@ const AddressInfo = () => {
       transactions.forEach((tx) => {
         tx.inputs.forEach((input) => {
           tx.outputs.forEach((output) => {
-            csvRows.push(
-              [
-                tx.transaction_id,
-                new Date(tx.block_time).toISOString(),
-                input.previous_outpoint_address,
-                input.previous_outpoint_amount,
-                output.script_public_key_address,
-                output.amount / 100000000,
-              ].join(",")
-            );
+            if (input.previous_outpoint_address === addr || output.script_public_key_address === addr) {
+              csvRows.push(
+                [
+                  tx.transaction_id,
+                  new Date(tx.block_time).toISOString(),
+                  input.previous_outpoint_address,
+                  input.previous_outpoint_amount / 100000000,
+                  output.script_public_key_address,
+                  output.amount / 100000000,
+                ].join(",")
+              );
+            }
           });
         });
       });
@@ -342,7 +344,7 @@ const AddressInfo = () => {
       }
 
       setButtonText("Generating CSV...");
-      const csvData = convertToCSV(transactions);
+      const csvData = convertToCSV(addr, transactions);
       downloadCSV(csvData, `${addr}-transactions.csv`);
 
       setButtonText("Download Complete ✅");
