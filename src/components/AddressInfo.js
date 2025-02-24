@@ -294,7 +294,7 @@ const AddressInfo = () => {
                 input.previous_outpoint_address,
                 input.previous_outpoint_amount,
                 output.script_public_key_address,
-                output.amount,
+                output.amount / 100000000,
               ].join(",")
             );
           });
