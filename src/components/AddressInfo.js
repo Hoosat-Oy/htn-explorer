@@ -33,6 +33,9 @@ const AddressInfo = () => {
   const { addr } = useParams();
   const ref = useRef(null);
 
+  const [buttonText, setButtonText] = useState("Download Transactions CSV");
+  const [isDownloading, setIsDownloading] = useState(false);
+
   const [addressBalance, setAddressBalance] = useState();
   const { blueScore } = useContext(BlueScoreContext);
   const [search, setSearch] = useSearchParams();
@@ -263,7 +266,14 @@ const AddressInfo = () => {
     }
   }, [view, activeTx, addr, loadTransactionsToShow]);
 
+  const sleep = (ms) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
   const downloadTransactionsAsCSV = async () => {
+    setButtonText("Fetching Transactions...");
+    setIsDownloading(true);
+
     const convertToCSV = (transactions) => {
       const headers = [
         "Transaction ID",
@@ -311,23 +321,39 @@ const AddressInfo = () => {
 
     try {
       while (true) {
+        setButtonText(`Fetching Transactions: ${page * 50} tx`);
         const response = await fetch(`${apiUrl}?page=${page}&items_per_page=50&resolve_previous_outpoints=light`);
         if (response.status === 200) {
           const data = await response.json();
-          if (data.length <= 0) {
-            break;
-          }
+          if (data.length <= 0) break;
           transactions = transactions.concat(data);
           page++;
+          sleep(500);
         } else {
           break;
         }
       }
+
+      if (transactions.length === 0) {
+        setButtonText("No Transactions Found");
+        setTimeout(() => setButtonText("Download Transactions CSV"), 2000);
+        setIsDownloading(false);
+        return;
+      }
+
+      setButtonText("Generating CSV...");
       const csvData = convertToCSV(transactions);
       downloadCSV(csvData, `${addr}-transactions.csv`);
+
+      setButtonText("Download Complete ✅");
+      setTimeout(() => setButtonText("Download Transactions CSV"), 3000);
     } catch (error) {
       console.error("Error fetching transactions:", error);
+      setButtonText("Error! Try Again");
+      setTimeout(() => setButtonText("Download Transactions CSV"), 3000);
     }
+
+    setIsDownloading(false);
   };
 
   return (
@@ -356,12 +382,11 @@ const AddressInfo = () => {
             <Button
               id="transactions-csv-download"
               variant="secondary"
-              type="submit"
-              onClick={() => {
-                downloadTransactionsAsCSV();
-              }}
+              type="button"
+              onClick={downloadTransactionsAsCSV}
+              disabled={isDownloading}
             >
-              Download transactions CSV
+              {buttonText}
             </Button>
           </Col>
         </Row>
