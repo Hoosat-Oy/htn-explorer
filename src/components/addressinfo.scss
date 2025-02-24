@@ -190,6 +190,23 @@
   }
 }
 
+.cvs-button {
+  color: $color1;
+  text-align: left;
+  font-family: "Rubik", "Courier New", Courier, monospace;
+  word-wrap: break-word;
+  width: 100%;
+  font-size: medium;
+  border-radius: .4rem;
+}
+
+
+@include media-breakpoint-down(sm) {
+  .cvs-button {
+    font-size: small;
+  }
+}
+
 .utxo-table {
   color: $color1;
   text-align: left;
