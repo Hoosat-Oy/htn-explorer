@@ -285,22 +285,24 @@ const AddressInfo = () => {
       ];
       let csvRows = [headers.join(",")];
       transactions.forEach((tx) => {
-        tx.inputs.forEach((input) => {
-          tx.outputs.forEach((output) => {
-            if (input.previous_outpoint_address === addr || output.script_public_key_address === addr) {
-              csvRows.push(
-                [
-                  tx.transaction_id,
-                  new Date(tx.block_time).toISOString(),
-                  input.previous_outpoint_address,
-                  input.previous_outpoint_amount / 100000000,
-                  output.script_public_key_address,
-                  output.amount / 100000000,
-                ].join(",")
-              );
-            }
+        if (tx.inputs !== null) {
+          tx.inputs.forEach((input) => {
+            tx.outputs.forEach((output) => {
+              if (input.previous_outpoint_address === addr || output.script_public_key_address === addr) {
+                csvRows.push(
+                  [
+                    tx.transaction_id,
+                    new Date(tx.block_time).toISOString(),
+                    input.previous_outpoint_address,
+                    input.previous_outpoint_amount / 100000000,
+                    output.script_public_key_address,
+                    output.amount / 100000000,
+                  ].join(",")
+                );
+              }
+            });
           });
-        });
+        }
       });
       return csvRows.join("\n");
     };
