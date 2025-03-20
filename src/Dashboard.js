@@ -116,7 +116,7 @@ function Dashboard() {
     if (blocks && blocks.length > 0) {
       //const loadVerboseForThisBlock = blocks[blocks.length - 1];
       //getDAGData(loadVerboseForThisBlock);
-      //updateDAGData(blocks);
+      updateDAGData(blocks);
     }
   }, [blocks]);
 
@@ -235,11 +235,9 @@ function Dashboard() {
           </Row>
         </Container>
       </div>
-      {/* Disable until network stabilizes with orphans.
       <div className="row3">
-        <DAGGraph DAG={ghostDAG} setRemoveFromDAG={setRemoveFromGhostDAG} />
-      </div> 
-      */}
+        <DAGGraph DAG={ghostDAG} />
+      </div>
       <BalanceModal handleClose={handleClose} show={show} address={address} balance={balance} />
     </div>
   );
