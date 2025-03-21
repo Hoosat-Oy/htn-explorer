@@ -31,9 +31,15 @@ function Dashboard() {
   const updateDAGData = async (blocksdata) => {
     var low_hash = blocksdata[0].block_hash;
     const { _, blocks } = await getBlocks(low_hash, true, false);
+
     console.log(`Updating blocks low_hash: ${blocks[0].verboseData.hash}`);
     var updatedDAG = [];
     for (var i = 0; i < blocks.length; i++) {
+      childrenHashes = blocks[i].verboseData.childrenHashes[0];
+      if (childrenHashes[0] === "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff") {
+        console.log("Chain tip found, lets not process further");
+        break;
+      }
       updatedDAG.push({
         hash: blocks[i].verboseData.hash,
         isChain: blocks[i].verboseData.isChainBlock === true ? true : false,
