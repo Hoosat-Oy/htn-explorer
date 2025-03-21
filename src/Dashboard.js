@@ -35,8 +35,8 @@ function Dashboard() {
     console.log(`Updating blocks low_hash: ${blocks[0].verboseData.hash}`);
     var updatedDAG = [];
     for (var i = 0; i < blocks.length; i++) {
-      var childrenHashes = blocks[i].verboseData.childrenHashes[0];
-      if (childrenHashes[0] === "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff") {
+      var childrenHash = blocks[i].verboseData.childrenHashes[0];
+      if (childrenHash === "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff") {
         console.log("Chain tip found, lets not process further");
         break;
       }
