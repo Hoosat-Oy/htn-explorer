@@ -27,7 +27,11 @@ const BlockOverview = (props) => {
   return (
     <div className="block-overview">
       <div className="d-flex flex-row w-100">
-        {!keepUpdating ? <FaPlay id="play-button" className="play-button" onClick={() => setKeepUpdating(true)} /> : <FaPause id="pause-button" className="play-button" onClick={() => setKeepUpdating(false)} />}
+        {!keepUpdating ? (
+          <FaPlay id="play-button" className="play-button" onClick={() => setKeepUpdating(true)} />
+        ) : (
+          <FaPause id="pause-button" className="play-button" onClick={() => setKeepUpdating(false)} />
+        )}
         <h4 className="block-overview-header text-center w-100 me-4">
           <FaDiceD20 className={isConnected && keepUpdating ? "rotate" : ""} size="1.7rem" /> LATEST BLOCKS
         </h4>
@@ -51,7 +55,7 @@ const BlockOverview = (props) => {
                 <tr id={x.block_hash} key={x.block_hash} onClick={onClickRow}>
                   <td className="table-timestamp">{moment(parseInt(x.timestamp)).format("YYYY‑MM‑DD HH:mm:ss")}</td>
                   {props.small ? <></> : <td>{x.blueScore}</td>}
-                  <td>{x.txs.length}</td>
+                  <td>{x.txCount}</td>
                   <td className="hashh">{x.block_hash}</td>
                 </tr>
               ))}

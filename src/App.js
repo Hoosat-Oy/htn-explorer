@@ -43,8 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-const socketAddress =
-  process.env.REACT_APP_SOCKET === undefined ? process.env.REACT_APP_SOCKET : "wss://socket.network.hoosat.fi";
+const socketAddress = process.env.REACT_APP_SOCKET;
 console.log(socketAddress);
 const socket = io(socketAddress, {
   path: "/ws/socket.io",
