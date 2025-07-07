@@ -6,7 +6,8 @@ import { getBlockdagInfo, getInfo } from "../htn-api-client";
 const BPS = 1;
 
 const BlockDAGBox = () => {
-  const [nextHFDAAScore, setNextHFDAAScore] = useState(29335426);
+  // const [nextHFDAAScore, setNextHFDAAScore] = useState(29335426);
+  const [nextHFDAAScore, setNextHFDAAScore] = useState(43334184);
   const [showHF, setShowHF] = useState(false);
   const [blockCount, setBlockCount] = useState();
   const [difficulty, setDifficulty] = useState();
