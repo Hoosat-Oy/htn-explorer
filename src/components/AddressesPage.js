@@ -20,6 +20,7 @@ const tags = new Map([
   ["hoosat:qrhed37kge64z6agkq82l7xce423ugdf308ehtsh72y2nee7x2kvzxv6xqwd4", "M4P PPLNSBF5"],
   ["hoosat:qpuvlmta9s07znc3hf0j4jvuwkgxzus5aen7echhr4mg5y4naxcxyuhetmvq9", "M4P   "],
   ["hoosat:qrk3xclt5m27hw3w3hp7mvawg9pnvxskk8x5xt9jugg7alm09ltkvf4uueqgl", "Klein"],
+  ["hoosat:qrkuugzna7jfm23cqsjd2ttmv9e07mvvn2luvrntswr5n7qthl7hccm7vkyh8", "Chargn"],
 ]);
 
 const AddressesPage = () => {
