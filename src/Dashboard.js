@@ -122,12 +122,12 @@ function Dashboard() {
     if (blocks && blocks.length > 0) {
       //const loadVerboseForThisBlock = blocks[blocks.length - 1];
       //getDAGData(loadVerboseForThisBlock);
-      updateDAGData(blocks);
+      // updateDAGData(blocks);
     }
   }, [blocks]);
 
   useEffect(() => {
-    setGhostDAG([]);
+    // setGhostDAG([]);
   }, []);
 
   const search = (e) => {
@@ -241,9 +241,9 @@ function Dashboard() {
           </Row>
         </Container>
       </div>
-      <div className="row3">
+      {/* <div className="row3">
         <DAGGraph DAG={ghostDAG} />
-      </div>
+      </div> */}
       <BalanceModal handleClose={handleClose} show={show} address={address} balance={balance} />
     </div>
   );
