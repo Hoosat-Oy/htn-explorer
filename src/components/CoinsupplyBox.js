@@ -5,6 +5,8 @@ import { useEffect, useState, useCallback } from "react";
 import { numberWithCommas } from "../helper";
 import { getCoinSupply, getHalving, getBlockdagInfo } from "../htn-api-client";
 
+const BPS = 5;
+
 function formatDuration(period) {
   const duration = moment.duration(period);
 
@@ -68,7 +70,7 @@ const CBox = () => {
       .then((response) => response.json())
       .then((d) => {
         if (dag_info.virtualDaaScore > 17500000) {
-          setBlockReward((d.blockreward * 0.95).toFixed(2));
+          setBlockReward(((d.blockreward * 0.95) / BPS).toFixed(2));
         } else {
           setBlockReward(d.blockreward.toFixed(2));
         }
@@ -97,11 +99,7 @@ const CBox = () => {
         <table style={{ fontSize: "1rem" }}>
           <tbody>
             <tr>
-              <td
-                colSpan="2"
-                className="text-center"
-                style={{ fontSize: "4rem" }}
-              >
+              <td colSpan="2" className="text-center" style={{ fontSize: "4rem" }}>
                 <FontAwesomeIcon icon={faCoins} />
                 <div id="light1" className="cardLight" />
               </td>
@@ -125,9 +123,7 @@ const CBox = () => {
             </tr>
             <tr>
               <td className="cardBoxElement align-top">Mined</td>
-              <td className="pt-1">
-                {((circCoins / 17100000000) * 100).toFixed(2)} %
-              </td>
+              <td className="pt-1">{((circCoins / 17100000000) * 100).toFixed(2)} %</td>
             </tr>
             <tr>
               <td className="cardBoxElement align-top">Block reward</td>
@@ -138,17 +134,11 @@ const CBox = () => {
               <td className="pt-1">
                 {halvingDate}
                 <br />
-                <div
-                  className="text-end w-100 nowrap"
-                  style={{ fontSize: "small" }}
-                >
+                <div className="text-end w-100 nowrap" style={{ fontSize: "small" }}>
                   {timeToHalving}
                 </div>
 
-                <div
-                  className="text-end w-100 pe-3 pt-1"
-                  style={{ fontSize: "small" }}
-                >
+                <div className="text-end w-100 pe-3 pt-1" style={{ fontSize: "small" }}>
                   to {halvingAmount} HTN
                 </div>
               </td>
