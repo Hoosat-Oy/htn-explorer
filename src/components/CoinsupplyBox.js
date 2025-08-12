@@ -70,7 +70,7 @@ const CBox = () => {
       .then((response) => response.json())
       .then((d) => {
         if (dag_info.virtualDaaScore > 17500000) {
-          setBlockReward(((d.blockreward * 0.95) / BPS).toFixed(2));
+          setBlockReward(((d.blockreward * 0.95)).toFixed(2));
         } else {
           setBlockReward(d.blockreward.toFixed(2));
         }
