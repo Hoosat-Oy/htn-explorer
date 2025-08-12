@@ -20,8 +20,6 @@ const MarketDataBox = () => {
     const blockReward = await getBlockReward();
     if (dag_info.virtualDaaScore > 17500000) {
       setDailyYield((1 / ((dag_info.difficulty * 2) / 1000)) * (blockReward * 0.95) * (86400 / 1));
-    } else if (dag_info.virtualDaaScore > 43334184) {
-      setDailyYield((1 / ((dag_info.difficulty * 2 * BPS) / 1000)) * (blockReward * 0.95) * ((86400 * BPS) / 1));
     } else {
       setDailyYield((1 / ((dag_info.difficulty * 2) / 1000)) * blockReward * (86400 / 1));
     }
