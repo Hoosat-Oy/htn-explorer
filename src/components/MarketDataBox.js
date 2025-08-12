@@ -108,11 +108,11 @@ const MarketDataBox = () => {
               <td className="pt-1">$ {numberWithCommas(marketData?.total_volume?.usd)}</td>
             </tr>
             <tr>
-              <td className="cardBoxElement nowrap">Yield Kh</td>
+              <td className="cardBoxElement nowrap">Daily Yield (Kh)</td>
               <td className="pt-1">{dailyYield.toFixed(2)} HTN</td>
             </tr>
             <tr>
-              <td className="cardBoxElement nowrap">Revenue Kh</td>
+              <td className="cardBoxElement nowrap">Daily Revenue (Kh)</td>
               <td className="pt-1">$ {(dailyYield * price).toFixed(6)}</td>
             </tr>
           </tbody>
