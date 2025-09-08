@@ -224,10 +224,10 @@ const AddressesPage = () => {
         const addressesResponse = await response.text();
         const addressesRows = addressesResponse.trim().split("\n");
         const parsedAddresses = addressesRows.map((row, _) => {
-          return row.split(",").trim();
+          return row.split(",");
         });
         parsedAddresses.forEach((address) => {
-          tags.set(address[0], address[1]);
+          tags.set(address[0].trim(), address[1].trim());
         });
         console.log(tags);
       } catch (error) {
