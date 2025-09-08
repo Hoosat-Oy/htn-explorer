@@ -11,7 +11,7 @@ const shiftSize = 7;
 const tags = new Map([
   ["hoosat:qzm5vg7uv66ze6mv8d32xhv50sxwhthkz9ly7049e87hr2rm7wr6zjxytztv7", "Burn Address"],
   ["hoosat:qp4ad2eh72xc8dtjjyz4llxzq9utn6k26uyl644xxw70wskdfl85zsqj9k4vz", "Developer fee"],
-  ["hoosat:qzlegrw3rseh9ma0j3726gtjlz0y4cmq8rrp25hkqgzcnmd4gplnz9rctast8", "Xeggex Exit Scam"],
+  ["hoosat:qpkcfshjeazmwex3t7x7qlctmhhratqauhkd5j254vfnmnuec7k6q4yzppn5q", "Xeggex Exit Scam Freezed"],
   ["hoosat:qzs4g22nvzl66lnt74wcy9lvu4kk4ka0w9hdhxyt5aem24r7q5v45wlqzxkwv", "Kenz"],
   ["hoosat:qqfyxz4lrve2y2wzr6zr4qusrtryln24fzd0hpqkwqrlx9qj2sedq92k4my7k", "Gran Búho Verde"],
   ["hoosat:qq96y2ew87phurzktjmttsmeh6eaymgndaatnsw7ze6pxf7xga3tuhzt9t8jv", "S.I.G "],
@@ -220,14 +220,14 @@ const AddressesPage = () => {
   useEffect(() => {
     const addTagAddressesFromFile = async (tag) => {
       try {
-        const response = await fetch(`https://shitlist.hoosat.fi/tags/${tag}.csv`);
+        const response = await fetch(`https://shitlist.hoosat.fi/tags/tags.csv`);
         const addressesResponse = await response.text();
         const addressesRows = addressesResponse.trim().split("\n");
         const parsedAddresses = addressesRows.map((row, _) => {
-          return row;
+          return row.split(",").trim();
         });
         parsedAddresses.forEach((address) => {
-          tags.set(address, tag.charAt(0).toUpperCase() + tag.slice(1));
+          tags.set(address[0], address[1]);
         });
         console.log(tags);
       } catch (error) {
@@ -251,7 +251,7 @@ const AddressesPage = () => {
         setLoading(false);
       }
     };
-    addTagAddressesFromFile("xeggex");
+    addTagAddressesFromFile();
     fetchYesterdaysCSV();
   }, []);
 
