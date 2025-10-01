@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import * as d3 from "d3";
 import * as dagreD3 from "dagre-d3";
 
-const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
+const DAGGraph = ({ DAG }) => {
   const svgRef = useRef(null);
   const navigate = useNavigate();
 
@@ -57,7 +57,7 @@ const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
       }
     });
 
-    // Add edges
+    // Add edges (non-selected first)
     DAG.forEach((block) => {
       const children = block.children
         .map((childHash) => DAG.find((b) => b.hash === childHash))
@@ -87,16 +87,27 @@ const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
                     style: "stroke: #3f4d46; fill: none; stroke-width: 2px;",
                     arrowheadStyle: "fill: #3f4d46; stroke-width: 2px;",
                   });
-                } else {
-                  graph.setEdge(parent, block.hash, {
-                    style: "stroke: #17888A; fill: none; stroke-width: 2px;",
-                    arrowheadStyle: "fill: #17888A; stroke-width: 2px;",
-                  });
                 }
               }
             }
           });
         }
+      }
+    });
+
+    // Add selected edges (#17888A) last to ensure they are on top
+    DAG.forEach((block) => {
+      if (block.blueparents) {
+        block.blueparents.forEach((parent) => {
+          if (parent === block.selectedParent && graph.hasNode(parent) && graph.hasNode(block.hash)) {
+            if (!graph.hasEdge(parent, block.hash)) {
+              graph.setEdge(parent, block.hash, {
+                style: "stroke: #17888A; fill: none; stroke-width: 2px;",
+                arrowheadStyle: "fill: #17888A; stroke-width: 2px;",
+              });
+            }
+          }
+        });
       }
     });
 
@@ -132,20 +143,6 @@ const DAGGraph = ({ DAG, setRemoveFromDAG }) => {
 
     var scaleVertical = Math.min(svgWidth / graphWidth, 1);
     var scaleHorizontal = Math.min(svgHeight / graphHeight, 1);
-    // console.log(`scale ${scaleVertical}`);
-    // var removed = 0;
-    // while (scaleVertical < 0.7 && scaleVertical > 0) {
-    //   graph.removeNode(graph.nodes().shift());
-    //   removed += 1;
-    //   render(g, graph);
-    //   graphWidth = graph.graph().width + 25;
-    //   graphHeight = graph.graph().height + 50;
-    //   scaleVertical = Math.min(svgWidth / graphWidth, 1);
-    //   scaleHorizontal = Math.min(svgHeight / graphHeight, 1);
-    //   console.log(`rerender scale ${scaleVertical}`);
-    // }
-    // setRemoveFromDAG(removed);
-
     const scale = Math.max(Math.min(scaleHorizontal, scaleVertical, 1), 0.75);
     let xOffset = Math.min(svgWidth - graphWidth * scale, 0);
     const yOffset = (svgHeight - graphHeight * scale) / 2;

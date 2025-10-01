@@ -31,9 +31,15 @@ function Dashboard() {
   const updateDAGData = async (blocksdata) => {
     var low_hash = blocksdata[0].block_hash;
     const { _, blocks } = await getBlocks(low_hash, true, false);
+
     console.log(`Updating blocks low_hash: ${blocks[0].verboseData.hash}`);
     var updatedDAG = [];
     for (var i = 0; i < blocks.length; i++) {
+      var childrenHash = blocks[i].verboseData.childrenHashes[0];
+      if (childrenHash === "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff") {
+        console.log("Chain tip found, lets not process further");
+        break;
+      }
       updatedDAG.push({
         hash: blocks[i].verboseData.hash,
         isChain: blocks[i].verboseData.isChainBlock === true ? true : false,
@@ -116,12 +122,12 @@ function Dashboard() {
     if (blocks && blocks.length > 0) {
       //const loadVerboseForThisBlock = blocks[blocks.length - 1];
       //getDAGData(loadVerboseForThisBlock);
-      //updateDAGData(blocks);
+      // updateDAGData(blocks);
     }
   }, [blocks]);
 
   useEffect(() => {
-    setGhostDAG([]);
+    // setGhostDAG([]);
   }, []);
 
   const search = (e) => {
@@ -235,11 +241,9 @@ function Dashboard() {
           </Row>
         </Container>
       </div>
-      {/* Disable until network stabilizes with orphans.
-      <div className="row3">
-        <DAGGraph DAG={ghostDAG} setRemoveFromDAG={setRemoveFromGhostDAG} />
-      </div> 
-      */}
+      {/* <div className="row3">
+        <DAGGraph DAG={ghostDAG} />
+      </div> */}
       <BalanceModal handleClose={handleClose} show={show} address={address} balance={balance} />
     </div>
   );

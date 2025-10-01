@@ -39,15 +39,25 @@ const TxOverview = (props) => {
   return (
     <div className="block-overview mb-4">
       <div className="d-flex flex-row w-100">
-        {!keepUpdating ? <FaPlay id="play-button" className="play-button" onClick={() => setKeepUpdating(true)} /> : <FaPause id="pause-button" className="play-button" onClick={() => setKeepUpdating(false)} />}
+        {!keepUpdating ? (
+          <FaPlay id="play-button" className="play-button" onClick={() => setKeepUpdating(true)} />
+        ) : (
+          <FaPause id="pause-button" className="play-button" onClick={() => setKeepUpdating(false)} />
+        )}
 
-        <OverlayTrigger overlay={<Tooltip id="tooltip-kgi">{ignoreCoinbaseTx ? "Show" : "Hide"} coinbase transactions</Tooltip>}>
+        <OverlayTrigger
+          overlay={<Tooltip id="tooltip-kgi">{ignoreCoinbaseTx ? "Show" : "Hide"} coinbase transactions</Tooltip>}
+        >
           <span>
-            <BiHide className={`mx-0 mt-3 hide-button ${ignoreCoinbaseTx && "hide-button-active"}`} onClick={toggleCoinbaseTransactions} />
+            <BiHide
+              className={`mx-0 mt-3 hide-button ${ignoreCoinbaseTx && "hide-button-active"}`}
+              onClick={toggleCoinbaseTransactions}
+            />
           </span>
         </OverlayTrigger>
         <h4 className="block-overview-header text-center w-100 me-4">
-          <RiMoneyDollarCircleFill className={isConnected && keepUpdating ? "rotate" : ""} size="1.7rem" /> LATEST TRANSACTIONS
+          <RiMoneyDollarCircleFill className={isConnected && keepUpdating ? "rotate" : ""} size="1.7rem" /> LATEST
+          TRANSACTIONS
         </h4>
       </div>
       <div className="block-overview-content">
@@ -60,36 +70,42 @@ const TxOverview = (props) => {
             </tr>
           </thead>
           <tbody>
-            {[...tempBlocks]
-              .sort((a, b) => b.blueScore - a.blueScore)
-              // .slice(0, props.lines)
-              .flatMap((block) =>
-                block.txs.slice(ignoreCoinbaseTx ? 1 : 0).flatMap((tx) =>
-                  tx.outputs.flatMap((output, outputIndex) => {
-                    return {
-                      amount: output[1],
-                      address: output[0],
-                      txId: tx.txId,
-                      outputIndex,
-                    };
-                  })
-                )
-              )
-              .filter((v, i, a) => a.findIndex((v2) => JSON.stringify(v) === JSON.stringify(v2)) === i)
-              .slice(0, props.lines)
-              .map((x) => {
-                return (
-                  <tr id={x.address} txid={x.txId} key={x.address + x.txId + x.outputIndex}>
-                    <td onClick={onClickRow}>{x.txId.slice(0, 10)}</td>
-                    <td onClick={onClickRow} align="right">
-                      {numberWithCommas(x.amount / 100000000)}&nbsp;HTN
-                    </td>
-                    <td className="hashh" onClick={onClickAddr}>
-                      {x.address}
-                    </td>
-                  </tr>
-                );
-              })}
+            {(() => {
+              const seen = new Set();
+              const rows = [];
+
+              [...tempBlocks]
+                .sort((a, b) => b.blueScore - a.blueScore)
+                .forEach((block) => {
+                  const txs = block.txs.slice(ignoreCoinbaseTx ? 1 : 0);
+                  txs.forEach((tx) => {
+                    tx.outputs.forEach(([address, amount], outputIndex) => {
+                      const key = `${tx.txId}-${outputIndex}`;
+                      if (!seen.has(key)) {
+                        seen.add(key);
+                        rows.push({
+                          amount,
+                          address,
+                          txId: tx.txId,
+                          outputIndex,
+                        });
+                      }
+                    });
+                  });
+                });
+
+              return rows.slice(0, props.lines).map((x) => (
+                <tr id={x.address} txid={x.txId} key={x.address + x.txId + x.outputIndex}>
+                  <td onClick={onClickRow}>{x.txId.slice(0, 10)}</td>
+                  <td onClick={onClickRow} align="right">
+                    {numberWithCommas(x.amount / 100000000)}&nbsp;HTN
+                  </td>
+                  <td className="hashh" onClick={onClickAddr}>
+                    {x.address}
+                  </td>
+                </tr>
+              ));
+            })()}
           </tbody>
         </table>
       </div>

@@ -3,10 +3,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { getBlockdagInfo, getInfo } from "../htn-api-client";
 
-const BPS = 1;
+const BPS = 5;
 
 const BlockDAGBox = () => {
-  const [nextHFDAAScore, setNextHFDAAScore] = useState(29335426);
+  // const [nextHFDAAScore, setNextHFDAAScore] = useState(29335426);
+  const [nextHFDAAScore, setNextHFDAAScore] = useState(43334184);
   const [showHF, setShowHF] = useState(false);
   const [blockCount, setBlockCount] = useState();
   const [difficulty, setDifficulty] = useState();
@@ -235,7 +236,7 @@ const BlockDAGBox = () => {
             <tr>
               <td className="cardBoxElement">Difficulty</td>
               <td className="pt-1 align-top" id="virtualDaaScore">
-                {(Number(difficulty) / 1e12).toFixed(3)} T
+                {(Number(difficulty) / 1e9).toFixed(3)} G
               </td>
             </tr>
             <tr>
