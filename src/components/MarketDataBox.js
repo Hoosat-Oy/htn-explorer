@@ -21,10 +21,10 @@ const MarketDataBox = () => {
     const blockReward = await getBlockReward();
     if (dag_info.virtualDaaScore > 17500000) {
       setDailyYield((1 / ((dag_info.difficulty * 2) / 1000)) * (blockReward * 0.95) * (86400 / 1));
-      setDailyEmissions(blockReward * 0.95 * 86400 * 5 * price);
+      setDailyEmissions(blockReward * 0.95 * 86400 * 5);
     } else {
       setDailyYield((1 / ((dag_info.difficulty * 2) / 1000)) * blockReward * (86400 / 1));
-      setDailyEmissions(blockReward * 86400 * 5 * price);
+      setDailyEmissions(blockReward * 86400 * 5);
     }
   };
 
@@ -125,11 +125,11 @@ const MarketDataBox = () => {
 
             <tr>
               <td className="cardBoxElement">Trade Volume</td>
-              <td className="pt-1">$ {numberWithCommas(marketData?.total_volume?.usd)}</td>
+              <td className="pt-1">$ {numberWithCommas(marketData?.total_volume?.usd.toFixed())}</td>
             </tr>
             <tr>
               <td className="cardBoxElement">Emissions</td>
-              <td className="pt-1">$ {dailyEmissions.toFixed(2)}</td>
+              <td className="pt-1">$ {(dailyEmissions * price).toFixed(2)}</td>
             </tr>
             <tr>
               <td className="cardBoxElement nowrap">Daily Yield (Kh)</td>
