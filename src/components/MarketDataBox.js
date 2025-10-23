@@ -125,7 +125,7 @@ const MarketDataBox = () => {
 
             <tr>
               <td className="cardBoxElement">Trade Volume</td>
-              <td className="pt-1">$ {numberWithCommas(marketData?.total_volume?.usd).toFixed(2)}</td>
+              <td className="pt-1">$ {numberWithCommas(marketData?.total_volume?.usd.toFixed(2))}</td>
             </tr>
             <tr>
               <td className="cardBoxElement">Emissions</td>
