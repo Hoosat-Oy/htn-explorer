@@ -91,6 +91,7 @@ const MarketDataBox = () => {
                 {marketData?.price_change_percentage_24h?.toFixed(1)} %<br />
               </td>
             </tr>
+
             <tr>
               <td style={{ fontSize: "small" }} className="cardBoxElement" align="right">
                 7d %
@@ -102,6 +103,20 @@ const MarketDataBox = () => {
                   <IoMdTrendingDown color="#d63328" />
                 )}
                 {marketData?.price_change_percentage_7d?.toFixed(1)} %<br />
+              </td>
+            </tr>
+
+            <tr>
+              <td style={{ fontSize: "small" }} className="cardBoxElement" align="right">
+                30d %
+              </td>
+              <td style={{ fontSize: "small" }} className="utxo-value-mono">
+                {marketData?.price_change_percentage_30d > 0 ? (
+                  <IoMdTrendingUp color="#398851" />
+                ) : (
+                  <IoMdTrendingDown color="#d63328" />
+                )}
+                {marketData?.price_change_percentage_30d?.toFixed(1)} %<br />
               </td>
             </tr>
 
