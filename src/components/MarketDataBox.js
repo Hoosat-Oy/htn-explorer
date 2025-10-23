@@ -64,7 +64,8 @@ const MarketDataBox = () => {
               <td className="cardBoxElement">Price</td>
               <td>$ {price} / HTN</td>
             </tr>
-            <tr>
+
+            {/* <tr>
               <td style={{ fontSize: "small" }} className="cardBoxElement" align="right">
                 1h %
               </td>
@@ -76,7 +77,7 @@ const MarketDataBox = () => {
                 )}
                 {marketData?.price_change_percentage_1h_in_currency?.usd?.toFixed(1)} %<br />
               </td>
-            </tr>
+            </tr> */}
             <tr>
               <td style={{ fontSize: "small" }} className="cardBoxElement" align="right">
                 24h %
@@ -103,9 +104,10 @@ const MarketDataBox = () => {
                 {marketData?.price_change_percentage_7d?.toFixed(1)} %<br />
               </td>
             </tr>
+
             <tr>
               <td className="cardBoxElement">Volume</td>
-              <td className="pt-1">$ {numberWithCommas(marketData?.total_volume?.usd)}</td>
+              <td className="pt-1">$ {numberWithCommas(marketData?.total_volume?.usd.toFixed(2))}</td>
             </tr>
             <tr>
               <td className="cardBoxElement nowrap">Daily Yield (Kh)</td>
