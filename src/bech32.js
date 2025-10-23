@@ -69,7 +69,7 @@ export const parsePayload = (payload) => {
   if (script[0] < 0x76) {
     const address_size = script[0];
     let address = script.slice(1, address_size + 1);
-    return [encodeAddress("htn", address, version), String.fromCharCode(...buffer.slice(19 + length, buffer.length))];
+    return [encodeAddress("hoosat", address, version), String.fromCharCode(...buffer.slice(19 + length, buffer.length))];
   }
   return [payload, ""];
 };

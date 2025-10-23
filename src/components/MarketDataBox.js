@@ -67,7 +67,8 @@ const MarketDataBox = () => {
               <td className="cardBoxElement">Price</td>
               <td>$ {price} / HTN</td>
             </tr>
-            <tr>
+
+            {/* <tr>
               <td style={{ fontSize: "small" }} className="cardBoxElement" align="right">
                 1h %
               </td>
@@ -79,7 +80,7 @@ const MarketDataBox = () => {
                 )}
                 {marketData?.price_change_percentage_1h_in_currency?.usd?.toFixed(1)} %<br />
               </td>
-            </tr>
+            </tr> */}
             <tr>
               <td style={{ fontSize: "small" }} className="cardBoxElement" align="right">
                 24h %
@@ -93,6 +94,7 @@ const MarketDataBox = () => {
                 {marketData?.price_change_percentage_24h?.toFixed(1)} %<br />
               </td>
             </tr>
+
             <tr>
               <td style={{ fontSize: "small" }} className="cardBoxElement" align="right">
                 7d %
@@ -106,6 +108,21 @@ const MarketDataBox = () => {
                 {marketData?.price_change_percentage_7d?.toFixed(1)} %<br />
               </td>
             </tr>
+
+            <tr>
+              <td style={{ fontSize: "small" }} className="cardBoxElement" align="right">
+                30d %
+              </td>
+              <td style={{ fontSize: "small" }} className="utxo-value-mono">
+                {marketData?.price_change_percentage_30d > 0 ? (
+                  <IoMdTrendingUp color="#398851" />
+                ) : (
+                  <IoMdTrendingDown color="#d63328" />
+                )}
+                {marketData?.price_change_percentage_30d?.toFixed(1)} %<br />
+              </td>
+            </tr>
+
             <tr>
               <td className="cardBoxElement">Trade Volume</td>
               <td className="pt-1">$ {numberWithCommas(marketData?.total_volume?.usd)}</td>
