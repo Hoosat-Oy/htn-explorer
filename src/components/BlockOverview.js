@@ -35,11 +35,6 @@ const BlockOverview = (props) => {
   return (
     <div className="block-overview">
       <div className="d-flex flex-row align-items-center justify-content-between w-100 mb-3">
-        {!keepUpdating ? (
-          <FaPlay id="play-button" className="play-button" onClick={() => setKeepUpdating(true)} />
-        ) : (
-          <FaPause id="pause-button" className="play-button" onClick={() => setKeepUpdating(false)} />
-        )}
         <h4 className="block-overview-header mb-0 pb-0 d-flex align-items-center gap-2">
           <span className="position-relative d-inline-flex align-items-center justify-content-center">
             <span
@@ -62,8 +57,13 @@ const BlockOverview = (props) => {
               />
             )}
           </span>
-          LATEST BLOCKS
+          Latest blocks
         </h4>
+        {!keepUpdating ? (
+          <FaPlay id="play-button" className="play-button" onClick={() => setKeepUpdating(true)} />
+        ) : (
+          <FaPause id="pause-button" className="play-button" onClick={() => setKeepUpdating(false)} />
+        )}
       </div>
 
       {tempBlocks.length === 0 ? (

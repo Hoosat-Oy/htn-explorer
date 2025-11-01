@@ -26,8 +26,10 @@ import { Tooltip } from "react-tooltip";
 import { TransactionListSkeleton, UtxoListSkeleton } from "./SkeletonLoader";
 import { BiCopy } from "react-icons/bi";
 import { FaQrcode, FaCheck, FaDownload } from "react-icons/fa";
+import { HiX } from "react-icons/hi";
 import TransactionItem from "./TransactionItem";
 import UtxoItem from "./UtxoItem";
+import { motion, AnimatePresence } from "framer-motion";
 
 const AddressInfoPage = () => {
   const { addr } = useParams();
@@ -162,8 +164,8 @@ const AddressInfo = () => {
 
       const qrCode = new QRCodeStyling({
         data: addr,
-        width: 200,
-        height: 200,
+        width: 300,
+        height: 300,
         type: "svg",
         dotsOptions: {
           color: "#14B8A6",
@@ -377,44 +379,33 @@ const AddressInfo = () => {
         {/* Address Card */}
         <Row className="mb-4">
           <Col xs={12}>
-            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-full w-full">
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 h-full w-full">
               <div className="d-flex flex-column gap-3">
                 <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                  <div className="flex-grow-1" style={{ minWidth: '0' }}>
-                    <div className="utxo-value-mono" style={{ fontSize: '0.95rem', wordBreak: 'break-all' }}>
-                      <span className="addressinfo-color">hoosat:</span>{addr.substring(7, addr.length - 8)}<span className="addressinfo-color">{addr.substring(addr.length - 8)}</span>
+                  <div className="flex-grow-1 d-flex align-items-center gap-2" style={{ minWidth: '0' }}>
+                    <div className="utxo-value-mono d-flex align-items-center gap-2" style={{ fontSize: '0.95rem', wordBreak: 'break-all' }}>
+                      <span><span className="addressinfo-color">hoosat:</span>{addr.substring(7, addr.length - 8)}<span className="addressinfo-color">{addr.substring(addr.length - 8)}</span></span>
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={<BSTooltip id="copy-addr-tooltip">{justCopied ? 'Copied!' : 'Copy Address'}</BSTooltip>}
+                      >
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(addr);
+                            setJustCopied(true);
+                            setTimeout(() => {
+                              setJustCopied(false);
+                            }, 2000);
+                          }}
+                          className="bg-transparent border-0 text-slate-400 hover:text-hoosat-teal transition-colors p-1"
+                          style={{ cursor: 'pointer', flexShrink: 0 }}
+                        >
+                          {justCopied ? <FaCheck size={14} /> : <BiCopy size={16} />}
+                        </button>
+                      </OverlayTrigger>
                     </div>
                   </div>
                   <div className="d-flex align-items-center gap-2 flex-wrap">
-                    <OverlayTrigger
-                      placement="top"
-                      overlay={<BSTooltip id="copy-tooltip">{justCopied ? 'Copied!' : 'Copy Address'}</BSTooltip>}
-                    >
-                      <Button
-                        onClick={() => {
-                          navigator.clipboard.writeText(addr);
-                          setJustCopied(true);
-                          setTimeout(() => {
-                            setJustCopied(false);
-                          }, 2000);
-                        }}
-                        style={{
-                          backgroundColor: '#14B8A6',
-                          border: 'none',
-                          padding: '0.5rem 0.75rem',
-                          borderRadius: '0.5rem',
-                          fontSize: '1rem',
-                          whiteSpace: 'nowrap',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          minWidth: '42px',
-                          height: '38px'
-                        }}
-                      >
-                        {justCopied ? <FaCheck /> : <BiCopy />}
-                      </Button>
-                    </OverlayTrigger>
                     <OverlayTrigger
                       placement="top"
                       overlay={<BSTooltip id="qr-tooltip">{showQr ? 'Hide QR Code' : 'Show QR Code'}</BSTooltip>}
@@ -438,42 +429,48 @@ const AddressInfo = () => {
                         <FaQrcode />
                       </Button>
                     </OverlayTrigger>
-                    <Button
-                      id="transactions-csv-download"
-                      onClick={downloadTransactionsAsCSV}
-                      disabled={isDownloading}
-                      style={{
-                        backgroundColor: '#14B8A6',
-                        border: 'none',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '0.5rem',
-                        fontSize: '0.875rem',
-                        whiteSpace: 'nowrap',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        height: '38px'
-                      }}
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<BSTooltip id="download-csv-tooltip">{isDownloading ? buttonText : 'Download Transactions CSV'}</BSTooltip>}
                     >
-                      <FaDownload />
-                      {buttonText}
-                    </Button>
+                      <Button
+                        id="transactions-csv-download"
+                        onClick={downloadTransactionsAsCSV}
+                        disabled={isDownloading}
+                        style={{
+                          backgroundColor: isDownloading ? '#0d9488' : '#14B8A6',
+                          border: 'none',
+                          padding: '0.5rem 0.75rem',
+                          borderRadius: '0.5rem',
+                          fontSize: '1rem',
+                          whiteSpace: 'nowrap',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          minWidth: '42px',
+                          height: '38px',
+                          opacity: isDownloading ? 0.8 : 1
+                        }}
+                      >
+                        {isDownloading ? (
+                          <Spinner animation="border" size="sm" style={{ width: '16px', height: '16px', borderWidth: '2px' }} />
+                        ) : (
+                          <FaDownload />
+                        )}
+                      </Button>
+                    </OverlayTrigger>
                   </div>
                 </div>
-                {showQr && <div className="qr-code mt-3" ref={ref} />}
               </div>
-            </div>
-          </Col>
-        </Row>
 
-        {/* Stats Cards */}
-        <Row className="g-3 mb-4">
+              {/* Stats Cards inside address card */}
+              <Row className="g-3 mt-3 pt-3" style={{ borderTop: '1px solid #334155' }}>
           <Col xs={12} sm={6} lg={3}>
-            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
-              <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Balance</div>
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+              <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Balance (HTN)</div>
               {addressBalance !== undefined ? (
-                <div className="text-hoosat-teal" style={{ fontSize: '1.5rem', fontWeight: '600' }}>
-                  {numberWithCommas(addressBalance / 100000000)} HTN
+                <div className="text-hoosat-teal" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                  {numberWithCommas(addressBalance / 100000000)}
                 </div>
               ) : (
                 <Spinner animation="border" size="sm" style={{ color: '#14B8A6' }} />
@@ -482,11 +479,11 @@ const AddressInfo = () => {
           </Col>
 
           <Col xs={12} sm={6} lg={3}>
-            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
               <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Value (USD)</div>
               {addressBalance !== undefined ? (
-                <div className="text-white" style={{ fontSize: '1.5rem', fontWeight: '600' }}>
-                  ${numberWithCommas(((addressBalance / 100000000) * price).toFixed(2))}
+                <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                  $ {numberWithCommas(((addressBalance / 100000000) * price).toFixed(2))}
                 </div>
               ) : (
                 <Spinner animation="border" size="sm" style={{ color: '#14B8A6' }} />
@@ -495,10 +492,10 @@ const AddressInfo = () => {
           </Col>
 
           <Col xs={12} sm={6} lg={3}>
-            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
               <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>UTXOs</div>
               {!loadingUtxos ? (
-                <div className="text-white" style={{ fontSize: '1.5rem', fontWeight: '600' }}>
+                <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
                   {numberWithCommas(utxos.length)}
                 </div>
               ) : (
@@ -509,15 +506,18 @@ const AddressInfo = () => {
           </Col>
 
           <Col xs={12} sm={6} lg={3}>
-            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
               <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Transactions</div>
               {txCount !== null ? (
-                <div className="text-white" style={{ fontSize: '1.5rem', fontWeight: '600' }}>
+                <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
                   {numberWithCommas(txCount)}
                 </div>
               ) : (
                 <Spinner animation="border" size="sm" style={{ color: '#14B8A6' }} />
               )}
+            </div>
+          </Col>
+        </Row>
             </div>
           </Col>
         </Row>
@@ -707,6 +707,60 @@ const AddressInfo = () => {
           </div>
         </Container>
       )}
+
+      {/* QR Code Modal */}
+      <AnimatePresence>
+        {showQr && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[80] flex items-center justify-center"
+              onClick={() => setShowQr(false)}
+            >
+              {/* QR Modal Content */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="w-full max-w-md mx-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="bg-hoosat-slate/95 backdrop-blur-lg border border-slate-700 rounded-lg shadow-2xl overflow-hidden">
+                  {/* Modal Header */}
+                  <div className="flex items-center justify-between p-4 border-b border-slate-700">
+                    <h3 className="text-xl font-bold text-gradient">Address QR Code</h3>
+                    <button
+                      onClick={() => setShowQr(false)}
+                      className="text-slate-300 hover:text-hoosat-teal transition-colors duration-200 bg-transparent border-0 p-0"
+                      style={{ background: 'transparent', border: 'none', outline: 'none', padding: 0 }}
+                    >
+                      <HiX size={24} />
+                    </button>
+                  </div>
+
+                  {/* QR Code Display */}
+                  <div className="p-6 flex flex-col items-center">
+                    <div className="qr-code bg-white p-4 rounded-lg" ref={ref} />
+                    <div className="mt-4 text-center">
+                      <p className="text-slate-400 text-sm mb-2">Scan to send HTN to this address</p>
+                      <div className="bg-hoosat-dark/50 p-3 rounded-lg border border-slate-700">
+                        <p className="text-slate-300 font-mono text-xs break-all">
+                          {addr}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

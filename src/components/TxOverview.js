@@ -68,23 +68,6 @@ const TxOverview = (props) => {
   return (
     <div className="block-overview mb-4">
       <div className="d-flex flex-row align-items-center justify-content-between w-100 mb-3">
-        <div className="d-flex align-items-center gap-2">
-          {!keepUpdating ? (
-            <FaPlay id="play-button" className="play-button" onClick={() => setKeepUpdating(true)} />
-          ) : (
-            <FaPause id="pause-button" className="play-button" onClick={() => setKeepUpdating(false)} />
-          )}
-          <OverlayTrigger
-            overlay={<Tooltip id="tooltip-kgi">{ignoreCoinbaseTx ? "Show" : "Hide"} coinbase transactions</Tooltip>}
-          >
-            <span>
-              <BiHide
-                className={`hide-button ${ignoreCoinbaseTx && "hide-button-active"}`}
-                onClick={toggleCoinbaseTransactions}
-              />
-            </span>
-          </OverlayTrigger>
-        </div>
         <h4 className="block-overview-header mb-0 pb-0 d-flex align-items-center gap-2">
           <span className="position-relative d-inline-flex align-items-center justify-content-center">
             <span
@@ -107,8 +90,25 @@ const TxOverview = (props) => {
               />
             )}
           </span>
-          LATEST TRANSACTIONS
+          Latest transactions
         </h4>
+        <div className="d-flex align-items-center gap-2">
+          {!keepUpdating ? (
+            <FaPlay id="play-button" className="play-button" onClick={() => setKeepUpdating(true)} />
+          ) : (
+            <FaPause id="pause-button" className="play-button" onClick={() => setKeepUpdating(false)} />
+          )}
+          <OverlayTrigger
+            overlay={<Tooltip id="tooltip-kgi">{ignoreCoinbaseTx ? "Show" : "Hide"} coinbase transactions</Tooltip>}
+          >
+            <span>
+              <BiHide
+                className={`hide-button ${ignoreCoinbaseTx && "hide-button-active"}`}
+                onClick={toggleCoinbaseTransactions}
+              />
+            </span>
+          </OverlayTrigger>
+        </div>
       </div>
       {tempBlocks.length === 0 ? (
         <TxTableSkeleton lines={props.lines} />

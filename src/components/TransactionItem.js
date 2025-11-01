@@ -210,7 +210,7 @@ const TransactionItem = ({
                     })
                   ) : (
                     <div className="text-slate-400 text-sm">
-                      🎁 COINBASE (New coins)
+                      COINBASE (New coins)
                     </div>
                   )}
                 </div>

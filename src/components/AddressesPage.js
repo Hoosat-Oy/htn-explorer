@@ -273,8 +273,7 @@ const AddressesPage = () => {
     <div className="blocks-page">
       <Container className="webpage px-md-5 blocks-page-overview" fluid>
         <div className="block-overview mb-4">
-          <div className="d-flex flex-row align-items-center justify-content-between w-100 mb-3">
-            <div style={{ width: '40px' }}></div>
+          <div className="d-flex flex-row align-items-center justify-content-between w-100 mb-3 mt-3">
             <h4 className="block-overview-header mb-0 pb-0 d-flex align-items-center gap-2">
               <span className="position-relative d-inline-flex align-items-center justify-content-center">
                 <span
@@ -288,7 +287,6 @@ const AddressesPage = () => {
               </span>
               Addresses and Balances
             </h4>
-            <div style={{ width: '40px' }}></div>
           </div>
           {loading ? (
             <TableSkeleton lines={25} />
@@ -302,6 +300,7 @@ const AddressesPage = () => {
                       <th>Balance</th>
                       <th>Change</th>
                       <th>Address</th>
+                        <th>Label</th>
                     </tr>
                   </thead>
                   <tbody>
