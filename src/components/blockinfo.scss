@@ -86,12 +86,12 @@
 }
 
 .block-utxo-amount {
-  color: rgb(33, 192, 46);
+  color: rgb(20 184 166);
   white-space: nowrap;
 }
 
 .block-utxo-amount-minus {
-  color: rgb(255, 82, 59);
+  color: rgb(255 77 125);
   white-space: nowrap;
 }
 
@@ -192,14 +192,14 @@
 }
 
 .utxo-amount {
-  background-color: rgb(65, 141, 65);
+  background-color: rgb(20 184 166);
   padding: 0.2rem 0.7rem;
   border-radius: 0.4rem;
   word-wrap: none;
   display: inline-block;
 }
 .utxo-amount-minus {
-  background-color: rgb(195, 38, 38);
+  background-color: rgb(255, 77, 125);
   padding: 0.2rem 0.7rem;
   border-radius: 0.4rem;
   word-wrap: none;
@@ -207,24 +207,23 @@
 }
 
 .table-timestamp {
-  word-wrap: normal;
-  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 .accepted-true {
-  background-color: rgb(65, 141, 65);
+  background-color: rgb(20 184 166);
   padding: 0.2em 0.4rem;
   border-radius: 0.4rem;
 }
 
 .accepted-false {
-  background-color: #ff9966;
+  background-color: rgb(255 159 77);
   padding: 0.2em 0.4rem;
   border-radius: 0.4rem;
 }
 
 .confirmations {
-  background-color: rgb(65, 141, 65);
+  background-color: rgb(20 184 166);
   padding: 0.2em 0.4rem;
   border-radius: 0.4rem;
 }

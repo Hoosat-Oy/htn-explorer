@@ -1,19 +1,17 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "font-awesome/css/font-awesome.min.css";
 import { useContext, useState, useEffect } from "react";
-import { Button, Col, Container, Form, InputGroup, Modal, Row, Spinner } from "react-bootstrap";
-import { useNavigate, useLocation } from "react-router";
+import { Col, Container, Modal, Row, Spinner } from "react-bootstrap";
+import { useNavigate } from "react-router";
 import "./App.scss";
 import BalanceModal from "./components/BalanceModal";
 import BlockDAGBox from "./components/BlockDAG";
 import BlockOverview from "./components/BlockOverview";
 import CoinsupplyBox from "./components/CoinsupplyBox";
-import KaspadInfoBox from "./components/HtndInfoBox";
 import MarketDataBox from "./components/MarketDataBox";
 import TxOverview from "./components/TxOverview";
-import DAGGraph from "./components/DAGGraph";
 import LastBlocksContext from "./components/LastBlocksContext";
-import { getBlock, getBlocks } from "./htn-api-client";
+import { getBlocks } from "./htn-api-client";
 
 function Dashboard() {
   const [show, setShow] = useState(false);
@@ -130,33 +128,6 @@ function Dashboard() {
     // setGhostDAG([]);
   }, []);
 
-  const search = (e) => {
-    e.preventDefault();
-    const v = e.target.searchInput.value;
-
-    setShowLoadingModal(true);
-
-    if (v.length === 64) {
-      getBlock(v)
-        .then((data) => {
-          if (data.detail === "Block not found") {
-            navigate(`/txs/${v}`);
-          } else {
-            navigate(`/blocks/${v}`);
-          }
-        })
-        .catch((err) => {
-          console.log("hier");
-        });
-    }
-
-    if (v.startsWith("hoosat:")) {
-      navigate(`/addresses/${v}`);
-    }
-
-    setShowLoadingModal(false);
-  };
-
   //<Button variant="primary">Go!</Button>
   return (
     <div>
@@ -165,54 +136,17 @@ function Dashboard() {
           <Spinner animation="border" variant="primary" size="xl" />
         </Modal.Body>
       </Modal>
-      <div className="row1">
-        <Container className="firstRow webpage" fluid>
-          <Row>
-            <Col md={12} className="d-flex flex-row justify-content-start text-light d-xs-none align-items-center">
-              <img className="big-htn-icon" src="/k-icon-glow.png" alt="logo" />
-              <div className="bigfont htn-badge">
-                HOOSAT
-                <br />
-                EXPLORER
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col xs={11}>
-              <Form onSubmit={search}>
-                <InputGroup className="ms-md-5 mt-5 me-5 dashboard-search-box">
-                  <Form.Control
-                    className="bg-light text-dark shadow-none"
-                    name="searchInput"
-                    type="text"
-                    placeholder="Search for hoosat:address or block"
-                  />
-                  <Button type="submit" className="shadow-none searchButton" variant="dark">
-                    <i className="fa fa-search" />
-                  </Button>
-                </InputGroup>
-              </Form>
-            </Col>
-          </Row>
-        </Container>
-      </div>
-      <div className="row2">
+      <div className="row2" style={{ paddingTop: '2rem' }}>
         <Container className="secondRow webpage" fluid>
-          <Row>
-            <Col sm={12} md={6} xl={4}>
-              <div className="infoBox">
-                <BlockDAGBox />
-              </div>
+          <Row className="align-items-stretch">
+            <Col sm={12} md={6} xl={4} className="mb-4 d-flex">
+              <BlockDAGBox />
             </Col>
-            <Col sm={12} md={6} xl={4}>
-              <div className="infoBox">
-                <CoinsupplyBox />
-              </div>
+            <Col sm={12} md={6} xl={4} className="mb-4 d-flex">
+              <CoinsupplyBox />
             </Col>
-            <Col sm={12} md={6} xl={4}>
-              <div className="infoBox">
-                <MarketDataBox />
-              </div>
+            <Col sm={12} md={6} xl={4} className="mb-4 d-flex">
+              <MarketDataBox />
             </Col>
           </Row>
         </Container>
@@ -226,17 +160,6 @@ function Dashboard() {
             </Col>
             <Col className="mt-5 mt-lg-0" xs={12} lg={6}>
               <TxOverview lines={12} />
-            </Col>
-          </Row>
-        </Container>
-      </div>
-      <div className="row5">
-        <Container className="secondRow webpage" fluid>
-          <Row>
-            <Col sm={12} md={12} xl={12}>
-              <div className="infoBox">
-                <KaspadInfoBox />
-              </div>
             </Col>
           </Row>
         </Container>

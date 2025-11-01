@@ -1,53 +1,57 @@
 import { faCoins } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
-import { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { getBlockdagInfo, getCoinSupply, getHalving } from "../htn-api-client";
 import { numberWithCommas } from "../helper";
-import { getCoinSupply, getHalving, getBlockdagInfo } from "../htn-api-client";
+import { CardSkeleton } from "./SkeletonLoader";
 
-const BPS = 5;
-
-function formatDuration(period) {
-  const duration = moment.duration(period);
-
+const formatDuration = (milliseconds) => {
+  const duration = moment.duration(milliseconds);
   const days = Math.floor(duration.asDays());
   const hours = duration.hours();
   const minutes = duration.minutes();
 
-  let result = [];
-  if (days > 0) result.push(`${days} day${days > 1 ? "s" : ""}`);
-  if (hours > 0) result.push(`${hours} hour${hours > 1 ? "s" : ""}`);
-  if (minutes > 0) result.push(`${minutes} minute${minutes > 1 ? "s" : ""}`);
-
-  return result.length > 0 ? result.join(", ") : "less than a minute";
-}
+  if (days > 0) {
+    return `in ${days} days, ${hours} hours`;
+  } else if (hours > 0) {
+    return `in ${hours} hours, ${minutes} minutes`;
+  } else {
+    return `in ${minutes} minutes`;
+  }
+};
 
 const CBox = () => {
   const [circCoins, setCircCoins] = useState("-");
-  const [blockReward, setBlockReward] = useState("-");
   const [halvingDate, setHalvingDate] = useState("-");
   const [timeToHalving, setTimeToHalving] = useState("-");
+  const [blockReward, setBlockReward] = useState("-");
   const [halvingAmount, setHalvingAmount] = useState("-");
+  const [isLoading, setIsLoading] = useState(true);
 
   const initBox = useCallback(() => {
     const fetchCoinSupply = async () => {
-      const coinSupplyResp = await getCoinSupply();
-      const dag_info = await getBlockdagInfo();
-      getBlockReward(dag_info);
+      try {
+        const coinSupplyResp = await getCoinSupply();
+        const dag_info = await getBlockdagInfo();
+        getBlockReward(dag_info);
 
-      getHalving().then((d) => {
-        const currentTimestamp = Date.now();
-        const halvingTimestamp = d.nextHalvingTimestamp * 1000;
-        const timeDifference = halvingTimestamp - currentTimestamp;
-        const duration = moment.duration(timeDifference, "milliseconds");
-        const timeToHalving = formatDuration(timeDifference);
+        getHalving().then((d) => {
+          const currentTimestamp = Date.now();
+          const halvingTimestamp = d.nextHalvingTimestamp * 1000;
+          const timeDifference = halvingTimestamp - currentTimestamp;
+          const duration = moment.duration(timeDifference, "milliseconds");
+          const timeToHalving = formatDuration(timeDifference);
 
-        setHalvingDate(moment(halvingTimestamp).format("YYYY-MM-DD HH:mm"));
-        setTimeToHalving(timeToHalving);
-        setHalvingAmount((d.nextHalvingAmount * 0.95).toFixed(2));
-      });
+          setHalvingDate(moment(halvingTimestamp).format("YYYY-MM-DD HH:mm"));
+          setTimeToHalving(timeToHalving);
+          setHalvingAmount((d.nextHalvingAmount * 0.95).toFixed(2));
+        });
 
-      setCircCoins(Math.round(coinSupplyResp.circulatingSupply / 100000000));
+        setCircCoins(Math.round(coinSupplyResp.circulatingSupply / 100000000));
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchCoinSupply();
   }, []);
@@ -79,75 +83,70 @@ const CBox = () => {
   }
 
   useEffect(() => {
-    document.getElementById("coins").animate(
-      [
-        // keyframes
-        { opacity: "1" },
-        { opacity: "0.6" },
-        { opacity: "1" },
-      ],
-      {
-        // timing options
-        duration: 300,
-      }
-    );
+    const element = document.getElementById("coins");
+    if (element) {
+      element.animate(
+        [
+          // keyframes
+          { opacity: "1" },
+          { opacity: "0.6" },
+          { opacity: "1" },
+        ],
+        {
+          // timing options
+          duration: 300,
+        }
+      );
+    }
   }, [circCoins]);
 
-  return (
-    <>
-      <div className="cardBox mx-0">
-        <table style={{ fontSize: "1rem" }}>
-          <tbody>
-            <tr>
-              <td colSpan="2" className="text-center" style={{ fontSize: "4rem" }}>
-                <FontAwesomeIcon icon={faCoins} />
-                <div id="light1" className="cardLight" />
-              </td>
-            </tr>
-            <tr>
-              <td colSpan="2" className="text-center">
-                <h3>Coin supply</h3>
-              </td>
-            </tr>
-            <tr>
-              <td className="cardBoxElement align-top">Total</td>
-              <td className="">
-                <div id="coins">{numberWithCommas(circCoins)} HTN</div>
-              </td>
-            </tr>
-            <tr>
-              <td className="cardBoxElement align-top">
-                Max <span className="aptimeToHalvingprox">(approx.)</span>
-              </td>
-              <td className="pt-1">17,100,000,000 HTN</td>
-            </tr>
-            <tr>
-              <td className="cardBoxElement align-top">Mined</td>
-              <td className="pt-1">{((circCoins / 17100000000) * 100).toFixed(2)} %</td>
-            </tr>
-            <tr>
-              <td className="cardBoxElement align-top">Block reward</td>
-              <td className="pt-1">{blockReward} HTN</td>
-            </tr>
-            <tr>
-              <td className="cardBoxElement align-top">Reward reduction</td>
-              <td className="pt-1">
-                {halvingDate}
-                <br />
-                <div className="text-end w-100 nowrap" style={{ fontSize: "small" }}>
-                  {timeToHalving}
-                </div>
+  if (isLoading) {
+    return <CardSkeleton />;
+  }
 
-                <div className="text-end w-100 pe-3 pt-1" style={{ fontSize: "small" }}>
-                  to {halvingAmount} HTN
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+  return (
+    <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-full w-full">
+      {/* Icon and Title */}
+      <div className="flex items-center gap-4 mb-6">
+        <div className="bg-gradient-to-br from-hoosat-teal/20 to-cyan-400/20 w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0">
+          <FontAwesomeIcon icon={faCoins} className="text-3xl text-hoosat-teal" />
+        </div>
+        <h3 className="text-2xl font-bold text-white">Coin Supply</h3>
       </div>
-    </>
+
+      {/* Content */}
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <span className="text-slate-400">Total</span>
+          <span className="text-white font-semibold" id="coins">{numberWithCommas(circCoins)} HTN</span>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span className="text-slate-400">Max <span className="text-xs">(approx.)</span></span>
+          <span className="text-white font-semibold">17,100,000,000 HTN</span>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span className="text-slate-400">Mined</span>
+          <span className="text-white font-semibold">{((circCoins / 17100000000) * 100).toFixed(2)} %</span>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span className="text-slate-400">Block reward</span>
+          <span className="text-white font-semibold">{blockReward} HTN</span>
+        </div>
+
+        <div className="flex justify-between items-start">
+          <span className="text-slate-400">Reward reduction</span>
+          <div className="text-right">
+            <div className="text-white font-semibold">{halvingDate}</div>
+            <div className="text-slate-400 text-sm mt-1">{timeToHalving}</div>
+            <div className="text-hoosat-teal text-sm mt-1">to {halvingAmount} HTN</div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default CBox;
+export default React.memo(CBox);

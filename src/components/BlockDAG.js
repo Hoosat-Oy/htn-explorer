@@ -1,7 +1,8 @@
 import { faDiagramProject } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getBlockdagInfo, getInfo } from "../htn-api-client";
+import { CardSkeleton } from "./SkeletonLoader";
 
 const BPS = 5;
 
@@ -17,13 +18,16 @@ const BlockDAGBox = () => {
   const [nextHardForkTime, setNextHardForkTime] = useState("");
   const [nextHardForkTimeTo, setNextHardForkTimeTo] = useState("");
   const [mempoolSize, setMempoolSize] = useState();
+  const [serverVersion, setServerVersion] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const initBox = async () => {
-    const dag_info = await getBlockdagInfo();
-    console.log("DAG Info ", dag_info);
-    setBlockCount(dag_info.blockCount);
-    setHeaderCount(dag_info.headerCount);
-    setVirtualDaaScore(dag_info.virtualDaaScore);
+    try {
+      const dag_info = await getBlockdagInfo();
+      console.log("DAG Info ", dag_info);
+      setBlockCount(dag_info.blockCount);
+      setHeaderCount(dag_info.headerCount);
+      setVirtualDaaScore(dag_info.virtualDaaScore);
     // Difficulty comes from node through the rest server.
     // We can estimate hashrate is two times difficulty.
     // We can also multiply the difficulty and hashrate with Block Per Second constant.
@@ -34,6 +38,15 @@ const BlockDAGBox = () => {
     setHashrate(dag_info.difficulty * 2 * BPS);
     const info = await getInfo();
     setMempoolSize(info.mempoolSize);
+
+    // Fetch server version from htnd endpoint
+    try {
+      const htndInfo = await fetch(`${process.env.REACT_APP_API}/info/htnd`);
+      const htndData = await htndInfo.json();
+      setServerVersion(htndData.serverVersion);
+    } catch (err) {
+      console.log("Error fetching server version:", err);
+    }
     const unixTimestamp = Math.floor(Date.now() / 1000);
     const timeToFork = nextHFDAAScore - dag_info.virtualDaaScore;
     const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
@@ -47,6 +60,9 @@ const BlockDAGBox = () => {
       setNextHardForkTimeTo(formattedTimeToFork);
     } else {
       setShowHF(false);
+    }
+    } finally {
+      setIsLoading(false);
     }
   };
   useEffect(() => {
@@ -90,44 +106,9 @@ const BlockDAGBox = () => {
 
   useEffect(
     (e) => {
-      document.getElementById("blockCount").animate(
-        [
-          // keyframes
-          { opacity: "1" },
-          { opacity: "0.6" },
-          { opacity: "1" },
-        ],
-        {
-          // timing options
-          duration: 300,
-        }
-      );
-    },
-    [blockCount]
-  );
-
-  useEffect(
-    (e) => {
-      document.getElementById("headerCount").animate(
-        [
-          // keyframes
-          { opacity: "1" },
-          { opacity: "0.6" },
-          { opacity: "1" },
-        ],
-        {
-          // timing options
-          duration: 300,
-        }
-      );
-    },
-    [headerCount]
-  );
-
-  useEffect(
-    (e) => {
-      if (showHF === true) {
-        document.getElementById("virtualDaaScore").animate(
+      const element = document.getElementById("blockCount");
+      if (element) {
+        element.animate(
           [
             // keyframes
             { opacity: "1" },
@@ -141,31 +122,14 @@ const BlockDAGBox = () => {
         );
       }
     },
-    [virtualDaaScore, showHF]
+    [blockCount]
   );
 
   useEffect(
     (e) => {
-      document.getElementById("hashrate").animate(
-        [
-          // keyframes
-          { opacity: "1" },
-          { opacity: "0.6" },
-          { opacity: "1" },
-        ],
-        {
-          // timing options
-          duration: 300,
-        }
-      );
-    },
-    [hashrate]
-  );
-
-  useEffect(
-    (e) => {
-      if (showHF === true) {
-        document.getElementById("nextHardForkTime").animate(
+      const element = document.getElementById("headerCount");
+      if (element) {
+        element.animate(
           [
             // keyframes
             { opacity: "1" },
@@ -177,6 +141,73 @@ const BlockDAGBox = () => {
             duration: 300,
           }
         );
+      }
+    },
+    [headerCount]
+  );
+
+  useEffect(
+    (e) => {
+      if (showHF === true) {
+        const element = document.getElementById("virtualDaaScore");
+        if (element) {
+          element.animate(
+            [
+              // keyframes
+              { opacity: "1" },
+              { opacity: "0.6" },
+              { opacity: "1" },
+            ],
+            {
+              // timing options
+              duration: 300,
+            }
+          );
+        }
+      }
+    },
+    [virtualDaaScore, showHF]
+  );
+
+  useEffect(
+    (e) => {
+      const element = document.getElementById("hashrate");
+      if (element) {
+        element.animate(
+          [
+            // keyframes
+            { opacity: "1" },
+            { opacity: "0.6" },
+            { opacity: "1" },
+          ],
+          {
+            // timing options
+            duration: 300,
+          }
+        );
+      }
+    },
+    [hashrate]
+  );
+
+  useEffect(
+    (e) => {
+      if (showHF === true) {
+        const element = document.getElementById("nextHardForkTime");
+        if (element) {
+          element.animate(
+            [
+              // keyframes
+              { opacity: "1" },
+              { opacity: "0.6" },
+              { opacity: "1" },
+            ],
+            {
+              // timing options
+              duration: 300,
+            }
+          );
+        }
       }
     },
     [nextHardForkTime, showHF]
@@ -201,77 +232,73 @@ const BlockDAGBox = () => {
     return `${hashrate.toFixed(2)} ${units[index]}`;
   };
 
+  if (isLoading) {
+    return <CardSkeleton />;
+  }
+
   return (
-    <>
-      <div className="cardBox mx-0">
-        <table style={{ fontSize: "1rem" }}>
-          <tbody>
-            <tr>
-              <td colSpan="2" className="text-center" style={{ fontSize: "4rem" }}>
-                <FontAwesomeIcon icon={faDiagramProject} />
-                <div className="cardLight" />
-              </td>
-            </tr>
-            <tr>
-              <td colSpan="2" className="text-center">
-                <h3>NETWORK INFO</h3>
-              </td>
-            </tr>
-            <tr>
-              <td className="cardBoxElement nowrap">Network name</td>
-              <td className="pt-1 text-nowrap">hoosat mainnet</td>
-            </tr>
-            <tr>
-              <td className="cardBoxElement text-nowrap">Virtual DAA Score</td>
-              <td className="pt-1 align-top" id="virtualDaaScore">
-                {Number(virtualDaaScore).toLocaleString()}
-              </td>
-            </tr>
-            <tr>
-              <td className="cardBoxElement">Block height</td>
-              <td className="pt-1" id="blockCount">
-                {Number(blockCount).toLocaleString()}
-              </td>
-            </tr>
-            <tr>
-              <td className="cardBoxElement">Difficulty</td>
-              <td className="pt-1 align-top" id="virtualDaaScore">
-                {(Number(difficulty) / 1e9).toFixed(3)} G
-              </td>
-            </tr>
-            <tr>
-              <td className="cardBoxElement">Hashrate</td>
-              <td className="pt-1" id="hashrate">
-                {formatHashrate(hashrate)}
-              </td>
-            </tr>
-            <tr>
-              <td className="cardBoxElement">Mempool size</td>
-              <td className="pt-1" id="headerCount">
-                {Number(mempoolSize).toLocaleString()}
-              </td>
-            </tr>
-            {showHF === true && (
-              <>
-                <tr>
-                  <td className="cardBoxElement nowrap">Hard Fork Date & Time:</td>
-                  <td className="pt-1 align-top" id="nextHardForkTime">
-                    {nextHardForkTime}
-                  </td>
-                </tr>
-                <tr>
-                  <td className="cardBoxElement nowrap">Time to the Hard Fork:</td>
-                  <td className="pt-1 align-top" id="nextHardForkTime">
-                    {nextHardForkTimeTo}
-                  </td>
-                </tr>
-              </>
-            )}
-          </tbody>
-        </table>
+    <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-full w-full">
+      {/* Icon and Title */}
+      <div className="flex items-center gap-4 mb-6">
+        <div className="bg-gradient-to-br from-hoosat-teal/20 to-cyan-400/20 w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0">
+          <FontAwesomeIcon icon={faDiagramProject} className="text-3xl text-hoosat-teal" />
+        </div>
+        <h3 className="text-2xl font-bold text-white">Network Info</h3>
       </div>
-    </>
+
+      {/* Content */}
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <span className="text-slate-400">Network name</span>
+          <span className="text-white font-semibold">hoosat mainnet</span>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span className="text-slate-400">Virtual DAA Score</span>
+          <span className="text-white font-semibold" id="virtualDaaScore">{Number(virtualDaaScore).toLocaleString()}</span>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span className="text-slate-400">Block height</span>
+          <span className="text-white font-semibold" id="blockCount">{Number(blockCount).toLocaleString()}</span>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span className="text-slate-400">Difficulty</span>
+          <span className="text-white font-semibold">{(Number(difficulty) / 1e9).toFixed(3)} G</span>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span className="text-slate-400">Hashrate</span>
+          <span className="text-white font-semibold" id="hashrate">{formatHashrate(hashrate)}</span>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span className="text-slate-400">Mempool size</span>
+          <span className="text-white font-semibold" id="headerCount">{Number(mempoolSize).toLocaleString()}</span>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span className="text-slate-400">Server version</span>
+          <span className="text-white font-semibold">{serverVersion}</span>
+        </div>
+
+        {showHF === true && (
+          <>
+            <div className="flex justify-between items-start pt-4 border-t border-slate-700">
+              <span className="text-slate-400">Hard Fork Date</span>
+              <span className="text-white font-semibold text-right" id="nextHardForkTime">{nextHardForkTime}</span>
+            </div>
+
+            <div className="flex justify-between items-center">
+              <span className="text-slate-400">Time to Fork</span>
+              <span className="text-white font-semibold">{nextHardForkTimeTo}</span>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 };
 
-export default BlockDAGBox;
+export default React.memo(BlockDAGBox);

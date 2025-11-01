@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Container, Spinner, Pagination } from "react-bootstrap";
+import { Container, Pagination } from "react-bootstrap";
 import { RiMoneyDollarCircleFill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import { PieChart, pieChartDefaultProps } from "react-minimal-pie-chart";
 import { useWindowSize } from "react-use";
 import { getCoinSupply } from "../htn-api-client";
+import { TableSkeleton } from "./SkeletonLoader";
 
 const shiftSize = 7;
 
@@ -272,18 +273,27 @@ const AddressesPage = () => {
     <div className="blocks-page">
       <Container className="webpage px-md-5 blocks-page-overview" fluid>
         <div className="block-overview mb-4">
-          <div className="d-flex flex-row w-100">
-            <h4 className="block-overview-header text-center w-100 mt-4">
-              <RiMoneyDollarCircleFill className={"rotate"} size="1.7rem" />
+          <div className="d-flex flex-row align-items-center justify-content-between w-100 mb-3">
+            <div style={{ width: '40px' }}></div>
+            <h4 className="block-overview-header mb-0 pb-0 d-flex align-items-center gap-2">
+              <span className="position-relative d-inline-flex align-items-center justify-content-center">
+                <span
+                  className="rounded-circle d-inline-block"
+                  style={{
+                    width: '10px',
+                    height: '10px',
+                    backgroundColor: '#14B8A6'
+                  }}
+                />
+              </span>
               Addresses and Balances
             </h4>
+            <div style={{ width: '40px' }}></div>
           </div>
-          <div className="block-overview-content">
-            {loading ? (
-              <Spinner animation="border" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </Spinner>
-            ) : (
+          {loading ? (
+            <TableSkeleton lines={25} />
+          ) : (
+            <div className="block-overview-content">
               <>
                 <table className={`styled-table w-100`}>
                   <thead>
@@ -394,8 +404,8 @@ const AddressesPage = () => {
                   <img src="/HTN-holder-rankings.webp" className="img-fluid" alt="Holder Rankings" />
                 </div>
               </>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </Container>
     </div>

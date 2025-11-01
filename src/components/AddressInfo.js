@@ -1,6 +1,6 @@
 import moment from "moment";
 import { useContext, useEffect, useRef, useState, useCallback } from "react";
-import { Button, Col, Container, Dropdown, Form, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Container, Form, Row, Spinner, OverlayTrigger, Tooltip as BSTooltip } from "react-bootstrap";
 import { BiGhost } from "react-icons/bi";
 import { useParams } from "react-router";
 import { Link, useSearchParams } from "react-router-dom";
@@ -23,6 +23,9 @@ import UtxoPagination from "./UtxoPagination.js";
 import QRCodeStyling from "qr-code-styling";
 import QrButton from "./QrButton";
 import { Tooltip } from "react-tooltip";
+import { TransactionListSkeleton, UtxoListSkeleton } from "./SkeletonLoader";
+import { BiCopy } from "react-icons/bi";
+import { FaQrcode, FaCheck, FaDownload } from "react-icons/fa";
 
 const AddressInfoPage = () => {
   const { addr } = useParams();
@@ -35,6 +38,7 @@ const AddressInfo = () => {
 
   const [buttonText, setButtonText] = useState("Download Transactions CSV");
   const [isDownloading, setIsDownloading] = useState(false);
+  const [justCopied, setJustCopied] = useState(false);
 
   const [addressBalance, setAddressBalance] = useState();
   const { blueScore } = useContext(BlueScoreContext);
@@ -138,41 +142,6 @@ const AddressInfo = () => {
   };
 
   useEffect(() => {
-    const qrCode = new QRCodeStyling({
-      data: addr.replace(":", ":"),
-      width: 200,
-      height: 200,
-      type: "svg",
-      image: "../htn-icon.png",
-      dotsOptions: {
-        color: "#181D30",
-        type: "extra-rounded",
-        gradient: {
-          type: "linear",
-          colorStops: [
-            { offset: 0, color: "#134a40" },
-            { offset: 1, color: "#134a40" },
-          ],
-        },
-      },
-      imageOptions: {
-        crossOrigin: "anonymous",
-        margin: 0,
-        //   imageSize: 1
-      },
-      backgroundOptions: {
-        color: "#ffffff",
-      },
-      cornersSquareOptions: {
-        color: "#134a40",
-      },
-      qrOptions: {
-        typeNumber: 0,
-      },
-    });
-
-    qrCode.append(ref.current);
-
     getAddressBalance(addr).then((res) => {
       setAddressBalance(res);
     });
@@ -186,6 +155,36 @@ const AddressInfo = () => {
   }, [addr]);
 
   useEffect(() => {
+    if (showQr && ref.current) {
+      ref.current.innerHTML = '';
+
+      const qrCode = new QRCodeStyling({
+        data: addr,
+        width: 200,
+        height: 200,
+        type: "svg",
+        dotsOptions: {
+          color: "#14B8A6",
+          type: "rounded",
+        },
+        backgroundOptions: {
+          color: "#ffffff",
+        },
+        cornersSquareOptions: {
+          color: "#14B8A6",
+          type: "extra-rounded",
+        },
+        cornersDotOptions: {
+          color: "#14B8A6",
+          type: "dot",
+        },
+      });
+
+      qrCode.append(ref.current);
+    }
+  }, [showQr, addr]);
+
+  useEffect(() => {
     localStorage.setItem("detailedView", detailedView);
   }, [detailedView]);
 
@@ -194,15 +193,8 @@ const AddressInfo = () => {
     // setLoadingUtxos(true);
   }, [addressBalance]);
 
-  const handleViewSwitch = (dontknow, e) => {
-    const newValue = e.target.textContent;
-
-    if (newValue === "UTXOs") {
-      setView("utxos");
-    }
-    if (newValue === "Transactions History") {
-      setView("transactions");
-    }
+  const handleViewSwitch = (newView) => {
+    setView(newView);
   };
 
   function removeDuplicates(arr) {
@@ -373,69 +365,157 @@ const AddressInfo = () => {
 
   return (
     <div className="addressinfo-page">
-      <Container className="webpage addressinfo-box" fluid>
+      <Container className="webpage" fluid style={{ paddingTop: '2rem' }}>
         <Row>
           <Col xs={12}>
-            <div className="addressinfo-title d-flex flex-row align-items-end">address Overview</div>
+            <h2 className="text-white mb-4" style={{ fontSize: '2rem', fontWeight: '700' }}>Address Overview</h2>
           </Col>
         </Row>
-        <Row>
-          <Col md={12} className="mt-sm-4">
-            <div className="addressinfo-header">Address</div>
-            <div className="utxo-value-mono">
-              <span class="addressinfo-color">hoosat</span>
-              {addr.substring(6, addr.length - 8)}
-              <span class="addressinfo-color">{addr.substring(addr.length - 8)}</span>
-              <CopyButton size="2rem" text={addr} />
-              <QrButton addr="{addr}" onClick={() => setShowQr(!showQr)} />
-              <div className="qr-code" ref={ref} hidden={!showQr} />
+
+        {/* Address Card */}
+        <Row className="mb-4">
+          <Col xs={12}>
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-full w-full">
+              <div className="d-flex flex-column gap-3">
+                <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                  <div className="flex-grow-1" style={{ minWidth: '0' }}>
+                    <div className="utxo-value-mono" style={{ fontSize: '0.95rem', wordBreak: 'break-all' }}>
+                      <span className="addressinfo-color">hoosat:</span>{addr.substring(7, addr.length - 8)}<span className="addressinfo-color">{addr.substring(addr.length - 8)}</span>
+                    </div>
+                  </div>
+                  <div className="d-flex align-items-center gap-2 flex-wrap">
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<BSTooltip id="copy-tooltip">{justCopied ? 'Copied!' : 'Copy Address'}</BSTooltip>}
+                    >
+                      <Button
+                        onClick={() => {
+                          navigator.clipboard.writeText(addr);
+                          setJustCopied(true);
+                          setTimeout(() => {
+                            setJustCopied(false);
+                          }, 2000);
+                        }}
+                        style={{
+                          backgroundColor: '#14B8A6',
+                          border: 'none',
+                          padding: '0.5rem 0.75rem',
+                          borderRadius: '0.5rem',
+                          fontSize: '1rem',
+                          whiteSpace: 'nowrap',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          minWidth: '42px',
+                          height: '38px'
+                        }}
+                      >
+                        {justCopied ? <FaCheck /> : <BiCopy />}
+                      </Button>
+                    </OverlayTrigger>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<BSTooltip id="qr-tooltip">{showQr ? 'Hide QR Code' : 'Show QR Code'}</BSTooltip>}
+                    >
+                      <Button
+                        onClick={() => setShowQr(!showQr)}
+                        style={{
+                          backgroundColor: showQr ? '#0d9488' : '#14B8A6',
+                          border: 'none',
+                          padding: '0.5rem 0.75rem',
+                          borderRadius: '0.5rem',
+                          fontSize: '1rem',
+                          whiteSpace: 'nowrap',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          minWidth: '42px',
+                          height: '38px'
+                        }}
+                      >
+                        <FaQrcode />
+                      </Button>
+                    </OverlayTrigger>
+                    <Button
+                      id="transactions-csv-download"
+                      onClick={downloadTransactionsAsCSV}
+                      disabled={isDownloading}
+                      style={{
+                        backgroundColor: '#14B8A6',
+                        border: 'none',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '0.5rem',
+                        fontSize: '0.875rem',
+                        whiteSpace: 'nowrap',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        height: '38px'
+                      }}
+                    >
+                      <FaDownload />
+                      {buttonText}
+                    </Button>
+                  </div>
+                </div>
+                {showQr && <div className="qr-code mt-3" ref={ref} />}
+              </div>
             </div>
           </Col>
         </Row>
-        <Row>
-          <Col md={12} style={{ marginTop: "15px", justifyContent: "left" }}>
-            <Button
-              id="transactions-csv-download"
-              variant="secondary"
-              type="button"
-              onClick={downloadTransactionsAsCSV}
-              disabled={isDownloading}
-            >
-              {buttonText}
-            </Button>
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={6} md={4}>
-            <div className="addressinfo-header mt-4">balance</div>
-            <div className="utxo-value d-flex">
+
+        {/* Stats Cards */}
+        <Row className="g-3 mb-4">
+          <Col xs={12} sm={6} lg={3}>
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+              <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Balance</div>
               {addressBalance !== undefined ? (
-                <div className="utxo-amount">+{numberWithCommas(addressBalance / 100000000)} HTN</div>
+                <div className="text-hoosat-teal" style={{ fontSize: '1.5rem', fontWeight: '600' }}>
+                  {numberWithCommas(addressBalance / 100000000)} HTN
+                </div>
               ) : (
-                <Spinner animation="border" variant="primary" />
+                <Spinner animation="border" size="sm" style={{ color: '#14B8A6' }} />
               )}
             </div>
           </Col>
-          <Col sm={6} md={4}>
-            <div className="addressinfo-header mt-4 ms-sm-5">UTXOs count</div>
-            <div className="utxo-value ms-sm-5">
-              {!loadingUtxos ? numberWithCommas(utxos.length) : <Spinner animation="border" variant="primary" />}
+
+          <Col xs={12} sm={6} lg={3}>
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+              <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Value (USD)</div>
+              {addressBalance !== undefined ? (
+                <div className="text-white" style={{ fontSize: '1.5rem', fontWeight: '600' }}>
+                  ${numberWithCommas(((addressBalance / 100000000) * price).toFixed(2))}
+                </div>
+              ) : (
+                <Spinner animation="border" size="sm" style={{ color: '#14B8A6' }} />
+              )}
+            </div>
+          </Col>
+
+          <Col xs={12} sm={6} lg={3}>
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+              <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>UTXOs</div>
+              {!loadingUtxos ? (
+                <div className="text-white" style={{ fontSize: '1.5rem', fontWeight: '600' }}>
+                  {numberWithCommas(utxos.length)}
+                </div>
+              ) : (
+                <Spinner animation="border" size="sm" style={{ color: '#14B8A6' }} />
+              )}
               {errorLoadingUtxos && <BiGhost className="error-icon" />}
             </div>
           </Col>
-        </Row>
-        <Row>
-          <Col sm={6} md={4}>
-            <div className="addressinfo-header addressinfo-header-border mt-4 mt-sm-4 pt-sm-4 me-sm-5">value</div>
-            <div className="utxo-value">{numberWithCommas(((addressBalance / 100000000) * price).toFixed(2))} USD</div>
-          </Col>
-          <Col sm={6} md={4}>
-            <div className="addressinfo-header addressinfo-header-border mt-4 mt-sm-4 pt-sm-4 ms-sm-5">
-              Transactions count
-            </div>
-            <div className="utxo-value ms-sm-5">
-              {txCount !== null ? numberWithCommas(txCount) : <Spinner animation="border" variant="primary" />}
-              {errorLoadingUtxos && <BiGhost className="error-icon" />}
+
+          <Col xs={12} sm={6} lg={3}>
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+              <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Transactions</div>
+              {txCount !== null ? (
+                <div className="text-white" style={{ fontSize: '1.5rem', fontWeight: '600' }}>
+                  {numberWithCommas(txCount)}
+                </div>
+              ) : (
+                <Spinner animation="border" size="sm" style={{ color: '#14B8A6' }} />
+              )}
             </div>
           </Col>
         </Row>
@@ -443,47 +523,96 @@ const AddressInfo = () => {
 
       <Container className="webpage mt-4" fluid>
         <Row>
-          <Col className="mt- d-flex flex-row">
-            <Dropdown className="d-inline mx-2" onSelect={handleViewSwitch}>
-              <Dropdown.Toggle id="dropdown-autoclose-true" variant="dark">
-                Change View
-              </Dropdown.Toggle>
-
-              <Dropdown.Menu>
-                <Dropdown.Item href="#">Transactions History</Dropdown.Item>
-                <Dropdown.Item href="#">UTXOs</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
+          <Col className="d-flex flex-row justify-content-center">
+            <div className="d-flex gap-2 p-1 rounded" style={{ backgroundColor: 'rgba(30, 41, 59, 0.6)', border: '1px solid #334155' }}>
+              <button
+                onClick={() => handleViewSwitch('transactions')}
+                className={`px-4 py-2 rounded transition-all ${
+                  view === 'transactions'
+                    ? 'bg-hoosat-teal text-white'
+                    : 'bg-transparent text-slate-400 hover:text-hoosat-teal'
+                }`}
+                style={{
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: view === 'transactions' ? '600' : '400',
+                  backgroundColor: view === 'transactions' ? '#14B8A6' : 'transparent',
+                  color: view === 'transactions' ? 'white' : '#94a3b8',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  if (view !== 'transactions') {
+                    e.target.style.color = '#14B8A6';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (view !== 'transactions') {
+                    e.target.style.color = '#94a3b8';
+                  }
+                }}
+              >
+                Transaction History
+              </button>
+              <button
+                onClick={() => handleViewSwitch('utxos')}
+                className={`px-4 py-2 rounded transition-all ${
+                  view === 'utxos'
+                    ? 'bg-hoosat-teal text-white'
+                    : 'bg-transparent text-slate-400 hover:text-hoosat-teal'
+                }`}
+                style={{
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: view === 'utxos' ? '600' : '400',
+                  backgroundColor: view === 'utxos' ? '#14B8A6' : 'transparent',
+                  color: view === 'utxos' ? 'white' : '#94a3b8',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  if (view !== 'utxos') {
+                    e.target.style.color = '#14B8A6';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (view !== 'utxos') {
+                    e.target.style.color = '#94a3b8';
+                  }
+                }}
+              >
+                UTXOs
+              </button>
+            </div>
           </Col>
         </Row>
       </Container>
 
       {view === "transactions" && (
-        <Container className="webpage addressinfo-box mt-4" fluid>
-          <Row className="border-bottom border-bottom-1">
-            <Col xs={6} className="d-flex flex-row align-items-center">
-              <div className="utxo-title d-flex flex-row">Transactions History</div>
-              <div className="ms-auto d-flex flex-row align-items-center">
-                <Toggle
-                  defaultChecked={localStorage.getItem("detailedView") === "true"}
-                  size={"1px"}
-                  icons={false}
-                  onChange={(e) => {
-                    setDetailedView(e.target.checked);
-                  }}
-                />
-                <span className="text-light ms-2">Show details</span>
-              </div>
-            </Col>
-            <Col xs={12} md={6} className="d-flex flex-row justify-content-end ms-auto">
-              {console.log("txc", txCount)}
-              {txCount !== null ? (
-                <UtxoPagination active={activeTx} total={Math.ceil(txCount / 20)} setActive={setActiveTx} />
-              ) : (
-                <Spinner className="m-3" animation="border" variant="primary" />
-              )}
-            </Col>
-          </Row>
+        <Container className="webpage mt-4" fluid>
+          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-full w-full">
+            <Row className="mb-3 pb-3 align-items-center" style={{ borderBottom: '1px solid #334155' }}>
+              <Col xs={12} md={6} className="d-flex flex-row align-items-center mb-3 mb-md-0">
+                <h4 className="mb-0 me-3" style={{ color: '#14B8A6', fontWeight: '600' }}>Transaction History</h4>
+                <div className="d-flex flex-row align-items-center">
+                  <Toggle
+                    defaultChecked={localStorage.getItem("detailedView") === "true"}
+                    icons={false}
+                    onChange={(e) => {
+                      setDetailedView(e.target.checked);
+                    }}
+                    className="hoosat-toggle"
+                  />
+                  <span className="text-slate-400 ms-2" style={{ fontSize: '0.875rem' }}>Show details</span>
+                </div>
+              </Col>
+              <Col xs={12} md={6} className="d-flex flex-row justify-content-md-end justify-content-center">
+                {console.log("txc", txCount)}
+                {txCount !== null ? (
+                  <UtxoPagination active={activeTx} total={Math.ceil(txCount / 20)} setActive={setActiveTx} />
+                ) : (
+                  <div className="skeleton skeleton-text" style={{ width: '200px', height: '36px', borderRadius: '0.5rem' }} />
+                )}
+              </Col>
+            </Row>
           {txCount === 0 && (
             <Row className="utxo-value mt-3">
               <Col xs={12}>No transactions to show.</Col>
@@ -696,25 +825,25 @@ const AddressInfo = () => {
               </Row>
             </>
           ) : (
-            <Spinner className="m-3" animation="border" variant="primary" />
+            <TransactionListSkeleton lines={10} />
           )}
+          </div>
         </Container>
       )}
       {view === "utxos" && (
-        <Container className="webpage addressinfo-box mt-4" fluid>
-          <Row className="border-bottom border-bottom-1">
-            <Col xs={1}>
-              <div className="utxo-title d-flex flex-row">UTXOs</div>
-            </Col>
-            {utxos.length > 10 ? (
-              <Col xs={12} sm={11} className="d-flex flex-row justify-items-end">
-                <UtxoPagination active={active} total={Math.ceil(utxos.length / 10)} setActive={setActive} />
+        <Container className="webpage mt-4" fluid>
+          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-full w-full">
+            <Row className="mb-3 pb-3 align-items-center" style={{ borderBottom: '1px solid #334155' }}>
+              <Col xs={12} md={6} className="d-flex flex-row align-items-center mb-3 mb-md-0">
+                <h4 className="mb-0" style={{ color: '#14B8A6', fontWeight: '600' }}>UTXOs</h4>
               </Col>
-            ) : (
-              <></>
-            )}
-          </Row>
-          {errorLoadingUtxos && <BiGhost className="error-icon" />}
+              {utxos.length > 10 && (
+                <Col xs={12} md={6} className="d-flex flex-row justify-content-md-end justify-content-center">
+                  <UtxoPagination active={active} total={Math.ceil(utxos.length / 10)} setActive={setActive} />
+                </Col>
+              )}
+            </Row>
+            {errorLoadingUtxos && <BiGhost className="error-icon" />}
           {!loadingUtxos ? (
             utxos
               .sort((a, b) => b.utxoEntry.blockDaaScore - a.utxoEntry.blockDaaScore)
@@ -765,8 +894,9 @@ const AddressInfo = () => {
                 </>
               ))
           ) : (
-            <Spinner animation="border" variant="primary" />
+            <UtxoListSkeleton lines={10} />
           )}
+          </div>
         </Container>
       )}
     </div>
