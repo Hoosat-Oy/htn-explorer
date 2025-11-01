@@ -6,6 +6,7 @@ import { useSearchParams } from "react-router-dom";
 import { getCoinSupply } from "../htn-api-client";
 import { TableSkeleton } from "./SkeletonLoader";
 import AddressBalanceItem from "./AddressBalanceItem";
+import EmptyTablePlaceholder from "./EmptyTablePlaceholder";
 
 const shiftSize = 7;
 
@@ -334,17 +335,21 @@ const AddressesPage = () => {
                 </div>
               </div>
 
-              {/* Address Items */}
-              {addresses.map((address, index) => (
-                <AddressBalanceItem
-                  key={index}
-                  address={address.address}
-                  rank={address.index}
-                  balance={address.balance}
-                  change={address.change}
-                  tag={address.tag}
-                />
-              ))}
+              {/* Address Items or Empty State */}
+              {addresses.length === 0 ? (
+                <EmptyTablePlaceholder message="No addresses found" />
+              ) : (
+                addresses.map((address, index) => (
+                  <AddressBalanceItem
+                    key={index}
+                    address={address.address}
+                    rank={address.index}
+                    balance={address.balance}
+                    change={address.change}
+                    tag={address.tag}
+                  />
+                ))
+              )}
               <div className="d-flex justify-content-center mt-4">
                 <Pagination>
                   <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />

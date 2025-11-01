@@ -184,7 +184,7 @@ const Header = ({ price, isConnected }) => {
                 }`
               }
             >
-              Top Addresses
+              Addresses
             </NavLink>
 
             {/* Wallets Dropdown */}
@@ -385,7 +385,7 @@ const Header = ({ price, isConnected }) => {
                   onClick={() => setIsOpen(false)}
                   style={{ textDecoration: 'none' }}
                 >
-                  Top Addresses
+                  Addresses
                 </NavLink>
 
                 {/* Mobile Wallets Dropdown */}

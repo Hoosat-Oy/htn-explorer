@@ -4,6 +4,7 @@ import { FaDiceD20, FaPause, FaPlay } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import LastBlocksContext from "./LastBlocksContext";
 import { TableSkeleton } from "./SkeletonLoader";
+import BlockItem from "./BlockItem";
 
 const BlockOverview = (props) => {
   const navigate = useNavigate();
@@ -70,26 +71,35 @@ const BlockOverview = (props) => {
         <TableSkeleton lines={props.lines} />
       ) : (
         <div className="block-overview-content">
-          <table className={`styled-table w-100`}>
-            <thead>
-              <tr>
-                <th>Timestamp</th>
-                {props.small ? <></> : <th>BlueScore</th>}
-                <th>TXs</th>
-                <th width="100%">Hash</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedBlocks.map((x) => (
-                <tr id={x.block_hash} key={x.block_hash} onClick={onClickRow}>
-                  <td className="table-timestamp">{moment(parseInt(x.timestamp)).format("YYYY-MM-DD HH:mm:ss")}</td>
-                  {props.small ? <></> : <td>{x.blueScore}</td>}
-                  <td>{x.txCount}</td>
-                  <td className="hashh">{x.block_hash}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {/* Table Header */}
+          <div className="block-table-header d-flex align-items-center gap-3 px-3 py-2 mb-2">
+            <div style={{ width: '180px', flexShrink: 0 }}>
+              <span className="text-slate-400 text-xs font-semibold">TIMESTAMP</span>
+            </div>
+            {!props.small && (
+              <div style={{ width: '140px', flexShrink: 0 }}>
+                <span className="text-slate-400 text-xs font-semibold">BLUESCORE</span>
+              </div>
+            )}
+            <div style={{ width: '80px', flexShrink: 0, textAlign: 'center' }}>
+              <span className="text-slate-400 text-xs font-semibold">TXS</span>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <span className="text-slate-400 text-xs font-semibold">HASH</span>
+            </div>
+          </div>
+
+          {/* Block Items */}
+          {sortedBlocks.map((x) => (
+            <BlockItem
+              key={x.block_hash}
+              blockHash={x.block_hash}
+              timestamp={x.timestamp}
+              blueScore={x.blueScore}
+              txCount={x.txCount}
+              small={props.small}
+            />
+          ))}
         </div>
       )}
     </div>

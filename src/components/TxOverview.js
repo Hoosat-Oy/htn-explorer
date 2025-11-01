@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { numberWithCommas } from "../helper";
 import LastBlocksContext from "./LastBlocksContext";
 import { TxTableSkeleton } from "./SkeletonLoader";
+import TxItem from "./TxItem";
+import EmptyTablePlaceholder from "./EmptyTablePlaceholder";
 
 const TxOverview = (props) => {
   const [tempBlocks, setTempBlocks] = useState([]);
@@ -114,28 +116,32 @@ const TxOverview = (props) => {
         <TxTableSkeleton lines={props.lines} />
       ) : (
         <div className="block-overview-content">
-          <table className={`styled-table w-100`}>
-            <thead>
-              <tr>
-                <th>Id</th>
-                <th>Amount</th>
-                <th width="100%">Recipient</th>
-              </tr>
-            </thead>
-            <tbody>
-              {txRows.map((x) => (
-                <tr id={x.address} txid={x.txId} key={x.address + x.txId + x.outputIndex}>
-                  <td onClick={onClickRow}>{x.txId.slice(0, 10)}</td>
-                  <td onClick={onClickRow} align="right">
-                    {numberWithCommas(x.amount / 100000000)}&nbsp;HTN
-                  </td>
-                  <td className="hashh" onClick={onClickAddr}>
-                    {x.address}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {/* Table Header */}
+          <div className="tx-table-header d-flex align-items-center gap-3 px-3 py-2 mb-2">
+            <div style={{ width: '120px', flexShrink: 0 }}>
+              <span className="text-slate-400 text-xs font-semibold">ID</span>
+            </div>
+            <div style={{ width: '200px', flexShrink: 0, textAlign: 'right' }}>
+              <span className="text-slate-400 text-xs font-semibold">AMOUNT</span>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <span className="text-slate-400 text-xs font-semibold">RECIPIENT</span>
+            </div>
+          </div>
+
+          {/* TX Items or Empty State */}
+          {txRows.length === 0 ? (
+            <EmptyTablePlaceholder message={ignoreCoinbaseTx ? "No non-coinbase transactions available" : "No transactions available"} />
+          ) : (
+            txRows.map((x) => (
+              <TxItem
+                key={x.address + x.txId + x.outputIndex}
+                txId={x.txId}
+                amount={x.amount}
+                address={x.address}
+              />
+            ))
+          )}
         </div>
       )}
     </div>
