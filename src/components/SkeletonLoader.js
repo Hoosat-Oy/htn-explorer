@@ -162,3 +162,75 @@ export const UtxoListSkeleton = ({ lines = 5 }) => {
     </>
   );
 };
+
+export const BlockDetailsSkeleton = () => {
+  return (
+    <div className="blockinfo-page">
+      <div className="container-fluid webpage" style={{ paddingTop: '2rem' }}>
+        <div className="row">
+          <div className="col-xs-12">
+            {/* Title Skeleton */}
+            <div className="skeleton skeleton-text mb-4" style={{ width: '200px', height: '32px' }} />
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col mx-0">
+            {/* Block Hash Card Skeleton */}
+            <div className="row mb-4">
+              <div className="col-xs-12">
+                <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 h-full w-full">
+                  {/* Block Hash */}
+                  <div className="mb-4">
+                    <div className="skeleton skeleton-text" style={{ width: '100%', height: '20px' }} />
+                  </div>
+
+                  {/* Stats Cards Row 1 */}
+                  <div className="row g-3 mt-3 pt-3" style={{ borderTop: '1px solid #334155' }}>
+                    {[...Array(4)].map((_, index) => (
+                      <div key={index} className="col-12 col-sm-6 col-lg-3">
+                        <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 h-100">
+                          <div className="skeleton skeleton-text mb-2" style={{ width: '80px', height: '14px' }} />
+                          <div className="skeleton skeleton-text" style={{ width: '120px', height: '22px' }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Stats Cards Row 2 */}
+                  <div className="row g-3 mt-3">
+                    {[...Array(4)].map((_, index) => (
+                      <div key={`row2-${index}`} className="col-12 col-sm-6 col-lg-3">
+                        <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 h-100">
+                          <div className="skeleton skeleton-text mb-2" style={{ width: '60px', height: '14px' }} />
+                          <div className="skeleton skeleton-text" style={{ width: '100px', height: '22px' }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Transactions Card Skeleton */}
+            <div className="row">
+              <div className="col">
+                <div className="mt-4 mb-5">
+                  <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 h-full w-full">
+                    {/* Header */}
+                    <div className="mb-3 pb-3" style={{ borderBottom: '1px solid #334155' }}>
+                      <div className="skeleton skeleton-text" style={{ width: '220px', height: '24px' }} />
+                    </div>
+
+                    {/* Transaction Items */}
+                    <TransactionListSkeleton lines={3} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

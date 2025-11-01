@@ -157,7 +157,14 @@ const TransactionItem = ({
       </div>
 
       {/* Detailed View - Expandable */}
-      {isExpanded && (
+      <div
+        style={{
+          maxHeight: isExpanded ? '3000px' : '0',
+          overflow: 'hidden',
+          transition: 'max-height 0.4s ease-in-out, opacity 0.3s ease-in-out',
+          opacity: isExpanded ? 1 : 0
+        }}
+      >
         <div className="transaction-details mt-4 pt-4 border-top border-slate-700">
           <div className="row">
             {/* FROM Section */}
@@ -249,7 +256,7 @@ const TransactionItem = ({
             </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
