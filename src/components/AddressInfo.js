@@ -240,7 +240,7 @@ const AddressInfo = () => {
   }, []);
 
   useEffect(() => {
-    setSearch({ page: activeTx });
+    setSearch({ page: activeTx }, { replace: true });
     setLoadingTxs(true);
     window.scrollTo(0, 0);
     if (prevActiveTx !== undefined) loadTransactionsToShow(addr, 20, (activeTx - 1) * 20);

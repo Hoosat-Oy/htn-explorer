@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Container, Pagination } from "react-bootstrap";
-import { RiMoneyDollarCircleFill } from "react-icons/ri";
-import { useNavigate } from "react-router-dom";
 import { PieChart, pieChartDefaultProps } from "react-minimal-pie-chart";
 import { useWindowSize } from "react-use";
+import { useSearchParams } from "react-router-dom";
 import { getCoinSupply } from "../htn-api-client";
 import { TableSkeleton } from "./SkeletonLoader";
+import AddressBalanceItem from "./AddressBalanceItem";
 
 const shiftSize = 7;
 
@@ -25,11 +25,12 @@ const tags = new Map([
 ]);
 
 const AddressesPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [circCoins, setCircCoins] = useState(0);
   const [addresses, setAddresses] = useState([]);
   const [yAddresses, setYAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const [rowsPerPage] = useState(25); // You can change this number to set rows per page
   const [chartData, setChartData] = useState([]);
   const [holdingData, setHoldingData] = useState([]);
@@ -38,11 +39,12 @@ const AddressesPage = () => {
   const [endPage, setEndPage] = useState([]);
   const { width } = useWindowSize();
 
-  const navigate = useNavigate();
-
-  const onClickAddr = (e) => {
-    navigate(`/addresses/${e.target.closest("tr").getAttribute("id")}`);
-  };
+  // Set initial page parameter if not present
+  useEffect(() => {
+    if (!searchParams.has('page')) {
+      setSearchParams({ page: '1' }, { replace: true });
+    }
+  }, []);
 
   const calculateCharts = useCallback(
     (addresses) => {
@@ -256,7 +258,12 @@ const AddressesPage = () => {
     fetchYesterdaysCSV();
   }, []);
 
-  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+  const handlePageChange = (pageNumber) => {
+    console.log('handlePageChange:', pageNumber, 'current history.length:', window.history.length);
+    setSearchParams({ page: pageNumber.toString() }, { replace: true });
+    console.log('after setSearchParams, history.length:', window.history.length);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   useEffect(() => {
     let startPage = Math.max(1, currentPage - 4);
@@ -275,134 +282,126 @@ const AddressesPage = () => {
         <div className="block-overview mb-4">
           <div className="d-flex flex-row align-items-center justify-content-between w-100 mb-3 mt-3">
             <h4 className="block-overview-header mb-0 pb-0 d-flex align-items-center gap-2">
-              <span className="position-relative d-inline-flex align-items-center justify-content-center">
-                <span
-                  className="rounded-circle d-inline-block"
-                  style={{
-                    width: '10px',
-                    height: '10px',
-                    backgroundColor: '#14B8A6'
-                  }}
-                />
-              </span>
               Addresses and Balances
             </h4>
           </div>
           {loading ? (
             <TableSkeleton lines={25} />
           ) : (
-            <div className="block-overview-content">
-              <>
-                <table className={`styled-table w-100`}>
-                  <thead>
-                    <tr>
-                      <th>Rank</th>
-                      <th>Balance</th>
-                      <th>Change</th>
-                      <th>Address</th>
-                        <th>Label</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {addresses.map((address, index) => (
-                      <tr key={index} id={address.address}>
-                        <td>{address.index}</td>
-                        <td>{Number(address.balance).toLocaleString()}</td>
-                        <td className={Number(address.change) < 0 ? "text-red" : "text-white"}>
-                          {Number(address.change).toLocaleString()}
-                        </td>
-                        <td className="hashh w-100" onClick={onClickAddr}>
-                          {address.address}
-                        </td>
-                        <td className="nowrap">{address.tag}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                <div className="d-flex justify-content-center mt-4">
-                  <Pagination>
-                    <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
-                    <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
-                    {[...Array(endPage - startPage + 1)].map((_, i) => (
-                      <Pagination.Item
-                        key={startPage + i}
-                        active={startPage + i === currentPage}
-                        onClick={() => handlePageChange(startPage + i)}
-                      >
-                        {startPage + i}
-                      </Pagination.Item>
-                    ))}
-                    <Pagination.Next
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    />
-                    <Pagination.Last
-                      onClick={() => handlePageChange(totalPages)}
-                      disabled={currentPage === totalPages}
-                    />
-                  </Pagination>
+            <div className="w-100">
+              {/* Table Header */}
+              <div className="address-table-header d-flex align-items-center gap-3 px-3 py-2 mb-2">
+                <div style={{ width: '80px', flexShrink: 0 }}>
+                  <span className="text-slate-400 text-xs font-semibold">RANK</span>
                 </div>
-                <h4 className="block-overview-header text-center w-100 mt-4">Top addresses own HTN.</h4>
-                <div className="d-flex justify-content-center mt-4">
-                  <PieChart
-                    data={holdingData}
-                    label={({ dataEntry }) => parseFloat(dataEntry.value).toFixed(2) + "% " + dataEntry.title}
-                    lineWidth={10}
-                    rounded
-                    paddingAngle={15}
-                    radius={pieChartDefaultProps.radius - shiftSize * 4}
-                    segmentsShift={(index) => (index === 0 ? shiftSize : 0.5)}
-                    labelStyle={(index) => ({
-                      fill: holdingData[index].color,
-                      fontSize: "5px",
-                      fontFamily: "sans-serif",
-                    })}
-                    labelPosition={112}
-                    style={{
-                      maxHeight: width < 768 ? "150px" : "250px",
-                      width: "100%",
-                    }}
-                    lengthAngle={-360}
+                <div style={{ width: '180px', flexShrink: 0 }}>
+                  <span className="text-slate-400 text-xs font-semibold">BALANCE</span>
+                </div>
+                <div style={{ width: '140px', flexShrink: 0, textAlign: 'center' }}>
+                  <span className="text-slate-400 text-xs font-semibold">24H CHANGE</span>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <span className="text-slate-400 text-xs font-semibold">ADDRESS</span>
+                </div>
+                <div style={{ width: '180px', flexShrink: 0, textAlign: 'right' }}>
+                  <span className="text-slate-400 text-xs font-semibold">LABEL</span>
+                </div>
+              </div>
+
+              {/* Address Items */}
+              {addresses.map((address, index) => (
+                <AddressBalanceItem
+                  key={index}
+                  address={address.address}
+                  rank={address.index}
+                  balance={address.balance}
+                  change={address.change}
+                  tag={address.tag}
+                />
+              ))}
+              <div className="d-flex justify-content-center mt-4">
+                <Pagination>
+                  <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
+                  <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
+                  {[...Array(endPage - startPage + 1)].map((_, i) => (
+                    <Pagination.Item
+                      key={startPage + i}
+                      active={startPage + i === currentPage}
+                      onClick={() => handlePageChange(startPage + i)}
+                    >
+                      {startPage + i}
+                    </Pagination.Item>
+                  ))}
+                  <Pagination.Next
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
                   />
-                </div>
-                <h4 className="block-overview-header text-center w-100 mt-4">Addresses own more than HTN.</h4>
-                <div className="d-flex justify-content-center mt-4">
-                  <PieChart
-                    data={chartData}
-                    label={({ dataEntry }) => parseFloat(dataEntry.percentage).toFixed(2) + "% " + dataEntry.title}
-                    lineWidth={10}
-                    rounded
-                    paddingAngle={15}
-                    radius={pieChartDefaultProps.radius - shiftSize * 4}
-                    segmentsShift={(index) => (index === 0 ? shiftSize : 0.5)}
-                    labelStyle={(index) => ({
-                      fill: chartData[index].color,
-                      fontSize: "5px",
-                      fontFamily: "sans-serif",
-                    })}
-                    labelPosition={112}
-                    style={{
-                      maxHeight: width < 768 ? "150px" : "250px",
-                      width: "100%",
-                    }}
-                    lengthAngle={-360}
+                  <Pagination.Last
+                    onClick={() => handlePageChange(totalPages)}
+                    disabled={currentPage === totalPages}
                   />
-                </div>
-                <div className="d-flex justify-content-center mt-4">
-                  <p style={{ fontSize: "8pt" }}>
-                    The HTN pie chart above illustrates the distribution of addresses based on their balance thresholds.
-                    For instance, addresses holding 15,000,000 HTN are categorized only under 'More than 10,000,000
-                    HTN'. Conversely, the category 'Less than 1,000 HTN' excludes addresses with zero balance.
-                  </p>
-                  <p style={{ fontSize: "8pt" }}>
-                    If you want to tag your address please feel free to open a ticket in discord or do a pull request in
-                    Github.
-                  </p>
-                </div>
-                <div className="d-flex justify-content-center mt-4">
-                  <img src="/HTN-holder-rankings.webp" className="img-fluid" alt="Holder Rankings" />
-                </div>
-              </>
+                </Pagination>
+              </div>
+              <h4 className="block-overview-header text-center w-100 mt-4">Top addresses own HTN.</h4>
+              <div className="d-flex justify-content-center mt-4">
+                <PieChart
+                  data={holdingData}
+                  label={({ dataEntry }) => parseFloat(dataEntry.value).toFixed(2) + "% " + dataEntry.title}
+                  lineWidth={10}
+                  rounded
+                  paddingAngle={15}
+                  radius={pieChartDefaultProps.radius - shiftSize * 4}
+                  segmentsShift={(index) => (index === 0 ? shiftSize : 0.5)}
+                  labelStyle={(index) => ({
+                    fill: holdingData[index].color,
+                    fontSize: "5px",
+                    fontFamily: "sans-serif",
+                  })}
+                  labelPosition={112}
+                  style={{
+                    maxHeight: width < 768 ? "150px" : "250px",
+                    width: "100%",
+                  }}
+                  lengthAngle={-360}
+                />
+              </div>
+              <h4 className="block-overview-header text-center w-100 mt-4">Addresses own more than HTN.</h4>
+              <div className="d-flex justify-content-center mt-4">
+                <PieChart
+                  data={chartData}
+                  label={({ dataEntry }) => parseFloat(dataEntry.percentage).toFixed(2) + "% " + dataEntry.title}
+                  lineWidth={10}
+                  rounded
+                  paddingAngle={15}
+                  radius={pieChartDefaultProps.radius - shiftSize * 4}
+                  segmentsShift={(index) => (index === 0 ? shiftSize : 0.5)}
+                  labelStyle={(index) => ({
+                    fill: chartData[index].color,
+                    fontSize: "5px",
+                    fontFamily: "sans-serif",
+                  })}
+                  labelPosition={112}
+                  style={{
+                    maxHeight: width < 768 ? "150px" : "250px",
+                    width: "100%",
+                  }}
+                  lengthAngle={-360}
+                />
+              </div>
+              <div className="d-flex justify-content-center mt-4">
+                <p style={{ fontSize: "8pt" }}>
+                  The HTN pie chart above illustrates the distribution of addresses based on their balance thresholds.
+                  For instance, addresses holding 15,000,000 HTN are categorized only under 'More than 10,000,000
+                  HTN'. Conversely, the category 'Less than 1,000 HTN' excludes addresses with zero balance.
+                </p>
+                <p style={{ fontSize: "8pt" }}>
+                  If you want to tag your address please feel free to open a ticket in discord or do a pull request in
+                  Github.
+                </p>
+              </div>
+              <div className="d-flex justify-content-center mt-4">
+                <img src="/HTN-holder-rankings.webp" className="img-fluid" alt="Holder Rankings" />
+              </div>
             </div>
           )}
         </div>
