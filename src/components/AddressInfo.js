@@ -26,6 +26,8 @@ import { Tooltip } from "react-tooltip";
 import { TransactionListSkeleton, UtxoListSkeleton } from "./SkeletonLoader";
 import { BiCopy } from "react-icons/bi";
 import { FaQrcode, FaCheck, FaDownload } from "react-icons/fa";
+import TransactionItem from "./TransactionItem";
+import UtxoItem from "./UtxoItem";
 
 const AddressInfoPage = () => {
   const { addr } = useParams();
@@ -588,16 +590,18 @@ const AddressInfo = () => {
 
       {view === "transactions" && (
         <Container className="webpage mt-4" fluid>
-          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-full w-full">
+          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 h-full w-full">
             <Row className="mb-3 pb-3 align-items-center" style={{ borderBottom: '1px solid #334155' }}>
               <Col xs={12} md={6} className="d-flex flex-row align-items-center mb-3 mb-md-0">
                 <h4 className="mb-0 me-3" style={{ color: '#14B8A6', fontWeight: '600' }}>Transaction History</h4>
                 <div className="d-flex flex-row align-items-center">
                   <Toggle
-                    defaultChecked={localStorage.getItem("detailedView") === "true"}
+                    checked={detailedView}
                     icons={false}
                     onChange={(e) => {
-                      setDetailedView(e.target.checked);
+                      const checked = e.target.checked;
+                      setDetailedView(checked);
+                      localStorage.setItem("detailedView", checked.toString());
                     }}
                     className="hoosat-toggle"
                   />
@@ -620,180 +624,20 @@ const AddressInfo = () => {
           )}
           {!loadingTxs ? (
             <>
-              {txs.map((x) => (
-                <>
-                  <Row className="utxo-value text-primary mt-3">
-                    <Col sm={7} md={7}>
-                      {moment(x.block_time).format("YYYY-MM-DD HH:mm:ss")}
-                    </Col>
-                  </Row>
-                  <Row className="pb-4 mb-0">
-                    <Col sm={12} md={7}>
-                      <div className="utxo-header mt-3">transaction id</div>
-                      <div className="utxo-value-mono">
-                        <Link className="blockinfo-link" to={`/txs/${x.transaction_id}`}>
-                          {x.transaction_id}
-                        </Link>
-                      </div>
-                    </Col>
-                    <Col sm={6} md={3}>
-                      <div className="utxo-header mt-3">amount</div>
-                      <div className="utxo-value">
-                        <Link className="blockinfo-link" to={`/txs/${x.transaction_id}`}>
-                          {getAmount(x.outputs, x.inputs) > 0 ? (
-                            <span className="utxo-amount">
-                              +{numberWithCommas(floatToStr(getAmount(x.outputs, x.inputs)))}&nbsp;HTN
-                            </span>
-                          ) : (
-                            <span className="utxo-amount-minus">
-                              {calculationFailed(numberWithCommas(floatToStr(getAmount(x.outputs, x.inputs))))}&nbsp;HTN
-                            </span>
-                          )}
-                        </Link>
-                      </div>
-                    </Col>
-                    <Col sm={6} md={2}>
-                      <div className="utxo-header mt-3">value</div>
-                      <div className="utxo-value">
-                        {numberWithCommas((getAmount(x.outputs, x.inputs) * price).toFixed(2))} $
-                      </div>
-                    </Col>
-                  </Row>
-                  {!!detailedView && (
-                    <Row className="utxo-border pb-4 mb-4">
-                      <Col sm={12} md={6}>
-                        <div className="utxo-header mt-1">FROM</div>
-                        <div className="utxo-value-mono" style={{ fontSize: "smaller" }}>
-                          {x.inputs?.length > 0
-                            ? x.inputs.map((x) => {
-                                return txsInpCache && txsInpCache[x.previous_outpoint_hash] ? (
-                                  <>
-                                    <Row id={`N${x.previous_outpoint_hash}${x.previous_outpoint_index}`}>
-                                      <Col xs={7} className="adressinfo-tx-overflow pb-0">
-                                        <Link
-                                          className="blockinfo-link"
-                                          to={`/addresses/${getAddrFromOutputs(
-                                            txsInpCache[x.previous_outpoint_hash]["outputs"],
-                                            x.previous_outpoint_index
-                                          )}`}
-                                        >
-                                          <span
-                                            className={
-                                              getAddrFromOutputs(
-                                                txsInpCache[x.previous_outpoint_hash]["outputs"],
-                                                x.previous_outpoint_index
-                                              ) === addr
-                                                ? "highlight-addr"
-                                                : ""
-                                            }
-                                          >
-                                            {getAddrFromOutputs(
-                                              txsInpCache[x.previous_outpoint_hash]["outputs"],
-                                              x.previous_outpoint_index
-                                            )}
-                                          </span>
-                                        </Link>
-                                      </Col>
-                                      <Col xs={5}>
-                                        <span className="block-utxo-amount-minus">
-                                          -
-                                          {numberWithCommas(
-                                            getAmountFromOutputs(
-                                              txsInpCache[x.previous_outpoint_hash]["outputs"],
-                                              x.previous_outpoint_index
-                                            )
-                                          )}
-                                          &nbsp;HTN
-                                        </span>
-                                      </Col>
-                                    </Row>
-                                  </>
-                                ) : (
-                                  <li key={`${x.previous_outpoint_hash}${x.previous_outpoint_index}`}>
-                                    {x.previous_outpoint_hash} #{x.previous_outpoint_index}
-                                  </li>
-                                );
-                              })
-                            : "COINBASE (New coins)"}
-                        </div>
-                      </Col>
-                      <Col sm={12} md={6}>
-                        <div className="utxo-header mt-1">TO</div>
-                        <div className="utxo-value-mono" style={{ fontSize: "smaller" }}>
-                          {x.outputs.map((x) => (
-                            <Row>
-                              <Col xs={7} className="pb-1 adressinfo-tx-overflow">
-                                <Link className="blockinfo-link" to={`/addresses/${x.script_public_key_address}`}>
-                                  <span className={x.script_public_key_address === addr ? "highlight-addr" : ""}>
-                                    {x.script_public_key_address}
-                                  </span>
-                                </Link>
-                              </Col>
-                              <Col xs={5}>
-                                <span className="block-utxo-amount">
-                                  +{numberWithCommas(x.amount / 100000000)}&nbsp;HTN
-                                </span>
-                              </Col>
-                            </Row>
-                          ))}
-                        </div>
-                      </Col>
-                      <Col md={12}>
-                        <div className="utxo-header">Details</div>
-                        <div
-                          className="utxo-value mt-2 d-flex flex-row flex-wrap"
-                          style={{ marginBottom: "-1rem", textDecoration: "none" }}
-                        >
-                          {x.is_accepted ? (
-                            <div className="accepted-true me-3 mb-3">
-                              <span data-tooltip-id="accepted-tooltip">accepted</span>
-                              <Tooltip
-                                id="accepted-tooltip"
-                                place="top"
-                                style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                                content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
-                              />
-                            </div>
-                          ) : (
-                            <div className="accepted-false me-3 mb-3">
-                              <span data-tooltip-id="accepted-tooltip">not accepted</span>
-                              <Tooltip
-                                id="accepted-tooltip"
-                                place="top"
-                                style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                                content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
-                              />
-                            </div>
-                          )}
-                          {x.is_accepted && blueScore !== 0 && blueScore - x.accepting_block_blue_score < 86400 && (
-                            <div className="confirmations mb-3">
-                              <span data-tooltip-id="confirmations-tooltip">
-                                {blueScore - x.accepting_block_blue_score}&nbsp;confirmations
-                              </span>
-                              <Tooltip
-                                id="confirmations-tooltip"
-                                place="top"
-                                style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                                content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
-                              />
-                            </div>
-                          )}
-                          {x.is_accepted && blueScore !== 0 && blueScore - x.accepting_block_blue_score >= 86400 && (
-                            <div className="confirmations mb-3">
-                              <span data-tooltip-id="confirmations-tooltip">confirmed</span>
-                              <Tooltip
-                                id="confirmations-tooltip"
-                                place="top"
-                                style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                                content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </Col>
-                    </Row>
-                  )}
-                </>
+              {txs.map((tx) => (
+                <TransactionItem
+                  key={tx.transaction_id}
+                  transaction={tx}
+                  addr={addr}
+                  price={price}
+                  blueScore={blueScore}
+                  txsInpCache={txsInpCache}
+                  getAmount={getAmount}
+                  getAddrFromOutputs={getAddrFromOutputs}
+                  getAmountFromOutputs={getAmountFromOutputs}
+                  calculationFailed={calculationFailed}
+                  detailedView={detailedView}
+                />
               ))}
               <Row>
                 <Col xs={12} sm={6} className="d-flex flex-row justify-content-center mb-3 mb-sm-0">
@@ -832,7 +676,7 @@ const AddressInfo = () => {
       )}
       {view === "utxos" && (
         <Container className="webpage mt-4" fluid>
-          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-full w-full">
+          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 h-full w-full">
             <Row className="mb-3 pb-3 align-items-center" style={{ borderBottom: '1px solid #334155' }}>
               <Col xs={12} md={6} className="d-flex flex-row align-items-center mb-3 mb-md-0">
                 <h4 className="mb-0" style={{ color: '#14B8A6', fontWeight: '600' }}>UTXOs</h4>
@@ -848,50 +692,14 @@ const AddressInfo = () => {
             utxos
               .sort((a, b) => b.utxoEntry.blockDaaScore - a.utxoEntry.blockDaaScore)
               .slice((active - 1) * 10, (active - 1) * 10 + 10)
-              .map((x) => (
-                <>
-                  <Row className="utxo-value text-primary mt-3">
-                    <Col sm={7} md={7}>
-                      {moment((currentEpochTime - (currentDaaScore - x.utxoEntry.blockDaaScore)) * 1000).format(
-                        "YYYY-MM-DD HH:mm:ss"
-                      )}
-                    </Col>
-                  </Row>
-                  <Row className="utxo-border pb-4 mb-4">
-                    <Col sm={6} md={4}>
-                      <div className="utxo-header mt-3">transaction id</div>
-                      <div className="utxo-value">
-                        <Link className="blockinfo-link" to={`/txs/${x.outpoint.transactionId}`}>
-                          {x.outpoint.transactionId}
-                        </Link>
-                      </div>
-                    </Col>
-                    <Col sm={6} md={4}>
-                      <div className="utxo-header mt-3">amount</div>
-                      <div className="utxo-value d-flex flex-row">
-                        <div className="utxo-amount">+{numberWithCommas(x.utxoEntry.amount / 100000000)} HTN</div>
-                      </div>
-                    </Col>
-                    <Col sm={6} md={4}>
-                      <div className="utxo-header mt-3">value</div>
-                      <div className="utxo-value">
-                        {numberWithCommas(((x.utxoEntry.amount / 100000000) * price).toFixed(2))} $
-                      </div>
-                    </Col>
-                    <Col sm={6} md={4}>
-                      <div className="utxo-header mt-3">index</div>
-                      <div className="utxo-value">{x.outpoint.index}</div>
-                    </Col>
-                    <Col sm={6} md={4}>
-                      <div className="utxo-header mt-3">Block DAA Score</div>
-                      <div className="utxo-value">{x.utxoEntry.blockDaaScore}</div>
-                    </Col>
-                    <Col sm={6} md={4}>
-                      <div className="utxo-header mt-3">details</div>
-                      <div className="utxo-value">Unspent</div>
-                    </Col>
-                  </Row>
-                </>
+              .map((utxo) => (
+                <UtxoItem
+                  key={`${utxo.outpoint.transactionId}-${utxo.outpoint.index}`}
+                  utxo={utxo}
+                  price={price}
+                  currentEpochTime={currentEpochTime}
+                  currentDaaScore={currentDaaScore}
+                />
               ))
           ) : (
             <UtxoListSkeleton lines={10} />
