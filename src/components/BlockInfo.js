@@ -13,6 +13,7 @@ import BlueScoreContext from "./BlueScoreContext.js";
 import CopyButton from "./CopyButton.js";
 import PriceContext from "./PriceContext.js";
 import { Tooltip as ReactTooltip } from "react-tooltip";
+import InfoCard from "./InfoCard.js";
 
 const BlockLamp = (props) => {
   return (
@@ -118,14 +119,15 @@ const BlockInfo = () => {
             {error ? <h1 variant="danger">Error loading block</h1> : <></>}
 
             {!!blockInfo ? (
-              <div className="blockinfo-content">
-                <div className="blockinfo-header">
-                  <h4 className="d-flex flex-row align-items-center">
-                    block details
+              <>
+                {/* Modern Header */}
+                <div className="mb-4">
+                  <h4 className="text-hoosat-teal d-flex flex-row align-items-center gap-2 mb-4" style={{ fontSize: '1.75rem', fontWeight: '600' }}>
+                    Block Details
                     {blockInfo.verboseData.isChainBlock !== null && (
                       <>
                         {isBlueBlock === null ? (
-                          <Spinner className="ms-3" animation="grow" />
+                          <Spinner className="ms-2" animation="grow" size="sm" style={{ color: '#14B8A6' }} />
                         ) : (
                           <BlockLamp isBlue={isBlueBlock} />
                         )}
@@ -133,8 +135,26 @@ const BlockInfo = () => {
                     )}
                   </h4>
                 </div>
-                {/* <font className="blockinfo-header-id">{id.substring(0, 20)}...</font> */}
-                <Container className="blockinfo-table mx-0" fluid>
+
+                {/* Key Info Cards */}
+                <Row className="g-3 mb-4">
+                  <Col xs={12} md={6} lg={3}>
+                    <InfoCard label="Blue Score" value={blockInfo.header.blueScore} />
+                  </Col>
+                  <Col xs={12} md={6} lg={3}>
+                    <InfoCard label="Timestamp" value={moment(parseInt(blockInfo.header.timestamp)).format("YYYY-MM-DD HH:mm:ss")} />
+                  </Col>
+                  <Col xs={12} md={6} lg={3}>
+                    <InfoCard label="Is Chain Block" value={!!blockInfo.verboseData.isChainBlock ? "true" : "false"} />
+                  </Col>
+                  <Col xs={12} md={6} lg={3}>
+                    <InfoCard label="DAA Score" value={blockInfo.header.daaScore} />
+                  </Col>
+                </Row>
+
+                {/* Detailed Information */}
+                <div className="blockinfo-content">
+                  <Container className="blockinfo-table mx-0" fluid>
                   <Row className="blockinfo-row">
                     <Col className="blockinfo-key" lg={2}>
                       Hash
@@ -340,7 +360,8 @@ const BlockInfo = () => {
                     </Col>
                   </Row>
                 </Container>
-              </div>
+                </div>
+              </>
             ) : (
               <></>
             )}
