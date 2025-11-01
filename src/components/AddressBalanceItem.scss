@@ -5,6 +5,15 @@
     box-shadow: 0 20px 25px -5px rgba(20, 184, 166, 0.1), 0 10px 10px -5px rgba(20, 184, 166, 0.04);
   }
 
+  // Show desktop layout by default, hide mobile
+  .desktop-layout {
+    display: flex;
+  }
+
+  .mobile-layout {
+    display: none;
+  }
+
   .rank-col {
     width: 80px;
     flex-shrink: 0;
@@ -83,8 +92,24 @@
 }
 
 // Responsive adjustments
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .address-balance-item {
+    // Hide desktop layout, show mobile layout
+    .desktop-layout {
+      display: none !important;
+    }
+
+    .mobile-layout {
+      display: block !important;
+    }
+
+    .mobile-label {
+      font-size: 0.625rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
     .address-link {
       font-size: 0.75rem;
     }

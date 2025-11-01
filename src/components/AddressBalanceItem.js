@@ -23,7 +23,8 @@ const AddressBalanceItem = ({ address, rank, balance, change, tag }) => {
       onClick={handleCardClick}
       style={{ cursor: 'pointer' }}
     >
-      <div className="d-flex align-items-center gap-3">
+      {/* Desktop Layout */}
+      <div className="desktop-layout d-flex align-items-center gap-3">
         {/* Rank */}
         <div className="rank-col">
           <div className="rank-number text-slate-300 font-semibold">
@@ -78,6 +79,59 @@ const AddressBalanceItem = ({ address, rank, balance, change, tag }) => {
               {tag}
             </span>
           )}
+        </div>
+      </div>
+
+      {/* Mobile Layout */}
+      <div className="mobile-layout">
+        {/* First Row: Rank, Balance, Label, Change */}
+        <div className="d-flex align-items-center justify-content-between mb-2">
+          <div className="d-flex align-items-center gap-3">
+            <div>
+              <div className="mobile-label text-slate-500 text-xs mb-1">Rank</div>
+              <div className="rank-number text-slate-300 font-semibold">#{rank}</div>
+            </div>
+            <div>
+              <div className="mobile-label text-slate-500 text-xs mb-1">Balance</div>
+              <div className="balance-amount text-hoosat-teal font-semibold">
+                {Number(balance).toLocaleString()}
+              </div>
+            </div>
+            {tag && (
+              <div>
+                <div className="mobile-label text-slate-500 text-xs mb-1">Label</div>
+                <span className="label-badge">
+                  {tag}
+                </span>
+              </div>
+            )}
+          </div>
+          <div>
+            <div className="mobile-label text-slate-500 text-xs mb-1 text-end">24H Change</div>
+            {change !== 0 ? (
+              <div className={`change-amount font-semibold d-flex align-items-center justify-content-end gap-1 ${
+                isPositiveChange ? 'text-success' : isNegativeChange ? 'text-danger' : 'text-slate-400'
+              }`}>
+                {isPositiveChange && <FaArrowUp size={12} />}
+                {isNegativeChange && <FaArrowDown size={12} />}
+                {Number(change).toLocaleString()}
+              </div>
+            ) : (
+              <div className="change-amount font-semibold text-slate-400 text-end">-</div>
+            )}
+          </div>
+        </div>
+
+        {/* Second Row: Address */}
+        <div className="text-left">
+          <div className="mobile-label text-slate-500 text-xs mb-1">Address</div>
+          <Link
+            to={`/addresses/${address}`}
+            className="address-link text-slate-300 hover:text-hoosat-teal transition-colors font-mono text-sm d-block"
+            style={{ textDecoration: 'none', wordBreak: 'break-all' }}
+          >
+            {address}
+          </Link>
         </div>
       </div>
     </div>

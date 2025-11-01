@@ -274,7 +274,7 @@ const AddressesPage = () => {
     console.log(`Total pages ${totalPages} and start page ${startPage} and end page ${endPage}`);
     setStartPage(startPage);
     setEndPage(endPage);
-  }, [totalPages]);
+  }, [totalPages, currentPage]);
 
   return (
     <div className="blocks-page">
@@ -284,6 +284,32 @@ const AddressesPage = () => {
             <h4 className="block-overview-header mb-0 pb-0 d-flex align-items-center gap-2">
               Addresses and Balances
             </h4>
+            {!loading && (
+              <Pagination size="sm">
+                <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
+                <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
+                {[...Array(Math.min(5, endPage - startPage + 1))].map((_, i) => {
+                  const pageNum = startPage + Math.floor((endPage - startPage) / 4) * i;
+                  return (
+                    <Pagination.Item
+                      key={pageNum}
+                      active={pageNum === currentPage}
+                      onClick={() => handlePageChange(pageNum)}
+                    >
+                      {pageNum}
+                    </Pagination.Item>
+                  );
+                })}
+                <Pagination.Next
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                />
+                <Pagination.Last
+                  onClick={() => handlePageChange(totalPages)}
+                  disabled={currentPage === totalPages}
+                />
+              </Pagination>
+            )}
           </div>
           {loading ? (
             <TableSkeleton lines={25} />

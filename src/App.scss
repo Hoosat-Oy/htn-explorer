@@ -471,6 +471,11 @@ body {
 
 .address-table-header {
   border-bottom: 2px solid #334155;
+
+  // Hide on mobile
+  @media (max-width: 900px) {
+    display: none !important;
+  }
 }
 
 .block-overview thead th {
