@@ -463,7 +463,7 @@ const AddressInfo = () => {
             <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
               <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Balance (HTN)</div>
               {addressBalance !== undefined ? (
-                <div className="text-hoosat-teal" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                <div className="text-hoosat-teal" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                   {numberWithCommas(addressBalance / 100000000)}
                 </div>
               ) : (
@@ -476,7 +476,7 @@ const AddressInfo = () => {
             <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
               <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Value (USD)</div>
               {addressBalance !== undefined ? (
-                <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                   $ {numberWithCommas(((addressBalance / 100000000) * price).toFixed(2))}
                 </div>
               ) : (
@@ -489,7 +489,7 @@ const AddressInfo = () => {
             <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
               <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>UTXOs</div>
               {!loadingUtxos ? (
-                <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                   {numberWithCommas(utxos.length)}
                 </div>
               ) : (
@@ -503,7 +503,7 @@ const AddressInfo = () => {
             <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
               <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Transactions</div>
               {txCount !== null ? (
-                <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                   {numberWithCommas(txCount)}
                 </div>
               ) : (

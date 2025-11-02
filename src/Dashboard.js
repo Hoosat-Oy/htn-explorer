@@ -1,94 +1,14 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "font-awesome/css/font-awesome.min.css";
-import { useContext, useState, useEffect } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import "./App.scss";
-import BalanceModal from "./components/BalanceModal";
 import BlockDAGBox from "./components/BlockDAG";
 import BlockOverview from "./components/BlockOverview";
 import CoinsupplyBox from "./components/CoinsupplyBox";
 import MarketDataBox from "./components/MarketDataBox";
 import TxOverview from "./components/TxOverview";
-import LastBlocksContext from "./components/LastBlocksContext";
 
 function Dashboard() {
-  const [show, setShow] = useState(false);
-  const { blocks } = useContext(LastBlocksContext);
-  const handleClose = () => setShow(false);
-
-  const [balance] = useState(0);
-  const [address] = useState("hoosat:");
-
-  // const getDAGData = async (loadVerboseForThisBlock) => {
-  //   try {
-  //     const maxBlocks = 40;
-  //     if (
-  //       loadVerboseForThisBlock.block_hash !== undefined &&
-  //       (ghostDAG.length == 0 ||
-  //         ghostDAG[ghostDAG.length - 1].id !==
-  //           loadVerboseForThisBlock.block_hash)
-  //     ) {
-  //       let tries = 3;
-  //       do {
-  //         // Retrieve the latest block verbosedata.
-  //         const block = await getBlock(loadVerboseForThisBlock.block_hash);
-  //         if (block) {
-  //           let newBlock = {
-  //             id: loadVerboseForThisBlock.block_hash,
-  //             isChain: block.verboseData.isChainBlock === true ? true : false,
-  //             blueparents: block.verboseData.mergeSetBluesHashes || [],
-  //             redparents: block.verboseData.mergeSetRedsHashes || [],
-  //           };
-  //           let blocks = ghostDAG;
-  //           // Check that newblock has last block as parent.
-  //           if (blocks.length > 0) {
-  //             const lastBlock = blocks[blocks.length - 1];
-  //             let lastBlockIsParentOfNewBlock = false;
-  //             for (let i = 0; i < newBlock.blueparents.length; i++) {
-  //               if (lastBlock.id === newBlock.blueparents[i]) {
-  //                 lastBlockIsParentOfNewBlock = true;
-  //                 break;
-  //               }
-  //             }
-  //             for (let i = 0; i < newBlock.redparents.length; i++) {
-  //               if (lastBlock.id === newBlock.redparents[i]) {
-  //                 lastBlockIsParentOfNewBlock = true;
-  //                 break;
-  //               }
-  //             }
-  //             if (lastBlockIsParentOfNewBlock) {
-  //               let newGhostDAG = [...blocks, newBlock];
-  //               setGhostDAG(newGhostDAG.slice(-maxBlocks));
-  //               return;
-  //             } else {
-  //               // Do a dirty fix and tie them together, it's just animation. We have just missed block fetch, even if we tried 3 times.
-  //               newBlock.blueparents = [...newBlock.blueparents, lastBlock.id];
-  //               let newGhostDAG = [...blocks, newBlock];
-  //               setGhostDAG(newGhostDAG.slice(-maxBlocks));
-  //               return;
-  //             }
-  //           } else {
-  //             setGhostDAG([newBlock]);
-  //           }
-  //         }
-  //         console.log(
-  //           `Error fetching block ${loadVerboseForThisBlock.block_hash}, tries left ${tries}`
-  //         );
-  //         tries = tries - 1;
-  //       } while (tries > 0);
-  //     }
-  //   } catch (error) {
-  //     console.error(
-  //       `Error fetching block ${loadVerboseForThisBlock.block_hash}:`,
-  //       error
-  //     );
-  //   }
-  // };
-
-  useEffect(() => {
-    // Placeholder for future DAG updates
-  }, [blocks]);
-
   return (
     <div>
       <div className="row2" style={{ paddingTop: '2rem' }}>
@@ -119,10 +39,6 @@ function Dashboard() {
           </Row>
         </Container>
       </div>
-      {/* <div className="row3">
-        <DAGGraph DAG={ghostDAG} />
-      </div> */}
-      <BalanceModal handleClose={handleClose} show={show} address={address} balance={balance} />
     </div>
   );
 }

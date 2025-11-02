@@ -70,7 +70,7 @@ const TransactionInfo = () => {
     }
     if (txInfo?.detail === "Transaction not found") {
       retryCnt.current += 1;
-      if (retryCnt.current < 60) {
+      if (retryCnt.current < 100) {
         setTimeout(getTx, 1000);
       }
     }
@@ -88,9 +88,7 @@ const TransactionInfo = () => {
       <Container className="webpage" fluid >
         <Row>
           <Col xs={12}>
-            {!!txInfo && txInfo?.detail !== "Transaction not found" && (
-              <h2 className="text-white mb-4" style={{ fontSize: '2rem', fontWeight: '700' }}>Transaction Details</h2>
-            )}
+            <h2 className="text-white mb-4" style={{ fontSize: '2rem', fontWeight: '700' }}>Transaction Details</h2>
           </Col>
         </Row>
 
@@ -356,13 +354,21 @@ const TransactionInfo = () => {
                 </Row>
               </>
             ) : (
-              <>
-                <Spinner animation="border" variant="primary" />
-                <h2 className="text-light">Retry {retryCnt.current}/60</h2>
-                <p className="blockinfo-row text-light">
-                  Sometimes TXs need a few minutes to be added into the database.
-                </p>
-              </>
+              <Row className="mb-4">
+                <Col xs={12}>
+                  <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 h-full w-full">
+                    <div className="d-flex flex-column align-items-center justify-content-center text-center py-4">
+                      <Spinner animation="border" variant="primary" className="mb-4" style={{ width: '3rem', height: '3rem' }} />
+                      <h3 className="text-white mb-3" style={{ fontSize: '1.5rem', fontWeight: '600' }}>
+                        Loading Transaction {retryCnt.current}/100
+                      </h3>
+                      <p className="text-slate-400 mb-0" style={{ fontSize: '1rem', maxWidth: '500px' }}>
+                        Sometimes transactions need a few minutes to be added into the database. Please wait...
+                      </p>
+                    </div>
+                  </div>
+                </Col>
+              </Row>
             )}
           </Col>
         </Row>
