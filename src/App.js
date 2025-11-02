@@ -21,11 +21,6 @@ import TxPage from "./components/TxPage";
 import Dashboard from "./Dashboard";
 import AddressesPage from "./components/AddressesPage";
 import Header from "./components/Header";
-// import 'moment/min/locales';
-
-// var locale = window.navigator.userLanguage || window.navigator.language || "en";
-// moment.locale(locale);
-// moment.locale('en');
 
 const buildVersion = process.env.REACT_APP_VERCEL_GIT_COMMIT_SHA || "0.1.0";
 
@@ -99,7 +94,6 @@ function App() {
     };
   }, []);
 
-  //<Button variant="primary">Go!</Button>
   return (
     <LastBlocksContext.Provider value={{ blocks, isConnected }}>
       <PriceContext.Provider value={{ price, marketData }}>

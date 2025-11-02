@@ -7,7 +7,6 @@ import { CardSkeleton } from "./SkeletonLoader";
 const BPS = 5;
 
 const BlockDAGBox = () => {
-  // const [nextHFDAAScore, setNextHFDAAScore] = useState(29335426);
   const [nextHFDAAScore] = useState(43334184);
   const [showHF, setShowHF] = useState(false);
   const [blockCount, setBlockCount] = useState();

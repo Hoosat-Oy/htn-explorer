@@ -1,7 +1,15 @@
 {
   "name": "htn-explorer",
-  "version": "0.1.0",
+  "version": "0.2.0",
+  "description": "Hoosat blockchain explorer - Modern UI for exploring blocks, transactions, and addresses",
   "private": true,
+  "scripts": {
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "react-scripts eject",
+    "serve": "serve build"
+  },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
     "@fortawesome/free-regular-svg-icons": "^6.1.2",
@@ -36,14 +44,6 @@
     "serve": "^14.0.1",
     "socket.io-client": "^4.5.1",
     "web-vitals": "^2.1.4"
-  },
-  "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test": "craco test",
-    "eject": "react-scripts eject",
-    "serve": "serve build",
-    "postinstall": "craco build"
   },
   "overrides": {
     "autoprefixer": "10.4.5"

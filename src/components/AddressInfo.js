@@ -190,7 +190,6 @@ const AddressInfo = () => {
 
   useEffect(() => {
     setErrorLoadingUtxos(false);
-    // setLoadingUtxos(true);
   }, [addressBalance]);
 
   const handleViewSwitch = (newView) => {

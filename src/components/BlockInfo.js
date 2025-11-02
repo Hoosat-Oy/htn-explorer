@@ -148,7 +148,7 @@ const BlockInfo = () => {
                         <Col xs={12} sm={6} lg={3}>
                           <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Blue Score</div>
-                            <div className="text-hoosat-teal" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                            <div className="text-hoosat-teal" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               {numberWithCommas(blockInfo.header.blueScore)}
                             </div>
                           </div>
@@ -157,7 +157,7 @@ const BlockInfo = () => {
                         <Col xs={12} sm={6} lg={3}>
                           <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Timestamp</div>
-                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               {moment(parseInt(blockInfo.header.timestamp)).format("YYYY-MM-DD HH:mm:ss")}
                             </div>
                           </div>
@@ -166,7 +166,7 @@ const BlockInfo = () => {
                         <Col xs={12} sm={6} lg={3}>
                           <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Is Chain Block</div>
-                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               {!!blockInfo.verboseData.isChainBlock ? "true" : "false"}
                             </div>
                           </div>
@@ -175,7 +175,7 @@ const BlockInfo = () => {
                         <Col xs={12} sm={6} lg={3}>
                           <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Transactions</div>
-                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               {numberWithCommas(blockInfo.transactions?.length || 0)}
                             </div>
                           </div>
@@ -187,7 +187,7 @@ const BlockInfo = () => {
                         <Col xs={12} sm={6} lg={3}>
                           <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Bits</div>
-                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               {blockInfo.header.bits}
                             </div>
                           </div>
@@ -196,7 +196,7 @@ const BlockInfo = () => {
                         <Col xs={12} sm={6} lg={3}>
                           <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Version</div>
-                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               {blockInfo.header.version}
                             </div>
                           </div>
@@ -205,7 +205,7 @@ const BlockInfo = () => {
                         <Col xs={12} sm={6} lg={3}>
                           <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Nonce</div>
-                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               {blockInfo.header.nonce}
                             </div>
                           </div>
@@ -214,7 +214,7 @@ const BlockInfo = () => {
                         <Col xs={12} sm={6} lg={3}>
                           <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>DAA Score</div>
-                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               {numberWithCommas(blockInfo.header.daaScore)}
                             </div>
                           </div>

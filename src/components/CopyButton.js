@@ -6,16 +6,6 @@ import { FaCheck } from "react-icons/fa";
 const CopyButton = (props) => {
   const [justCopied, setJustCopied] = useState(false);
 
-  // useEffect(() => {
-  //     document.getElementById('coins').animate([
-  //         // keyframes
-  //         { transform: 'rotate(0.5turn)'}
-  //       ], {
-  //         // timing options
-  //         duration: 300
-  //       });
-  // }, [justCopied])
-
   const handleOnClick = (e) => {
     setJustCopied(true);
     navigator.clipboard.writeText(props.text);

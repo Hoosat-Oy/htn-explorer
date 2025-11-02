@@ -5,36 +5,66 @@
   <meta charset="utf-8" />
   <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#000000" />
-  <meta name="description"
-    content="This is a Hoosat explorer for a DAG overview. You can query addresses, blocks and transactions." />
-  <meta name="title" content="Hoosat explorer" />
-  <meta name="url" content="https://explorer.hoosati.fi" />
-  <meta name="image" content="%PUBLIC_URL%/k-icon-glow.png" />
+  <meta name="theme-color" content="#14B8A6" />
+
+  <!-- Primary Meta Tags -->
+  <title>Hoosat Explorer - Blockchain Explorer for Hoosat Network</title>
+  <meta name="title" content="Hoosat Explorer - Blockchain Explorer for Hoosat Network" />
+  <meta name="description" content="Explore Hoosat blockchain with real-time network stats, block explorer, transaction tracking, and address lookup. Fast, modern UI for the Hoosat DAG network." />
+  <meta name="keywords" content="Hoosat, blockchain explorer, crypto explorer, HTN, DAG network, block explorer, transaction tracker, cryptocurrency" />
+  <meta name="author" content="Hoosat Network" />
+  <link rel="canonical" href="https://network.hoosat.fi/" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://network.hoosat.fi/" />
+  <meta property="og:title" content="Hoosat Explorer - Blockchain Explorer for Hoosat Network" />
+  <meta property="og:description" content="Explore Hoosat blockchain with real-time network stats, block explorer, transaction tracking, and address lookup. Fast, modern UI for the Hoosat DAG network." />
+  <meta property="og:image" content="https://network.hoosat.fi/k-icon-glow.png" />
+  <meta property="og:site_name" content="Hoosat Explorer" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://network.hoosat.fi/" />
+  <meta property="twitter:title" content="Hoosat Explorer - Blockchain Explorer for Hoosat Network" />
+  <meta property="twitter:description" content="Explore Hoosat blockchain with real-time network stats, block explorer, transaction tracking, and address lookup." />
+  <meta property="twitter:image" content="https://network.hoosat.fi/k-icon-glow.png" />
+
+  <!-- Additional Meta Tags -->
+  <meta name="robots" content="index, follow" />
+  <meta name="language" content="English" />
+  <meta name="revisit-after" content="1 days" />
+
+  <!-- Favicons and Touch Icons -->
   <link rel="apple-touch-icon" href="%PUBLIC_URL%/k-icon-glow.png" />
-  <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
   <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
     integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Righteous" />
-  <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-  <title>Hoosat Explorer</title>
-  <script src="https://unpkg.com/react@18.0.0/umd/react.production.min.js" crossorigin></script>
-
-  <script src="https://unpkg.com/react-dom@18.0.0/umd/react-dom.production.min.js" crossorigin></script>
-
-  <script src="https://unpkg.com/react-bootstrap@2.10.7/dist/react-bootstrap.min.js" crossorigin></script>
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Hoosat Explorer",
+    "description": "Blockchain explorer for Hoosat Network - explore blocks, transactions, and addresses",
+    "url": "https://network.hoosat.fi/",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Hoosat Network"
+    }
+  }
+  </script>
 </head>
 
 <body>
