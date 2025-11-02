@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
 import moment from 'moment';
@@ -7,11 +7,19 @@ import './BlockItem.scss';
 const BlockItem = ({ blockHash, timestamp, blueScore, txCount, small }) => {
   const navigate = useNavigate();
 
-  const handleCardClick = () => {
+  const handleCardClick = useCallback(() => {
     navigate(`/blocks/${blockHash}`);
-  };
+  }, [blockHash, navigate]);
 
-  const formattedTimestamp = moment(parseInt(timestamp)).format("YYYY-MM-DD HH:mm:ss");
+  const formattedTimestamp = useMemo(() =>
+    moment(parseInt(timestamp)).format("YYYY-MM-DD HH:mm:ss"),
+    [timestamp]
+  );
+
+  const formattedTimestampMobile = useMemo(() =>
+    moment(parseInt(timestamp)).format("MM-DD HH:mm:ss"),
+    [timestamp]
+  );
 
   return (
     <div
@@ -68,7 +76,7 @@ const BlockItem = ({ blockHash, timestamp, blueScore, txCount, small }) => {
           <div>
             <div className="mobile-label text-slate-500 text-xs mb-1">Timestamp</div>
             <div className="timestamp-text text-slate-300 font-semibold">
-              {moment(parseInt(timestamp)).format("MM-DD HH:mm:ss")}
+              {formattedTimestampMobile}
             </div>
           </div>
           {!small && (
@@ -99,4 +107,4 @@ const BlockItem = ({ blockHash, timestamp, blueScore, txCount, small }) => {
   );
 };
 
-export default BlockItem;
+export default React.memo(BlockItem);

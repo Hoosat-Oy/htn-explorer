@@ -806,3 +806,10 @@ body {
     border-color: $color2 !important;
   }
 }
+
+// Mobile Performance: Disable backdrop-blur on mobile devices (GPU-intensive)
+@media (max-width: 768px) {
+  .backdrop-blur-lg {
+    backdrop-filter: none !important;
+  }
+}
