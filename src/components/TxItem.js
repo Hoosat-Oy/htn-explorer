@@ -100,4 +100,4 @@ const TxItem = ({ txId, amount, address }) => {
   );
 };
 
-export default TxItem;
+export default React.memo(TxItem);

@@ -202,7 +202,7 @@ const AddressInfo = () => {
   };
 
   function removeDuplicates(arr) {
-    return arr.filter((item, index) => arr.indexOf(item) === index);
+    return Array.from(new Set(arr));
   }
 
   const loadTransactionsToShow = useCallback((addr, limit, offset) => {
@@ -216,7 +216,6 @@ const AddressInfo = () => {
           setLoadingTxs(false);
           return;
         }
-        console.log("loading done.");
         setLoadingTxs(false);
 
         getTransactions(
@@ -229,38 +228,38 @@ const AddressInfo = () => {
         ).then((txs) => {
           var txInpObj = {};
           txs.forEach((x) => (txInpObj[x.transaction_id] = x));
-          console.log(txInpObj);
           setTxsInpCache(txInpObj);
         });
       })
       .catch((ex) => {
-        console.log("nicht eroflgreich", ex);
         setLoadingTxs(false);
       });
   }, []);
 
   useEffect(() => {
     setSearch({ page: activeTx }, { replace: true });
-    setLoadingTxs(true);
     window.scrollTo(0, 0);
-    if (prevActiveTx !== undefined) loadTransactionsToShow(addr, 20, (activeTx - 1) * 20);
-  }, [activeTx, addr, loadTransactionsToShow, prevActiveTx, setSearch]);
 
-  useEffect(() => {
     if (view === "transactions") {
+      setLoadingTxs(true);
       loadTransactionsToShow(addr, 20, (activeTx - 1) * 20);
-      getAddressTxCount(addr).then((totalCount) => {
-        setTxCount(totalCount);
-      });
-      getAddressUtxos(addr).then((res) => {
-        console.log("UTXOs loaded.");
-        setLoadingUtxos(false);
-        setUtxos(res);
-      });
+
+      // Only fetch count on initial load or when address changes
+      if (prevActiveTx === undefined) {
+        getAddressTxCount(addr).then((totalCount) => {
+          setTxCount(totalCount);
+        });
+      }
+
+      // Load UTXOs only on initial load
+      if (prevActiveTx === undefined) {
+        getAddressUtxos(addr).then((res) => {
+          setLoadingUtxos(false);
+          setUtxos(res);
+        });
+      }
     }
-    if (view === "utxos") {
-    }
-  }, [view, activeTx, addr, loadTransactionsToShow]);
+  }, [view, activeTx, addr, loadTransactionsToShow, prevActiveTx, setSearch]);
 
   const sleep = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -359,7 +358,6 @@ const AddressInfo = () => {
       setButtonText("Download Complete ✅");
       setTimeout(() => setButtonText("Download Transactions CSV"), 3000);
     } catch (error) {
-      console.error("Error fetching transactions:", error);
       setButtonText("Error! Try Again");
       setTimeout(() => setButtonText("Download Transactions CSV"), 3000);
     }
@@ -609,7 +607,6 @@ const AddressInfo = () => {
                 </div>
               </Col>
               <Col xs={12} md={6} className="d-flex flex-row justify-content-md-end justify-content-center">
-                {console.log("txc", txCount)}
                 {txCount !== null ? (
                   <UtxoPagination active={activeTx} total={Math.ceil(txCount / 20)} setActive={setActiveTx} />
                 ) : (

@@ -95,7 +95,7 @@ const Header = ({ price, isConnected }) => {
           navigate(`/blocks/${v}`);
         }
       } catch (err) {
-        console.log("Error:", err);
+        // Error handling
       }
     } else if (v.startsWith("hoosat:")) {
       navigate(`/addresses/${v}`);

@@ -79,7 +79,7 @@ const CBox = () => {
           setBlockReward(d.blockreward.toFixed(2));
         }
       })
-      .catch((err) => console.log("Error", err));
+      .catch((err) => {});
   }
 
   useEffect(() => {

@@ -60,7 +60,6 @@ const BlockInfo = () => {
           if (block.verboseData.isChainBlock) {
             return block.verboseData.mergeSetBluesHashes.includes(blockInfo.verboseData.hash);
           } else {
-            // console.log("PUSH", block.verboseData.childrenHashes)
             childListGlob.push(block.verbosedata.childrenHashes);
           }
         }
@@ -68,7 +67,7 @@ const BlockInfo = () => {
 
       isBlueBlock([...(blockInfo.verboseData.childrenHashes || [])])
         .then((res) => setIsBlueBlock(res))
-        .catch((err) => console.log("ERROR", err));
+        .catch((err) => {});
 
       let [address, miner] = ["No miner info", "No miner info"];
 
@@ -88,10 +87,9 @@ const BlockInfo = () => {
             obj[cur["transaction_id"]] = cur;
             return obj;
           }, {});
-          console.log(respAsObj);
           setTxInfo(respAsObj);
         })
-        .catch((err) => console.log("Error ", err));
+        .catch((err) => {});
 
       setMinerName(miner);
       setMinerAddress(address);

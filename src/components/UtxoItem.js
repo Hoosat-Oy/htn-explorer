@@ -109,4 +109,4 @@ const UtxoItem = ({
   );
 };
 
-export default UtxoItem;
+export default React.memo(UtxoItem);

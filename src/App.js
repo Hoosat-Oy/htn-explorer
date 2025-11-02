@@ -28,10 +28,8 @@ import Header from "./components/Header";
 // moment.locale('en');
 
 const buildVersion = process.env.REACT_APP_VERCEL_GIT_COMMIT_SHA || "0.1.0";
-console.log(buildVersion);
 
 const socketAddress = process.env.REACT_APP_SOCKET;
-console.log(socketAddress);
 const socket = io(socketAddress, {
   path: "/ws/socket.io",
 });
@@ -54,10 +52,9 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         setPrice(data["current_price"]["usd"].toFixed(8));
-        console.log(data);
         setMarketData(data);
       })
-      .catch((r) => console.log(r));
+      .catch((r) => {});
   };
 
   useEffect(() => {
@@ -86,7 +83,6 @@ function App() {
     socket.on("bluescore", (e) => {
       setBlueScore(e.blueScore);
     });
-    console.log("join room bluescore");
     socket.emit("join-room", "bluescore");
 
     socket.on("new-block", (d) => {
@@ -97,6 +93,8 @@ function App() {
       clearInterval(intervalPrice);
       socket.off("connect");
       socket.off("disconnect");
+      socket.off("last-blocks");
+      socket.off("bluescore");
       socket.off("new-block");
     };
   }, []);

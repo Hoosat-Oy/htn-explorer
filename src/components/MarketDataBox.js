@@ -40,7 +40,6 @@ const MarketDataBox = () => {
       const data = await response.json();
       return data.blockreward;
     } catch (err) {
-      console.log("Error", err);
       return null;
     }
   }

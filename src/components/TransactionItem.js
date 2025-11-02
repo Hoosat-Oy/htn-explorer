@@ -261,4 +261,4 @@ const TransactionItem = ({
   );
 };
 
-export default TransactionItem;
+export default React.memo(TransactionItem);

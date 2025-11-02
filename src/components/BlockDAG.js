@@ -24,7 +24,6 @@ const BlockDAGBox = () => {
   const initBox = async () => {
     try {
       const dag_info = await getBlockdagInfo();
-      console.log("DAG Info ", dag_info);
       setBlockCount(dag_info.blockCount);
       setHeaderCount(dag_info.headerCount);
       setVirtualDaaScore(dag_info.virtualDaaScore);
@@ -45,7 +44,7 @@ const BlockDAGBox = () => {
       const htndData = await htndInfo.json();
       setServerVersion(htndData.serverVersion);
     } catch (err) {
-      console.log("Error fetching server version:", err);
+      // Error handling
     }
     const unixTimestamp = Math.floor(Date.now() / 1000);
     const timeToFork = nextHFDAAScore - dag_info.virtualDaaScore;
@@ -215,7 +214,6 @@ const BlockDAGBox = () => {
 
   const formatHashrate = (hashrate) => {
     if (typeof hashrate !== "number" || hashrate < 0) {
-      console.error("Invalid hashrate. Please provide a positive number.");
       return;
     }
 
@@ -228,7 +226,6 @@ const BlockDAGBox = () => {
       index++;
     }
 
-    console.log(`${hashrate.toFixed(2)} ${units[index]}`);
     return `${hashrate.toFixed(2)} ${units[index]}`;
   };
 

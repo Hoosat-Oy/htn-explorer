@@ -63,4 +63,4 @@ const OutputItem = ({ txOutput }) => {
   );
 };
 
-export default OutputItem;
+export default React.memo(OutputItem);

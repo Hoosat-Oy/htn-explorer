@@ -7,7 +7,7 @@ function updateQueryBlockFromBlockDag() {
     .then((d) => {
       queryBlock = d.virtualParentHashes[0];
     })
-    .catch((err) => console.log("Error", err));
+    .catch((err) => {});
 }
 
 function uniqBy(a, key) {
@@ -43,6 +43,6 @@ export function getNewBlocks(func, trimTo) {
 
         func(blocksCache);
       })
-      .catch((err) => console.log("Error", err));
+      .catch((err) => {});
   }
 }

@@ -75,15 +75,12 @@ const AddressesPage = () => {
           holdingRanges["Top 10000"] += balance;
         }
       });
-      console.log(holdingRanges);
-      console.log(circCoins);
       const holdingPercentage = {
         "Top 10": (holdingRanges["Top 10"] / parseFloat(circCoins)) * 100,
         "Top 100": (holdingRanges["Top 100"] / parseFloat(circCoins)) * 100,
         "Top 1000": (holdingRanges["Top 1000"] / parseFloat(circCoins)) * 100,
         "Top 10000": (holdingRanges["Top 10000"] / parseFloat(circCoins)) * 100,
       };
-      console.log(holdingPercentage);
 
       addresses.forEach((address) => {
         const balance = parseInt(address.balance);
@@ -172,7 +169,6 @@ const AddressesPage = () => {
   useEffect(() => {
     const fetchCircCoins = async () => {
       const coinSupplyResp = await getCoinSupply();
-      console.log(coinSupplyResp);
       setCircCoins(Math.round(coinSupplyResp.circulatingSupply / 100000000));
     };
     fetchCircCoins();
@@ -210,7 +206,6 @@ const AddressesPage = () => {
         setAddresses(balanceChanges);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching the CSV file:", error);
         setLoading(false);
       }
     };
@@ -233,9 +228,8 @@ const AddressesPage = () => {
         parsedAddresses.forEach((address) => {
           tags.set(address[0].trim(), address[1].trim());
         });
-        console.log(tags);
       } catch (error) {
-        console.error("Error fetching the CSV file:", error.message);
+        // Error handling
       }
     };
     const fetchYesterdaysCSV = async () => {
@@ -247,11 +241,9 @@ const AddressesPage = () => {
           const [address, balance] = row.split(",");
           return { index, address, balance: parseFloat(balance) / 100000000 };
         });
-        console.log("Fetched yesterdays addresses.");
         setYAddresses(parsedYesterdays);
         setTotalPages(Math.ceil(parsedYesterdays.length));
       } catch (error) {
-        console.error("Error fetching the CSV file:", error);
         setLoading(false);
       }
     };
@@ -260,9 +252,7 @@ const AddressesPage = () => {
   }, []);
 
   const handlePageChange = (pageNumber) => {
-    console.log('handlePageChange:', pageNumber, 'current history.length:', window.history.length);
     setSearchParams({ page: pageNumber.toString() }, { replace: true });
-    console.log('after setSearchParams, history.length:', window.history.length);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -272,7 +262,6 @@ const AddressesPage = () => {
     if (endPage === totalPages) {
       startPage = Math.max(1, endPage - 9);
     }
-    console.log(`Total pages ${totalPages} and start page ${startPage} and end page ${endPage}`);
     setStartPage(startPage);
     setEndPage(endPage);
   }, [totalPages, currentPage]);
