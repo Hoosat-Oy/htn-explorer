@@ -38,7 +38,7 @@ const TransactionItem = ({
   const showConfirmations = transaction.is_accepted && confirmations < 86400;
 
   return (
-    <div className="transaction-item bg-hoosat-slate/50 backdrop-blur-lg rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 p-4 mb-3">
+    <div className="transaction-item bg-hoosat-slate/50 backdrop-blur-lg border border-slate-700 hover:border-hoosat-teal transition-all duration-300 p-4 mb-3">
       {/* Header - Always Visible */}
       <div className="transaction-header">
         {/* Date/Time row */}

@@ -17,7 +17,7 @@ const InputItem = ({
     : null;
 
   return (
-    <div className="utxo-item bg-hoosat-slate/50 backdrop-blur-lg rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 p-4 mb-3">
+    <div className="utxo-item bg-hoosat-slate/50 backdrop-blur-lg border border-slate-700 hover:border-hoosat-teal transition-all duration-300 p-4 mb-3">
       {/* Header */}
       <div className="utxo-header-section">
         {/* Main Info Row */}

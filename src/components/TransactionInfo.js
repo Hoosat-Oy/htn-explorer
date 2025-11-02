@@ -227,7 +227,7 @@ const TransactionInfo = () => {
                       {/* Stats Cards */}
                       <Row className="g-3 mt-3 pt-3" style={{ borderTop: '1px solid #334155' }}>
                         <Col xs={12} sm={6} lg={4}>
-                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Block Time</div>
                             <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
                               {moment(parseInt(txInfo.block_time)).format("YYYY-MM-DD HH:mm:ss")}
@@ -236,7 +236,7 @@ const TransactionInfo = () => {
                         </Col>
 
                         <Col xs={12} sm={6} lg={4}>
-                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Mass</div>
                             <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
                               {txInfo.mass ? txInfo.mass : "-"}
@@ -246,7 +246,7 @@ const TransactionInfo = () => {
 
                         {showTxFee && (
                           <Col xs={12} sm={6} lg={4}>
-                            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                               <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Transaction Fee</div>
                               <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
                                 {txInfo && additionalTxInfo && (
@@ -375,7 +375,7 @@ const TransactionInfo = () => {
 
         {/* Tab Switcher */}
         {!!txInfo && txInfo?.detail !== "Transaction not found" && (
-          <Container className="webpage mt-4" fluid>
+          <Container className="webpage" fluid>
             <Row>
               <Col className="d-flex flex-row justify-content-center">
                 <div className="d-flex gap-2 p-1 rounded" style={{ backgroundColor: 'rgba(30, 41, 59, 0.6)', border: '1px solid #334155' }}>
