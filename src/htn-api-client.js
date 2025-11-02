@@ -9,18 +9,6 @@ export async function getBlock(hash) {
   return res;
 }
 
-export async function getBlocks(hash, includeBlocks, includeTransactions) {
-  const res = await fetch(
-    `${API_BASE}blocks?lowHash=${hash}&includeBlocks=${includeBlocks}&includeTransactions=${includeTransactions}`,
-    {}
-  )
-    .then((response) => response.json())
-    .then((data) => {
-      return data;
-    });
-  return res;
-}
-
 export async function getInfo() {
   const res = await fetch(`${API_BASE}info/htnd`, {})
     .then((response) => response.json())

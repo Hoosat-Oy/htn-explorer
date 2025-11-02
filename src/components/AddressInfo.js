@@ -1,11 +1,10 @@
-import moment from "moment";
 import { useContext, useEffect, useRef, useState, useCallback } from "react";
-import { Button, Col, Container, Dropdown, Form, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Container, Form, Row, Spinner, OverlayTrigger, Tooltip as BSTooltip } from "react-bootstrap";
 import { BiGhost } from "react-icons/bi";
 import { useParams } from "react-router";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import Toggle from "react-toggle";
-import usePrevious, { floatToStr, numberWithCommas } from "../helper";
+import usePrevious, { numberWithCommas } from "../helper";
 import {
   getAddressBalance,
   getAddressTxCount,
@@ -16,13 +15,17 @@ import {
   getTransactionsFromAddress,
 } from "../htn-api-client.js";
 import BlueScoreContext from "./BlueScoreContext";
-import CopyButton from "./CopyButton.js";
 import PriceContext from "./PriceContext.js";
 import UtxoPagination from "./UtxoPagination.js";
 
 import QRCodeStyling from "qr-code-styling";
-import QrButton from "./QrButton";
-import { Tooltip } from "react-tooltip";
+import { TransactionListSkeleton, UtxoListSkeleton } from "./SkeletonLoader";
+import { BiCopy } from "react-icons/bi";
+import { FaQrcode, FaCheck, FaDownload } from "react-icons/fa";
+import { HiX } from "react-icons/hi";
+import TransactionItem from "./TransactionItem";
+import UtxoItem from "./UtxoItem";
+import { motion, AnimatePresence } from "framer-motion";
 
 const AddressInfoPage = () => {
   const { addr } = useParams();
@@ -35,6 +38,7 @@ const AddressInfo = () => {
 
   const [buttonText, setButtonText] = useState("Download Transactions CSV");
   const [isDownloading, setIsDownloading] = useState(false);
+  const [justCopied, setJustCopied] = useState(false);
 
   const [addressBalance, setAddressBalance] = useState();
   const { blueScore } = useContext(BlueScoreContext);
@@ -82,11 +86,11 @@ const AddressInfo = () => {
   };
 
   const getAddrFromOutputs = (outputs, index) => {
-    if (outputs[index] && outputs[index].index == index) {
+    if (outputs[index] && outputs[index].index === index) {
       return outputs[index].script_public_key_address;
     } else {
       if (outputs && outputs.length > 0) {
-        for (var i = 0; i < outputs.length; i++) {
+        for (let i = 0; i < outputs.length; i++) {
           if (outputs[i].index === index) {
             return outputs[i].script_public_key_address;
           }
@@ -96,11 +100,11 @@ const AddressInfo = () => {
   };
 
   const getAmountFromOutputs = (outputs, index) => {
-    if (outputs[index] && outputs[index].index == index) {
+    if (outputs[index] && outputs[index].index === index) {
       return outputs[index].amount / 100000000;
     } else {
       if (outputs && outputs.length > 0) {
-        for (var i = 0; i < outputs.length; i++) {
+        for (let i = 0; i < outputs.length; i++) {
           if (outputs[i].index === index) {
             return outputs[i].amount / 100000000;
           }
@@ -117,18 +121,18 @@ const AddressInfo = () => {
   };
 
   const getAmount = (outputs, inputs) => {
-    var balance = 0;
-    for (var i = 0; i < outputs.length; i++) {
+    let balance = 0;
+    for (let i = 0; i < outputs.length; i++) {
       if (outputs[i].script_public_key_address === addr) {
         balance += outputs[i].amount / 100000000;
       }
     }
     if (inputs && inputs.length > 0) {
-      for (var i = 0; i < inputs.length; i++) {
-        var outputs = txsInpCache[inputs[i].previous_outpoint_hash]?.outputs;
-        if (outputs !== undefined && outputs.length > 0) {
-          if (getAddrFromOutputs(outputs, inputs[i].previous_outpoint_index) === addr) {
-            let amount = getAmountFromOutputs(outputs, inputs[i].previous_outpoint_index);
+      for (let j = 0; j < inputs.length; j++) {
+        const cachedOutputs = txsInpCache[inputs[j].previous_outpoint_hash]?.outputs;
+        if (cachedOutputs !== undefined && cachedOutputs.length > 0) {
+          if (getAddrFromOutputs(cachedOutputs, inputs[j].previous_outpoint_index) === addr) {
+            let amount = getAmountFromOutputs(cachedOutputs, inputs[j].previous_outpoint_index);
             balance -= amount;
           }
         }
@@ -138,41 +142,6 @@ const AddressInfo = () => {
   };
 
   useEffect(() => {
-    const qrCode = new QRCodeStyling({
-      data: addr.replace(":", ":"),
-      width: 200,
-      height: 200,
-      type: "svg",
-      image: "../htn-icon.png",
-      dotsOptions: {
-        color: "#181D30",
-        type: "extra-rounded",
-        gradient: {
-          type: "linear",
-          colorStops: [
-            { offset: 0, color: "#134a40" },
-            { offset: 1, color: "#134a40" },
-          ],
-        },
-      },
-      imageOptions: {
-        crossOrigin: "anonymous",
-        margin: 0,
-        //   imageSize: 1
-      },
-      backgroundOptions: {
-        color: "#ffffff",
-      },
-      cornersSquareOptions: {
-        color: "#134a40",
-      },
-      qrOptions: {
-        typeNumber: 0,
-      },
-    });
-
-    qrCode.append(ref.current);
-
     getAddressBalance(addr).then((res) => {
       setAddressBalance(res);
     });
@@ -186,27 +155,49 @@ const AddressInfo = () => {
   }, [addr]);
 
   useEffect(() => {
+    if (showQr && ref.current) {
+      ref.current.innerHTML = '';
+
+      const qrCode = new QRCodeStyling({
+        data: addr,
+        width: 300,
+        height: 300,
+        type: "svg",
+        dotsOptions: {
+          color: "#14B8A6",
+          type: "rounded",
+        },
+        backgroundOptions: {
+          color: "#ffffff",
+        },
+        cornersSquareOptions: {
+          color: "#14B8A6",
+          type: "extra-rounded",
+        },
+        cornersDotOptions: {
+          color: "#14B8A6",
+          type: "dot",
+        },
+      });
+
+      qrCode.append(ref.current);
+    }
+  }, [showQr, addr]);
+
+  useEffect(() => {
     localStorage.setItem("detailedView", detailedView);
   }, [detailedView]);
 
   useEffect(() => {
     setErrorLoadingUtxos(false);
-    // setLoadingUtxos(true);
   }, [addressBalance]);
 
-  const handleViewSwitch = (dontknow, e) => {
-    const newValue = e.target.textContent;
-
-    if (newValue === "UTXOs") {
-      setView("utxos");
-    }
-    if (newValue === "Transactions History") {
-      setView("transactions");
-    }
+  const handleViewSwitch = (newView) => {
+    setView(newView);
   };
 
   function removeDuplicates(arr) {
-    return arr.filter((item, index) => arr.indexOf(item) === index);
+    return Array.from(new Set(arr));
   }
 
   const loadTransactionsToShow = useCallback((addr, limit, offset) => {
@@ -220,7 +211,6 @@ const AddressInfo = () => {
           setLoadingTxs(false);
           return;
         }
-        console.log("loading done.");
         setLoadingTxs(false);
 
         getTransactions(
@@ -233,38 +223,38 @@ const AddressInfo = () => {
         ).then((txs) => {
           var txInpObj = {};
           txs.forEach((x) => (txInpObj[x.transaction_id] = x));
-          console.log(txInpObj);
           setTxsInpCache(txInpObj);
         });
       })
       .catch((ex) => {
-        console.log("nicht eroflgreich", ex);
         setLoadingTxs(false);
       });
   }, []);
 
   useEffect(() => {
-    setSearch({ page: activeTx });
-    setLoadingTxs(true);
+    setSearch({ page: activeTx }, { replace: true });
     window.scrollTo(0, 0);
-    if (prevActiveTx !== undefined) loadTransactionsToShow(addr, 20, (activeTx - 1) * 20);
-  }, [activeTx, addr, loadTransactionsToShow, prevActiveTx, setSearch]);
 
-  useEffect(() => {
     if (view === "transactions") {
+      setLoadingTxs(true);
       loadTransactionsToShow(addr, 20, (activeTx - 1) * 20);
-      getAddressTxCount(addr).then((totalCount) => {
-        setTxCount(totalCount);
-      });
-      getAddressUtxos(addr).then((res) => {
-        console.log("UTXOs loaded.");
-        setLoadingUtxos(false);
-        setUtxos(res);
-      });
+
+      // Only fetch count on initial load or when address changes
+      if (prevActiveTx === undefined) {
+        getAddressTxCount(addr).then((totalCount) => {
+          setTxCount(totalCount);
+        });
+      }
+
+      // Load UTXOs only on initial load
+      if (prevActiveTx === undefined) {
+        getAddressUtxos(addr).then((res) => {
+          setLoadingUtxos(false);
+          setUtxos(res);
+        });
+      }
     }
-    if (view === "utxos") {
-    }
-  }, [view, activeTx, addr, loadTransactionsToShow]);
+  }, [view, activeTx, addr, loadTransactionsToShow, prevActiveTx, setSearch]);
 
   const sleep = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -363,7 +353,6 @@ const AddressInfo = () => {
       setButtonText("Download Complete ✅");
       setTimeout(() => setButtonText("Download Transactions CSV"), 3000);
     } catch (error) {
-      console.error("Error fetching transactions:", error);
       setButtonText("Error! Try Again");
       setTimeout(() => setButtonText("Download Transactions CSV"), 3000);
     }
@@ -373,69 +362,155 @@ const AddressInfo = () => {
 
   return (
     <div className="addressinfo-page">
-      <Container className="webpage addressinfo-box" fluid>
+      <Container className="webpage" fluid style={{ paddingTop: '2rem' }}>
         <Row>
           <Col xs={12}>
-            <div className="addressinfo-title d-flex flex-row align-items-end">address Overview</div>
+            <h2 className="text-white mb-4" style={{ fontSize: '2rem', fontWeight: '700' }}>Address Overview</h2>
           </Col>
         </Row>
-        <Row>
-          <Col md={12} className="mt-sm-4">
-            <div className="addressinfo-header">Address</div>
-            <div className="utxo-value-mono">
-              <span class="addressinfo-color">hoosat</span>
-              {addr.substring(6, addr.length - 8)}
-              <span class="addressinfo-color">{addr.substring(addr.length - 8)}</span>
-              <CopyButton size="2rem" text={addr} />
-              <QrButton addr="{addr}" onClick={() => setShowQr(!showQr)} />
-              <div className="qr-code" ref={ref} hidden={!showQr} />
-            </div>
-          </Col>
-        </Row>
-        <Row>
-          <Col md={12} style={{ marginTop: "15px", justifyContent: "left" }}>
-            <Button
-              id="transactions-csv-download"
-              variant="secondary"
-              type="button"
-              onClick={downloadTransactionsAsCSV}
-              disabled={isDownloading}
-            >
-              {buttonText}
-            </Button>
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={6} md={4}>
-            <div className="addressinfo-header mt-4">balance</div>
-            <div className="utxo-value d-flex">
+
+        {/* Address Card */}
+        <Row className="mb-4">
+          <Col xs={12}>
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 h-full w-full">
+              <div className="d-flex flex-column gap-3">
+                <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                  <div className="flex-grow-1 d-flex align-items-center gap-2" style={{ minWidth: '0' }}>
+                    <div className="utxo-value-mono d-flex align-items-center gap-2" style={{ fontSize: '0.95rem', wordBreak: 'break-all' }}>
+                      <span><span className="addressinfo-color">hoosat:</span>{addr.substring(7, addr.length - 8)}<span className="addressinfo-color">{addr.substring(addr.length - 8)}</span></span>
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={<BSTooltip id="copy-addr-tooltip">{justCopied ? 'Copied!' : 'Copy Address'}</BSTooltip>}
+                      >
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(addr);
+                            setJustCopied(true);
+                            setTimeout(() => {
+                              setJustCopied(false);
+                            }, 2000);
+                          }}
+                          className="bg-transparent border-0 text-slate-400 hover:text-hoosat-teal transition-colors p-1"
+                          style={{ cursor: 'pointer', flexShrink: 0 }}
+                        >
+                          {justCopied ? <FaCheck size={14} /> : <BiCopy size={16} />}
+                        </button>
+                      </OverlayTrigger>
+                    </div>
+                  </div>
+                  <div className="d-flex align-items-center gap-2 flex-wrap">
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<BSTooltip id="qr-tooltip">{showQr ? 'Hide QR Code' : 'Show QR Code'}</BSTooltip>}
+                    >
+                      <Button
+                        onClick={() => setShowQr(!showQr)}
+                        style={{
+                          backgroundColor: showQr ? '#0d9488' : '#14B8A6',
+                          border: 'none',
+                          padding: '0.5rem 0.75rem',
+                          borderRadius: '0.5rem',
+                          fontSize: '1rem',
+                          whiteSpace: 'nowrap',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          minWidth: '42px',
+                          height: '38px'
+                        }}
+                      >
+                        <FaQrcode />
+                      </Button>
+                    </OverlayTrigger>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<BSTooltip id="download-csv-tooltip">{isDownloading ? buttonText : 'Download Transactions CSV'}</BSTooltip>}
+                    >
+                      <Button
+                        id="transactions-csv-download"
+                        onClick={downloadTransactionsAsCSV}
+                        disabled={isDownloading}
+                        style={{
+                          backgroundColor: isDownloading ? '#0d9488' : '#14B8A6',
+                          border: 'none',
+                          padding: '0.5rem 0.75rem',
+                          borderRadius: '0.5rem',
+                          fontSize: '1rem',
+                          whiteSpace: 'nowrap',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          minWidth: '42px',
+                          height: '38px',
+                          opacity: isDownloading ? 0.8 : 1
+                        }}
+                      >
+                        {isDownloading ? (
+                          <Spinner animation="border" size="sm" style={{ width: '16px', height: '16px', borderWidth: '2px' }} />
+                        ) : (
+                          <FaDownload />
+                        )}
+                      </Button>
+                    </OverlayTrigger>
+                  </div>
+                </div>
+              </div>
+
+              {/* Stats Cards inside address card */}
+              <Row className="g-3 mt-3 pt-3" style={{ borderTop: '1px solid #334155' }}>
+          <Col xs={12} sm={6} lg={3}>
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+              <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Balance (HTN)</div>
               {addressBalance !== undefined ? (
-                <div className="utxo-amount">+{numberWithCommas(addressBalance / 100000000)} HTN</div>
+                <div className="text-hoosat-teal" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  {numberWithCommas(addressBalance / 100000000)}
+                </div>
               ) : (
-                <Spinner animation="border" variant="primary" />
+                <Spinner animation="border" size="sm" style={{ color: '#14B8A6' }} />
               )}
             </div>
           </Col>
-          <Col sm={6} md={4}>
-            <div className="addressinfo-header mt-4 ms-sm-5">UTXOs count</div>
-            <div className="utxo-value ms-sm-5">
-              {!loadingUtxos ? numberWithCommas(utxos.length) : <Spinner animation="border" variant="primary" />}
+
+          <Col xs={12} sm={6} lg={3}>
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+              <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Value (USD)</div>
+              {addressBalance !== undefined ? (
+                <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  $ {numberWithCommas(((addressBalance / 100000000) * price).toFixed(2))}
+                </div>
+              ) : (
+                <Spinner animation="border" size="sm" style={{ color: '#14B8A6' }} />
+              )}
+            </div>
+          </Col>
+
+          <Col xs={12} sm={6} lg={3}>
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+              <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>UTXOs</div>
+              {!loadingUtxos ? (
+                <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  {numberWithCommas(utxos.length)}
+                </div>
+              ) : (
+                <Spinner animation="border" size="sm" style={{ color: '#14B8A6' }} />
+              )}
               {errorLoadingUtxos && <BiGhost className="error-icon" />}
+            </div>
+          </Col>
+
+          <Col xs={12} sm={6} lg={3}>
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+              <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Transactions</div>
+              {txCount !== null ? (
+                <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  {numberWithCommas(txCount)}
+                </div>
+              ) : (
+                <Spinner animation="border" size="sm" style={{ color: '#14B8A6' }} />
+              )}
             </div>
           </Col>
         </Row>
-        <Row>
-          <Col sm={6} md={4}>
-            <div className="addressinfo-header addressinfo-header-border mt-4 mt-sm-4 pt-sm-4 me-sm-5">value</div>
-            <div className="utxo-value">{numberWithCommas(((addressBalance / 100000000) * price).toFixed(2))} USD</div>
-          </Col>
-          <Col sm={6} md={4}>
-            <div className="addressinfo-header addressinfo-header-border mt-4 mt-sm-4 pt-sm-4 ms-sm-5">
-              Transactions count
-            </div>
-            <div className="utxo-value ms-sm-5">
-              {txCount !== null ? numberWithCommas(txCount) : <Spinner animation="border" variant="primary" />}
-              {errorLoadingUtxos && <BiGhost className="error-icon" />}
             </div>
           </Col>
         </Row>
@@ -443,47 +518,97 @@ const AddressInfo = () => {
 
       <Container className="webpage mt-4" fluid>
         <Row>
-          <Col className="mt- d-flex flex-row">
-            <Dropdown className="d-inline mx-2" onSelect={handleViewSwitch}>
-              <Dropdown.Toggle id="dropdown-autoclose-true" variant="dark">
-                Change View
-              </Dropdown.Toggle>
-
-              <Dropdown.Menu>
-                <Dropdown.Item href="#">Transactions History</Dropdown.Item>
-                <Dropdown.Item href="#">UTXOs</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
+          <Col className="d-flex flex-row justify-content-center">
+            <div className="d-flex gap-2 p-1 rounded" style={{ backgroundColor: 'rgba(30, 41, 59, 0.6)', border: '1px solid #334155' }}>
+              <button
+                onClick={() => handleViewSwitch('transactions')}
+                className={`px-4 py-2 rounded transition-all ${
+                  view === 'transactions'
+                    ? 'bg-hoosat-teal text-white'
+                    : 'bg-transparent text-slate-400 hover:text-hoosat-teal'
+                }`}
+                style={{
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: view === 'transactions' ? '600' : '400',
+                  backgroundColor: view === 'transactions' ? '#14B8A6' : 'transparent',
+                  color: view === 'transactions' ? 'white' : '#94a3b8',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  if (view !== 'transactions') {
+                    e.target.style.color = '#14B8A6';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (view !== 'transactions') {
+                    e.target.style.color = '#94a3b8';
+                  }
+                }}
+              >
+                Transaction History
+              </button>
+              <button
+                onClick={() => handleViewSwitch('utxos')}
+                className={`px-4 py-2 rounded transition-all ${
+                  view === 'utxos'
+                    ? 'bg-hoosat-teal text-white'
+                    : 'bg-transparent text-slate-400 hover:text-hoosat-teal'
+                }`}
+                style={{
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: view === 'utxos' ? '600' : '400',
+                  backgroundColor: view === 'utxos' ? '#14B8A6' : 'transparent',
+                  color: view === 'utxos' ? 'white' : '#94a3b8',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  if (view !== 'utxos') {
+                    e.target.style.color = '#14B8A6';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (view !== 'utxos') {
+                    e.target.style.color = '#94a3b8';
+                  }
+                }}
+              >
+                UTXOs
+              </button>
+            </div>
           </Col>
         </Row>
       </Container>
 
       {view === "transactions" && (
-        <Container className="webpage addressinfo-box mt-4" fluid>
-          <Row className="border-bottom border-bottom-1">
-            <Col xs={6} className="d-flex flex-row align-items-center">
-              <div className="utxo-title d-flex flex-row">Transactions History</div>
-              <div className="ms-auto d-flex flex-row align-items-center">
-                <Toggle
-                  defaultChecked={localStorage.getItem("detailedView") === "true"}
-                  size={"1px"}
-                  icons={false}
-                  onChange={(e) => {
-                    setDetailedView(e.target.checked);
-                  }}
-                />
-                <span className="text-light ms-2">Show details</span>
-              </div>
-            </Col>
-            <Col xs={12} md={6} className="d-flex flex-row justify-content-end ms-auto">
-              {console.log("txc", txCount)}
-              {txCount !== null ? (
-                <UtxoPagination active={activeTx} total={Math.ceil(txCount / 20)} setActive={setActiveTx} />
-              ) : (
-                <Spinner className="m-3" animation="border" variant="primary" />
-              )}
-            </Col>
-          </Row>
+        <Container className="webpage mt-4" fluid>
+          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 h-full w-full">
+            <Row className="mb-3 pb-3 align-items-center" style={{ borderBottom: '1px solid #334155' }}>
+              <Col xs={12} md={6} className="d-flex flex-row align-items-center mb-3 mb-md-0">
+                <h4 className="mb-0 me-3" style={{ color: '#14B8A6', fontWeight: '600' }}>Transaction History</h4>
+                <div className="d-flex flex-row align-items-center">
+                  <Toggle
+                    checked={detailedView}
+                    icons={false}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setDetailedView(checked);
+                      localStorage.setItem("detailedView", checked.toString());
+                    }}
+                    className="hoosat-toggle"
+                  />
+                  <span className="text-slate-400 ms-2" style={{ fontSize: '0.875rem' }}>Show details</span>
+                </div>
+              </Col>
+              <Col xs={12} md={6} className="d-flex flex-row justify-content-md-end justify-content-center">
+                {txCount !== null ? (
+                  <UtxoPagination active={activeTx} total={Math.ceil(txCount / 20)} setActive={setActiveTx} />
+                ) : (
+                  <div className="skeleton skeleton-text" style={{ width: '200px', height: '36px', borderRadius: '0.5rem' }} />
+                )}
+              </Col>
+            </Row>
           {txCount === 0 && (
             <Row className="utxo-value mt-3">
               <Col xs={12}>No transactions to show.</Col>
@@ -491,180 +616,20 @@ const AddressInfo = () => {
           )}
           {!loadingTxs ? (
             <>
-              {txs.map((x) => (
-                <>
-                  <Row className="utxo-value text-primary mt-3">
-                    <Col sm={7} md={7}>
-                      {moment(x.block_time).format("YYYY-MM-DD HH:mm:ss")}
-                    </Col>
-                  </Row>
-                  <Row className="pb-4 mb-0">
-                    <Col sm={12} md={7}>
-                      <div className="utxo-header mt-3">transaction id</div>
-                      <div className="utxo-value-mono">
-                        <Link className="blockinfo-link" to={`/txs/${x.transaction_id}`}>
-                          {x.transaction_id}
-                        </Link>
-                      </div>
-                    </Col>
-                    <Col sm={6} md={3}>
-                      <div className="utxo-header mt-3">amount</div>
-                      <div className="utxo-value">
-                        <Link className="blockinfo-link" to={`/txs/${x.transaction_id}`}>
-                          {getAmount(x.outputs, x.inputs) > 0 ? (
-                            <span className="utxo-amount">
-                              +{numberWithCommas(floatToStr(getAmount(x.outputs, x.inputs)))}&nbsp;HTN
-                            </span>
-                          ) : (
-                            <span className="utxo-amount-minus">
-                              {calculationFailed(numberWithCommas(floatToStr(getAmount(x.outputs, x.inputs))))}&nbsp;HTN
-                            </span>
-                          )}
-                        </Link>
-                      </div>
-                    </Col>
-                    <Col sm={6} md={2}>
-                      <div className="utxo-header mt-3">value</div>
-                      <div className="utxo-value">
-                        {numberWithCommas((getAmount(x.outputs, x.inputs) * price).toFixed(2))} $
-                      </div>
-                    </Col>
-                  </Row>
-                  {!!detailedView && (
-                    <Row className="utxo-border pb-4 mb-4">
-                      <Col sm={12} md={6}>
-                        <div className="utxo-header mt-1">FROM</div>
-                        <div className="utxo-value-mono" style={{ fontSize: "smaller" }}>
-                          {x.inputs?.length > 0
-                            ? x.inputs.map((x) => {
-                                return txsInpCache && txsInpCache[x.previous_outpoint_hash] ? (
-                                  <>
-                                    <Row id={`N${x.previous_outpoint_hash}${x.previous_outpoint_index}`}>
-                                      <Col xs={7} className="adressinfo-tx-overflow pb-0">
-                                        <Link
-                                          className="blockinfo-link"
-                                          to={`/addresses/${getAddrFromOutputs(
-                                            txsInpCache[x.previous_outpoint_hash]["outputs"],
-                                            x.previous_outpoint_index
-                                          )}`}
-                                        >
-                                          <span
-                                            className={
-                                              getAddrFromOutputs(
-                                                txsInpCache[x.previous_outpoint_hash]["outputs"],
-                                                x.previous_outpoint_index
-                                              ) === addr
-                                                ? "highlight-addr"
-                                                : ""
-                                            }
-                                          >
-                                            {getAddrFromOutputs(
-                                              txsInpCache[x.previous_outpoint_hash]["outputs"],
-                                              x.previous_outpoint_index
-                                            )}
-                                          </span>
-                                        </Link>
-                                      </Col>
-                                      <Col xs={5}>
-                                        <span className="block-utxo-amount-minus">
-                                          -
-                                          {numberWithCommas(
-                                            getAmountFromOutputs(
-                                              txsInpCache[x.previous_outpoint_hash]["outputs"],
-                                              x.previous_outpoint_index
-                                            )
-                                          )}
-                                          &nbsp;HTN
-                                        </span>
-                                      </Col>
-                                    </Row>
-                                  </>
-                                ) : (
-                                  <li key={`${x.previous_outpoint_hash}${x.previous_outpoint_index}`}>
-                                    {x.previous_outpoint_hash} #{x.previous_outpoint_index}
-                                  </li>
-                                );
-                              })
-                            : "COINBASE (New coins)"}
-                        </div>
-                      </Col>
-                      <Col sm={12} md={6}>
-                        <div className="utxo-header mt-1">TO</div>
-                        <div className="utxo-value-mono" style={{ fontSize: "smaller" }}>
-                          {x.outputs.map((x) => (
-                            <Row>
-                              <Col xs={7} className="pb-1 adressinfo-tx-overflow">
-                                <Link className="blockinfo-link" to={`/addresses/${x.script_public_key_address}`}>
-                                  <span className={x.script_public_key_address === addr ? "highlight-addr" : ""}>
-                                    {x.script_public_key_address}
-                                  </span>
-                                </Link>
-                              </Col>
-                              <Col xs={5}>
-                                <span className="block-utxo-amount">
-                                  +{numberWithCommas(x.amount / 100000000)}&nbsp;HTN
-                                </span>
-                              </Col>
-                            </Row>
-                          ))}
-                        </div>
-                      </Col>
-                      <Col md={12}>
-                        <div className="utxo-header">Details</div>
-                        <div
-                          className="utxo-value mt-2 d-flex flex-row flex-wrap"
-                          style={{ marginBottom: "-1rem", textDecoration: "none" }}
-                        >
-                          {x.is_accepted ? (
-                            <div className="accepted-true me-3 mb-3">
-                              <span data-tooltip-id="accepted-tooltip">accepted</span>
-                              <Tooltip
-                                id="accepted-tooltip"
-                                place="top"
-                                style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                                content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
-                              />
-                            </div>
-                          ) : (
-                            <div className="accepted-false me-3 mb-3">
-                              <span data-tooltip-id="accepted-tooltip">not accepted</span>
-                              <Tooltip
-                                id="accepted-tooltip"
-                                place="top"
-                                style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                                content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
-                              />
-                            </div>
-                          )}
-                          {x.is_accepted && blueScore !== 0 && blueScore - x.accepting_block_blue_score < 86400 && (
-                            <div className="confirmations mb-3">
-                              <span data-tooltip-id="confirmations-tooltip">
-                                {blueScore - x.accepting_block_blue_score}&nbsp;confirmations
-                              </span>
-                              <Tooltip
-                                id="confirmations-tooltip"
-                                place="top"
-                                style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                                content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
-                              />
-                            </div>
-                          )}
-                          {x.is_accepted && blueScore !== 0 && blueScore - x.accepting_block_blue_score >= 86400 && (
-                            <div className="confirmations mb-3">
-                              <span data-tooltip-id="confirmations-tooltip">confirmed</span>
-                              <Tooltip
-                                id="confirmations-tooltip"
-                                place="top"
-                                style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                                content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </Col>
-                    </Row>
-                  )}
-                </>
+              {txs.map((tx) => (
+                <TransactionItem
+                  key={tx.transaction_id}
+                  transaction={tx}
+                  addr={addr}
+                  price={price}
+                  blueScore={blueScore}
+                  txsInpCache={txsInpCache}
+                  getAmount={getAmount}
+                  getAddrFromOutputs={getAddrFromOutputs}
+                  getAmountFromOutputs={getAmountFromOutputs}
+                  calculationFailed={calculationFailed}
+                  detailedView={detailedView}
+                />
               ))}
               <Row>
                 <Col xs={12} sm={6} className="d-flex flex-row justify-content-center mb-3 mb-sm-0">
@@ -696,79 +661,98 @@ const AddressInfo = () => {
               </Row>
             </>
           ) : (
-            <Spinner className="m-3" animation="border" variant="primary" />
+            <TransactionListSkeleton lines={10} />
           )}
+          </div>
         </Container>
       )}
       {view === "utxos" && (
-        <Container className="webpage addressinfo-box mt-4" fluid>
-          <Row className="border-bottom border-bottom-1">
-            <Col xs={1}>
-              <div className="utxo-title d-flex flex-row">UTXOs</div>
-            </Col>
-            {utxos.length > 10 ? (
-              <Col xs={12} sm={11} className="d-flex flex-row justify-items-end">
-                <UtxoPagination active={active} total={Math.ceil(utxos.length / 10)} setActive={setActive} />
+        <Container className="webpage mt-4" fluid>
+          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 h-full w-full">
+            <Row className="mb-3 pb-3 align-items-center" style={{ borderBottom: '1px solid #334155' }}>
+              <Col xs={12} md={6} className="d-flex flex-row align-items-center mb-3 mb-md-0">
+                <h4 className="mb-0" style={{ color: '#14B8A6', fontWeight: '600' }}>UTXOs</h4>
               </Col>
-            ) : (
-              <></>
-            )}
-          </Row>
-          {errorLoadingUtxos && <BiGhost className="error-icon" />}
+              {utxos.length > 10 && (
+                <Col xs={12} md={6} className="d-flex flex-row justify-content-md-end justify-content-center">
+                  <UtxoPagination active={active} total={Math.ceil(utxos.length / 10)} setActive={setActive} />
+                </Col>
+              )}
+            </Row>
+            {errorLoadingUtxos && <BiGhost className="error-icon" />}
           {!loadingUtxos ? (
             utxos
               .sort((a, b) => b.utxoEntry.blockDaaScore - a.utxoEntry.blockDaaScore)
               .slice((active - 1) * 10, (active - 1) * 10 + 10)
-              .map((x) => (
-                <>
-                  <Row className="utxo-value text-primary mt-3">
-                    <Col sm={7} md={7}>
-                      {moment((currentEpochTime - (currentDaaScore - x.utxoEntry.blockDaaScore)) * 1000).format(
-                        "YYYY-MM-DD HH:mm:ss"
-                      )}
-                    </Col>
-                  </Row>
-                  <Row className="utxo-border pb-4 mb-4">
-                    <Col sm={6} md={4}>
-                      <div className="utxo-header mt-3">transaction id</div>
-                      <div className="utxo-value">
-                        <Link className="blockinfo-link" to={`/txs/${x.outpoint.transactionId}`}>
-                          {x.outpoint.transactionId}
-                        </Link>
-                      </div>
-                    </Col>
-                    <Col sm={6} md={4}>
-                      <div className="utxo-header mt-3">amount</div>
-                      <div className="utxo-value d-flex flex-row">
-                        <div className="utxo-amount">+{numberWithCommas(x.utxoEntry.amount / 100000000)} HTN</div>
-                      </div>
-                    </Col>
-                    <Col sm={6} md={4}>
-                      <div className="utxo-header mt-3">value</div>
-                      <div className="utxo-value">
-                        {numberWithCommas(((x.utxoEntry.amount / 100000000) * price).toFixed(2))} $
-                      </div>
-                    </Col>
-                    <Col sm={6} md={4}>
-                      <div className="utxo-header mt-3">index</div>
-                      <div className="utxo-value">{x.outpoint.index}</div>
-                    </Col>
-                    <Col sm={6} md={4}>
-                      <div className="utxo-header mt-3">Block DAA Score</div>
-                      <div className="utxo-value">{x.utxoEntry.blockDaaScore}</div>
-                    </Col>
-                    <Col sm={6} md={4}>
-                      <div className="utxo-header mt-3">details</div>
-                      <div className="utxo-value">Unspent</div>
-                    </Col>
-                  </Row>
-                </>
+              .map((utxo) => (
+                <UtxoItem
+                  key={`${utxo.outpoint.transactionId}-${utxo.outpoint.index}`}
+                  utxo={utxo}
+                  price={price}
+                  currentEpochTime={currentEpochTime}
+                  currentDaaScore={currentDaaScore}
+                />
               ))
           ) : (
-            <Spinner animation="border" variant="primary" />
+            <UtxoListSkeleton lines={10} />
           )}
+          </div>
         </Container>
       )}
+
+      {/* QR Code Modal */}
+      <AnimatePresence>
+        {showQr && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[80] flex items-center justify-center"
+              onClick={() => setShowQr(false)}
+            >
+              {/* QR Modal Content */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="w-full max-w-md mx-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="bg-hoosat-slate/95 backdrop-blur-lg border border-slate-700 rounded-lg shadow-2xl overflow-hidden">
+                  {/* Modal Header */}
+                  <div className="flex items-center justify-between p-4 border-b border-slate-700">
+                    <h3 className="text-xl font-bold text-gradient">Address QR Code</h3>
+                    <button
+                      onClick={() => setShowQr(false)}
+                      className="text-slate-300 hover:text-hoosat-teal transition-colors duration-200 bg-transparent border-0 p-0"
+                      style={{ background: 'transparent', border: 'none', outline: 'none', padding: 0 }}
+                    >
+                      <HiX size={24} />
+                    </button>
+                  </div>
+
+                  {/* QR Code Display */}
+                  <div className="p-6 flex flex-col items-center">
+                    <div className="qr-code bg-white p-4 rounded-lg" ref={ref} />
+                    <div className="mt-4 text-center">
+                      <p className="text-slate-400 text-sm mb-2">Scan to send HTN to this address</p>
+                      <div className="bg-hoosat-dark/50 p-3 rounded-lg border border-slate-700">
+                        <p className="text-slate-300 font-mono text-xs break-all">
+                          {addr}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -1,0 +1,57 @@
+.utxo-item {
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 20px 25px -5px rgba(20, 184, 166, 0.1), 0 10px 10px -5px rgba(20, 184, 166, 0.04);
+  }
+
+  .utxo-header-section {
+    .copy-btn {
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .utxo-tx-id {
+    font-size: 0.875rem;
+    line-height: 1.4;
+
+    &:hover {
+      text-decoration: underline !important;
+    }
+  }
+
+  .amount-positive {
+    color: #4ade80;
+    font-size: 1rem;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+
+    &.unspent {
+      background-color: rgba(74, 222, 128, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(74, 222, 128, 0.3);
+    }
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .utxo-item {
+    .utxo-tx-id {
+      font-size: 0.75rem;
+    }
+  }
+}

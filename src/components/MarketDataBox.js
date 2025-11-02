@@ -1,32 +1,36 @@
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import { HiCurrencyDollar } from "react-icons/hi";
 import { IoMdTrendingDown, IoMdTrendingUp } from "react-icons/io";
 import { numberWithCommas } from "../helper";
 import { getCoinSupply, getBlockdagInfo } from "../htn-api-client";
 import PriceContext from "./PriceContext";
-
-const BPS = 5;
+import { CardSkeleton } from "./SkeletonLoader";
 
 const MarketDataBox = () => {
   const [circCoinsMData, setCircCoinsMData] = useState("-");
   const { price, marketData } = useContext(PriceContext);
   const [dailyYield, setDailyYield] = useState(0);
   const [dailyEmissions, setDailyEmissions] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const initBox = async () => {
-    const coin_supply = await getCoinSupply();
-    const dag_info = await getBlockdagInfo();
-    setCircCoinsMData(Math.round(parseFloat(coin_supply.circulatingSupply) / 100000000));
-    // daily yield = (your hashrate / network hashrate) * block reward * (86400 / blocks per second)
-    const blockReward = await getBlockReward();
-    if (dag_info.virtualDaaScore > 17500000) {
-      setDailyYield((1 / ((dag_info.difficulty * 2) / 1000)) * (blockReward * 0.95) * (86400 / 1));
-      setDailyEmissions(blockReward * 0.95 * 86400 * 5);
-    } else {
-      setDailyYield((1 / ((dag_info.difficulty * 2) / 1000)) * blockReward * (86400 / 1));
-      setDailyEmissions(blockReward * 86400 * 5);
+  const initBox = useCallback(async () => {
+    try {
+      const coin_supply = await getCoinSupply();
+      const dag_info = await getBlockdagInfo();
+      setCircCoinsMData(Math.round(parseFloat(coin_supply.circulatingSupply) / 100000000));
+      // daily yield = (your hashrate / network hashrate) * block reward * (86400 / blocks per second)
+      const blockReward = await getBlockReward();
+      if (dag_info.virtualDaaScore > 17500000) {
+        setDailyYield((1 / ((dag_info.difficulty * 2) / 1000)) * (blockReward * 0.95) * (86400 / 1));
+        setDailyEmissions(blockReward * 0.95 * 86400 * 5);
+      } else {
+        setDailyYield((1 / ((dag_info.difficulty * 2) / 1000)) * blockReward * (86400 / 1));
+        setDailyEmissions(blockReward * 86400 * 5);
+      }
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, []);
 
   async function getBlockReward() {
     try {
@@ -34,116 +38,95 @@ const MarketDataBox = () => {
       const data = await response.json();
       return data.blockreward;
     } catch (err) {
-      console.log("Error", err);
       return null;
     }
   }
 
   useEffect(() => {
     initBox();
-  }, []);
+  }, [initBox]);
+
+  if (isLoading) {
+    return <CardSkeleton />;
+  }
 
   return (
-    <>
-      <div className="cardBox mx-0">
-        <table>
-          <tbody>
-            <tr>
-              <td colSpan="2" className="text-center" style={{ fontSize: "3.8rem" }}>
-                <HiCurrencyDollar style={{ transform: "translateY(-10px)" }} />
-                <div id="light1" className="cardLight" />
-              </td>
-            </tr>
-            <tr>
-              <td colSpan="2" className="text-center">
-                <h3>Market data</h3>
-              </td>
-            </tr>
-            <tr>
-              <td className="cardBoxElement">MCAP</td>
-              <td className="pt-1">$ {(circCoinsMData * price).toFixed(2)} </td>
-            </tr>
-            <tr>
-              <td className="cardBoxElement">Price</td>
-              <td>$ {price} / HTN</td>
-            </tr>
+      <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-full w-full">
+        {/* Icon and Title */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="bg-gradient-to-br from-hoosat-teal/20 to-cyan-400/20 w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0">
+            <HiCurrencyDollar className="text-3xl text-hoosat-teal" />
+          </div>
+          <h3 className="text-2xl font-bold text-white">Market Data</h3>
+        </div>
 
-            {/* <tr>
-              <td style={{ fontSize: "small" }} className="cardBoxElement" align="right">
-                1h %
-              </td>
-              <td style={{ fontSize: "small" }} className="utxo-value-mono">
-                {marketData?.price_change_percentage_1h_in_currency?.usd > 0 ? (
-                  <IoMdTrendingUp color="#398851" />
-                ) : (
-                  <IoMdTrendingDown color="#d63328" />
-                )}
-                {marketData?.price_change_percentage_1h_in_currency?.usd?.toFixed(1)} %<br />
-              </td>
-            </tr> */}
-            <tr>
-              <td style={{ fontSize: "small" }} className="cardBoxElement" align="right">
-                24h %
-              </td>
-              <td style={{ fontSize: "small" }} className="utxo-value-mono">
-                {marketData?.price_change_percentage_24h > 0 ? (
-                  <IoMdTrendingUp color="#398851" />
-                ) : (
-                  <IoMdTrendingDown color="#d63328" />
-                )}
-                {marketData?.price_change_percentage_24h?.toFixed(1)} %<br />
-              </td>
-            </tr>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <span className="text-slate-400">MCAP</span>
+            <span className="text-white font-semibold">$ {(circCoinsMData * price).toFixed(2)}</span>
+          </div>
 
-            <tr>
-              <td style={{ fontSize: "small" }} className="cardBoxElement" align="right">
-                7d %
-              </td>
-              <td style={{ fontSize: "small" }} className="utxo-value-mono">
-                {marketData?.price_change_percentage_7d > 0 ? (
-                  <IoMdTrendingUp color="#398851" />
-                ) : (
-                  <IoMdTrendingDown color="#d63328" />
-                )}
-                {marketData?.price_change_percentage_7d?.toFixed(1)} %<br />
-              </td>
-            </tr>
+          <div className="flex justify-between items-start">
+            <span className="text-slate-400">Price</span>
+            <div className="text-right">
+              <div className="text-white font-semibold">$ {price} / HTN</div>
+              <div className="flex gap-3 mt-2 text-xs">
+                <span className="flex items-center gap-1">
+                  {marketData?.price_change_percentage_24h > 0 ? (
+                    <IoMdTrendingUp color="#398851" size={12} />
+                  ) : (
+                    <IoMdTrendingDown color="#d63328" size={12} />
+                  )}
+                  <span className={marketData?.price_change_percentage_24h > 0 ? "text-green-500" : "text-red-500"}>
+                    {marketData?.price_change_percentage_24h?.toFixed(1)}% 24h
+                  </span>
+                </span>
+                <span className="flex items-center gap-1">
+                  {marketData?.price_change_percentage_7d > 0 ? (
+                    <IoMdTrendingUp color="#398851" size={12} />
+                  ) : (
+                    <IoMdTrendingDown color="#d63328" size={12} />
+                  )}
+                  <span className={marketData?.price_change_percentage_7d > 0 ? "text-green-500" : "text-red-500"}>
+                    {marketData?.price_change_percentage_7d?.toFixed(1)}% 7d
+                  </span>
+                </span>
+                <span className="flex items-center gap-1">
+                  {marketData?.price_change_percentage_30d > 0 ? (
+                    <IoMdTrendingUp color="#398851" size={12} />
+                  ) : (
+                    <IoMdTrendingDown color="#d63328" size={12} />
+                  )}
+                  <span className={marketData?.price_change_percentage_30d > 0 ? "text-green-500" : "text-red-500"}>
+                    {marketData?.price_change_percentage_30d?.toFixed(1)}% 30d
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
 
-            <tr>
-              <td style={{ fontSize: "small" }} className="cardBoxElement" align="right">
-                30d %
-              </td>
-              <td style={{ fontSize: "small" }} className="utxo-value-mono">
-                {marketData?.price_change_percentage_30d > 0 ? (
-                  <IoMdTrendingUp color="#398851" />
-                ) : (
-                  <IoMdTrendingDown color="#d63328" />
-                )}
-                {marketData?.price_change_percentage_30d?.toFixed(1)} %<br />
-              </td>
-            </tr>
+          <div className="flex justify-between items-center">
+            <span className="text-slate-400">Trade Volume</span>
+            <span className="text-white font-semibold">$ {numberWithCommas(marketData?.total_volume?.usd.toFixed(2))}</span>
+          </div>
 
-            <tr>
-              <td className="cardBoxElement">Trade Volume</td>
-              <td className="pt-1">$ {numberWithCommas(marketData?.total_volume?.usd.toFixed(2))}</td>
-            </tr>
-            <tr>
-              <td className="cardBoxElement">Emissions</td>
-              <td className="pt-1">$ {(dailyEmissions * price).toFixed(2)}</td>
-            </tr>
-            <tr>
-              <td className="cardBoxElement nowrap">Daily Yield (Kh)</td>
-              <td className="pt-1">{dailyYield.toFixed(2)} HTN</td>
-            </tr>
-            <tr>
-              <td className="cardBoxElement nowrap">Daily Revenue (Kh)</td>
-              <td className="pt-1">$ {(dailyYield * price).toFixed(6)}</td>
-            </tr>
-          </tbody>
-        </table>
+          <div className="flex justify-between items-center">
+            <span className="text-slate-400">Emissions</span>
+            <span className="text-white font-semibold">$ {(dailyEmissions * price).toFixed(2)}</span>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <span className="text-slate-400">Daily Yield (Kh)</span>
+            <span className="text-white font-semibold">{dailyYield.toFixed(2)} HTN</span>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <span className="text-slate-400">Daily Revenue (Kh)</span>
+            <span className="text-white font-semibold">$ {(dailyYield * price).toFixed(6)}</span>
+          </div>
+        </div>
       </div>
-    </>
   );
 };
 
-export default MarketDataBox;
+export default React.memo(MarketDataBox);

@@ -3,7 +3,7 @@
 import moment from "moment";
 import { useContext, useEffect, useState } from "react";
 import { Col, Container, OverlayTrigger, Row, Spinner, Tooltip } from "react-bootstrap";
-import { BiNetworkChart } from "react-icons/bi";
+import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
 import { parsePayload } from "../bech32.js";
@@ -12,7 +12,8 @@ import { getBlock, getTransactions } from "../htn-api-client.js";
 import BlueScoreContext from "./BlueScoreContext.js";
 import CopyButton from "./CopyButton.js";
 import PriceContext from "./PriceContext.js";
-import { Tooltip as ReactTooltip } from "react-tooltip";
+import TransactionItem from "./TransactionItem.js";
+import { BlockDetailsSkeleton } from "./SkeletonLoader.js";
 
 const BlockLamp = (props) => {
   return (
@@ -20,21 +21,6 @@ const BlockLamp = (props) => {
       <div className={`ms-3 block-lamp-${props.isBlue ? "blue" : "red"}`} />
     </OverlayTrigger>
   );
-};
-
-const getAddrFromOutputs = (outputs, i) => {
-  for (const o of outputs) {
-    if (o.index === i) {
-      return o.script_public_key_address;
-    }
-  }
-};
-const getAmountFromOutputs = (outputs, i) => {
-  for (const o of outputs) {
-    if (o.index === i) {
-      return o.amount / 100000000;
-    }
-  }
 };
 
 const BlockInfo = () => {
@@ -46,6 +32,7 @@ const BlockInfo = () => {
   const [minerAddress, setMinerAddress] = useState();
   const [isBlueBlock, setIsBlueBlock] = useState(null);
   const [error, setError] = useState(false);
+  const [showAdditionalDetails, setShowAdditionalDetails] = useState(false);
   const { price } = useContext(PriceContext);
 
   useEffect(() => {
@@ -72,7 +59,6 @@ const BlockInfo = () => {
           if (block.verboseData.isChainBlock) {
             return block.verboseData.mergeSetBluesHashes.includes(blockInfo.verboseData.hash);
           } else {
-            // console.log("PUSH", block.verboseData.childrenHashes)
             childListGlob.push(block.verbosedata.childrenHashes);
           }
         }
@@ -80,7 +66,7 @@ const BlockInfo = () => {
 
       isBlueBlock([...(blockInfo.verboseData.childrenHashes || [])])
         .then((res) => setIsBlueBlock(res))
-        .catch((err) => console.log("ERROR", err));
+        .catch((err) => {});
 
       let [address, miner] = ["No miner info", "No miner info"];
 
@@ -100,247 +86,369 @@ const BlockInfo = () => {
             obj[cur["transaction_id"]] = cur;
             return obj;
           }, {});
-          console.log(respAsObj);
           setTxInfo(respAsObj);
         })
-        .catch((err) => console.log("Error ", err));
+        .catch((err) => {});
 
       setMinerName(miner);
       setMinerAddress(address);
     }
   }, [blockInfo]);
 
+  if (!blockInfo && !error) {
+    return <BlockDetailsSkeleton />;
+  }
+
   return (
     <div className="blockinfo-page">
-      <Container className="webpage" fluid>
+      <Container className="webpage" fluid style={{ paddingTop: '2rem' }}>
         <Row>
-          <Col className="mx-0">
+          <Col xs={12}>
             {error ? <h1 variant="danger">Error loading block</h1> : <></>}
 
+            {!!blockInfo && (
+              <h2 className="text-white mb-4" style={{ fontSize: '2rem', fontWeight: '700' }}>Block Details</h2>
+            )}
+          </Col>
+        </Row>
+
+        <Row>
+          <Col className="mx-0">
             {!!blockInfo ? (
-              <div className="blockinfo-content">
-                <div className="blockinfo-header">
-                  <h4 className="d-flex flex-row align-items-center">
-                    block details
-                    {blockInfo.verboseData.isChainBlock !== null && (
-                      <>
-                        {isBlueBlock === null ? (
-                          <Spinner className="ms-3" animation="grow" />
-                        ) : (
-                          <BlockLamp isBlue={isBlueBlock} />
-                        )}
-                      </>
-                    )}
-                  </h4>
-                </div>
-                {/* <font className="blockinfo-header-id">{id.substring(0, 20)}...</font> */}
-                <Container className="blockinfo-table mx-0" fluid>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Hash
-                    </Col>
-                    <Col className="blockinfo-value-mono" lg={10}>
-                      {blockInfo.verboseData.hash}
-                      <CopyButton text={blockInfo.verboseData.hash} />
-                    </Col>
-                    {/* {isBlue ? "BLUE" : "RED"} */}
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Blue Score
-                    </Col>
-                    <Col className="blockinfo-value" lg={10}>
-                      {blockInfo.header.blueScore}
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Bits
-                    </Col>
-                    <Col className="blockinfo-value" lg={10}>
-                      {blockInfo.header.bits}
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Timestamp
-                    </Col>
-                    <Col className="blockinfo-value" lg={10}>
-                      {moment(parseInt(blockInfo.header.timestamp)).format("YYYY-MM-DD HH:mm:ss")} (
-                      {blockInfo.header.timestamp})
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Version
-                    </Col>
-                    <Col className="blockinfo-value" lg={10}>
-                      {blockInfo.header.version}
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Is Chain Block
-                    </Col>
-                    <Col className="blockinfo-value" lg={10}>
-                      <span data-tooltip-id="is-chain-block-tooltip">
-                        {!!blockInfo.verboseData.isChainBlock ? "true" : "false"}
-                      </span>
-                      <ReactTooltip
-                        id="is-chain-block-tooltip"
-                        place="top"
-                        style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                        content="Chain block true means the block is a blue block, part of the main chain. Chain block false means the block is an orphan, also known as a red block, but it is still included in the chain due to GhostDAG. To calculate the reward for any mined block (B), find the chain block (C) that merged it. If B is in C's MergesetReds, there is no reward. If B is in MergesetBlues, the reward is in the corresponding coinbase output."
-                      />
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Selected Parent hash
-                    </Col>
-                    <Col className="blockinfo-value-mono" lg={10}>
-                      <Link className="blockinfo-link" to={`/blocks/${blockInfo.verboseData.selectedParentHash}`}>
-                        {blockInfo.verboseData.selectedParentHash}
-                      </Link>
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Parents
-                    </Col>
-                    <Col className="blockinfo-value-mono" lg={10}>
-                      <ul>
-                        {blockInfo.header.parents[0].parentHashes.map((x) => (
-                          <li>
-                            <Link className="blockinfo-link" to={`/blocks/${x}`}>
-                              {x}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Mergeset Blues hashes
-                    </Col>
-                    <Col className="blockinfo-value-mono" lg={10}>
-                      <ul>
-                        {(blockInfo.verboseData.mergeSetBluesHashes || []).map((x) => (
-                          <li>
-                            <Link className="blockinfo-link" to={`/blocks/${x}`}>
-                              {x}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Mergeset Reds hashes
-                    </Col>
-                    <Col className="blockinfo-value-mono" lg={10}>
-                      <ul>
-                        {(blockInfo.verboseData.mergeSetRedsHashes || []).map((x) => (
-                          <li>
-                            <Link className="blockinfo-link" to={`/blocks/${x}`}>
-                              {x}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Children
-                    </Col>
-                    <Col className="blockinfo-value-mono" lg={10}>
-                      <ul>
-                        {(blockInfo.verboseData.childrenHashes || []).map((child) => (
-                          <li>
-                            <Link className="blockinfo-link" to={`/blocks/${child}`}>
-                              {child}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Merkle Root
-                    </Col>
-                    <Col className="blockinfo-value-mono" lg={10}>
-                      {blockInfo.header.hashMerkleRoot}
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Accepted Merkle Root
-                    </Col>
-                    <Col className="blockinfo-value-mono" lg={10}>
-                      {blockInfo.header.acceptedIdMerkleRoot}
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      UTXO Commitment
-                    </Col>
-                    <Col className="blockinfo-value-mono" lg={10}>
-                      {blockInfo.header.utxoCommitment}
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Nonce
-                    </Col>
-                    <Col className="blockinfo-value" lg={10}>
-                      {blockInfo.header.nonce}
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      DAA Score
-                    </Col>
-                    <Col className="blockinfo-value" lg={10}>
-                      {blockInfo.header.daaScore}
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Blue Work
-                    </Col>
-                    <Col className="blockinfo-value" lg={10}>
-                      {blockInfo.header.blueWork} ({BigInt(`0x${blockInfo.header.blueWork}`).toString()})
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Pruning Point
-                    </Col>
-                    <Col className="blockinfo-value-mono" lg={10}>
-                      <Link className="blockinfo-link" to={`/blocks/${blockInfo.header.pruningPoint}`}>
-                        {blockInfo.header.pruningPoint}
-                      </Link>
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row border-bottom-0">
-                    <Col className="blockinfo-key" lg={2}>
-                      Miner Info
-                    </Col>
-                    <Col className="blockinfo-value-mono md-3" lg={10}>
-                      <div className="blockinfo-value">{minerName}</div>
-                      <div>
-                        <Link className="blockinfo-link" to={`/addresses/${minerAddress}`}>
-                          {minerAddress}
-                        </Link>
+              <>
+                {/* Block Hash Card - similar to Address Card */}
+                <Row className="mb-4">
+                  <Col xs={12}>
+                    <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 h-full w-full">
+                      {/* Block Hash with Copy Button and Lamp */}
+                      <div className="mb-4">
+                        <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                          <div className="flex-grow-1 d-flex align-items-center gap-2" style={{ minWidth: '0' }}>
+                            <div className="d-flex align-items-center gap-2" style={{ fontSize: '0.95rem', wordBreak: 'break-all', fontFamily: 'monospace' }}>
+                              <span className="text-slate-200">Hash: {blockInfo.verboseData.hash}</span>
+                              <CopyButton text={blockInfo.verboseData.hash} />
+                            </div>
+                          </div>
+                          <div className="d-flex align-items-center gap-2">
+                            {blockInfo.verboseData.isChainBlock !== null && (
+                              <>
+                                {isBlueBlock === null ? (
+                                  <Spinner animation="grow" size="sm" style={{ color: '#14B8A6' }} />
+                                ) : (
+                                  <BlockLamp isBlue={isBlueBlock} />
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </Col>
-                  </Row>
-                </Container>
-              </div>
+
+                      {/* Stats Cards inside block card */}
+                      <Row className="g-3 mt-3 pt-3" style={{ borderTop: '1px solid #334155' }}>
+                        <Col xs={12} sm={6} lg={3}>
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                            <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Blue Score</div>
+                            <div className="text-hoosat-teal" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                              {numberWithCommas(blockInfo.header.blueScore)}
+                            </div>
+                          </div>
+                        </Col>
+
+                        <Col xs={12} sm={6} lg={3}>
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                            <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Timestamp</div>
+                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                              {moment(parseInt(blockInfo.header.timestamp)).format("YYYY-MM-DD HH:mm:ss")}
+                            </div>
+                          </div>
+                        </Col>
+
+                        <Col xs={12} sm={6} lg={3}>
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                            <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Is Chain Block</div>
+                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                              {!!blockInfo.verboseData.isChainBlock ? "true" : "false"}
+                            </div>
+                          </div>
+                        </Col>
+
+                        <Col xs={12} sm={6} lg={3}>
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                            <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Transactions</div>
+                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                              {numberWithCommas(blockInfo.transactions?.length || 0)}
+                            </div>
+                          </div>
+                        </Col>
+                      </Row>
+
+                      {/* Second row of stats */}
+                      <Row className="g-3 mt-3">
+                        <Col xs={12} sm={6} lg={3}>
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                            <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Bits</div>
+                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                              {blockInfo.header.bits}
+                            </div>
+                          </div>
+                        </Col>
+
+                        <Col xs={12} sm={6} lg={3}>
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                            <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Version</div>
+                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                              {blockInfo.header.version}
+                            </div>
+                          </div>
+                        </Col>
+
+                        <Col xs={12} sm={6} lg={3}>
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                            <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Nonce</div>
+                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                              {blockInfo.header.nonce}
+                            </div>
+                          </div>
+                        </Col>
+
+                        <Col xs={12} sm={6} lg={3}>
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                            <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>DAA Score</div>
+                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                              {numberWithCommas(blockInfo.header.daaScore)}
+                            </div>
+                          </div>
+                        </Col>
+                      </Row>
+
+                      {/* Show Additional Details Button */}
+                      <div className="mt-4 pt-3" style={{ borderTop: '1px solid #334155' }}>
+                        <button
+                          onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}
+                          className="d-flex align-items-center gap-2 bg-transparent border-0 text-slate-400 hover:text-hoosat-teal transition-colors"
+                          style={{ cursor: 'pointer', fontSize: '0.95rem', fontWeight: '500' }}
+                        >
+                          {showAdditionalDetails ? <BiChevronUp size={20} /> : <BiChevronDown size={20} />}
+                          <span>{showAdditionalDetails ? 'Hide Additional Details' : 'Show Additional Details'}</span>
+                        </button>
+
+                        {/* Additional Details - Expandable */}
+                        <div
+                          style={{
+                            maxHeight: showAdditionalDetails ? '5000px' : '0',
+                            overflow: 'hidden',
+                            transition: 'max-height 0.4s ease-in-out, opacity 0.3s ease-in-out',
+                            opacity: showAdditionalDetails ? 1 : 0
+                          }}
+                        >
+                          <div className="mt-4">
+                              {/* Technical Details Row */}
+                              <Row className="g-3 mb-3">
+                                  <Col xs={12} md={6}>
+                                      <div className="bg-hoosat-slate/30 p-3 rounded-xl border border-slate-700">
+                                          <div className="text-slate-400 mb-1" style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase' }}>
+                                              Merkle Root
+                                          </div>
+                                          <div className="text-slate-300 font-mono" style={{ fontSize: '0.8rem', wordBreak: 'break-all' }}>
+                                              {blockInfo.header.hashMerkleRoot}
+                                          </div>
+                                      </div>
+                                  </Col>
+                                  <Col xs={12} md={6}>
+                                      <div className="bg-hoosat-slate/30 p-3 rounded-xl border border-slate-700">
+                                          <div className="text-slate-400 mb-1" style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase' }}>
+                                              Accepted Merkle Root
+                                          </div>
+                                          <div className="text-slate-300 font-mono" style={{ fontSize: '0.8rem', wordBreak: 'break-all' }}>
+                                              {blockInfo.header.acceptedIdMerkleRoot}
+                                          </div>
+                                      </div>
+                                  </Col>
+                                  <Col xs={12} md={6}>
+                                      <div className="bg-hoosat-slate/30 p-3 rounded-xl border border-slate-700">
+                                          <div className="text-slate-400 mb-1" style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase' }}>
+                                              UTXO Commitment
+                                          </div>
+                                          <div className="text-slate-300 font-mono" style={{ fontSize: '0.8rem', wordBreak: 'break-all' }}>
+                                              {blockInfo.header.utxoCommitment}
+                                          </div>
+                                      </div>
+                                  </Col>
+                                  <Col xs={12} md={6}>
+                                      <div className="bg-hoosat-slate/30 p-3 rounded-xl border border-slate-700">
+                                          <div className="text-slate-400 mb-1" style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase' }}>
+                                              Blue Work
+                                          </div>
+                                          <div className="text-slate-300 font-mono" style={{ fontSize: '0.8rem', wordBreak: 'break-all' }}>
+                                              {blockInfo.header.blueWork} ({BigInt(`0x${blockInfo.header.blueWork}`).toString()})
+                                          </div>
+                                      </div>
+                                  </Col>
+                              </Row>
+
+                            {/* Selected Parent Hash */}
+                            <div className="row py-3" style={{ borderBottom: '1px solid #334155' }}>
+                              <div className="col-12 col-md-3">
+                                <div className="text-slate-400" style={{ fontSize: '0.875rem', fontWeight: '600' }}>
+                                  Selected Parent Hash
+                                </div>
+                              </div>
+                              <div className="col-12 col-md-9">
+                                <Link
+                                  to={`/blocks/${blockInfo.verboseData.selectedParentHash}`}
+                                  className="text-hoosat-teal hover:text-teal-400 font-mono"
+                                  style={{ fontSize: '0.85rem', wordBreak: 'break-all', textDecoration: 'none' }}
+                                >
+                                  {blockInfo.verboseData.selectedParentHash}
+                                </Link>
+                              </div>
+                            </div>
+
+                            {/* Parents */}
+                            <div className="row py-3" style={{ borderBottom: '1px solid #334155' }}>
+                              <div className="col-12 col-md-3">
+                                <div className="text-slate-400" style={{ fontSize: '0.875rem', fontWeight: '600' }}>
+                                  Parents ({blockInfo.header.parents[0].parentHashes.length})
+                                </div>
+                              </div>
+                              <div className="col-12 col-md-9">
+                                <div className="d-flex flex-column gap-2">
+                                  {blockInfo.header.parents[0].parentHashes.map((hash, idx) => (
+                                    <Link
+                                      key={idx}
+                                      to={`/blocks/${hash}`}
+                                      className="text-hoosat-teal hover:text-teal-400 font-mono"
+                                      style={{ fontSize: '0.85rem', wordBreak: 'break-all', textDecoration: 'none' }}
+                                    >
+                                      {hash}
+                                    </Link>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Mergeset Blues Hashes */}
+                            {blockInfo.verboseData.mergeSetBluesHashes && blockInfo.verboseData.mergeSetBluesHashes.length > 0 && (
+                              <div className="row py-3" style={{ borderBottom: '1px solid #334155' }}>
+                                <div className="col-12 col-md-3">
+                                  <div className="text-slate-400" style={{ fontSize: '0.875rem', fontWeight: '600' }}>
+                                    Mergeset Blues ({blockInfo.verboseData.mergeSetBluesHashes.length})
+                                  </div>
+                                </div>
+                                <div className="col-12 col-md-9">
+                                  <div className="d-flex flex-column gap-2">
+                                    {blockInfo.verboseData.mergeSetBluesHashes.map((hash, idx) => (
+                                      <Link
+                                        key={idx}
+                                        to={`/blocks/${hash}`}
+                                        className="text-hoosat-teal hover:text-teal-400 font-mono"
+                                        style={{ fontSize: '0.85rem', wordBreak: 'break-all', textDecoration: 'none' }}
+                                      >
+                                        {hash}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Mergeset Reds Hashes */}
+                            {blockInfo.verboseData.mergeSetRedsHashes && blockInfo.verboseData.mergeSetRedsHashes.length > 0 && (
+                              <div className="row py-3" style={{ borderBottom: '1px solid #334155' }}>
+                                <div className="col-12 col-md-3">
+                                  <div className="text-slate-400" style={{ fontSize: '0.875rem', fontWeight: '600' }}>
+                                    Mergeset Reds ({blockInfo.verboseData.mergeSetRedsHashes.length})
+                                  </div>
+                                </div>
+                                <div className="col-12 col-md-9">
+                                  <div className="d-flex flex-column gap-2">
+                                    {blockInfo.verboseData.mergeSetRedsHashes.map((hash, idx) => (
+                                      <Link
+                                        key={idx}
+                                        to={`/blocks/${hash}`}
+                                        className="text-hoosat-teal hover:text-teal-400 font-mono"
+                                        style={{ fontSize: '0.85rem', wordBreak: 'break-all', textDecoration: 'none' }}
+                                      >
+                                        {hash}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Children */}
+                            {blockInfo.verboseData.childrenHashes && blockInfo.verboseData.childrenHashes.length > 0 && (
+                              <div className="row py-3" style={{ borderBottom: '1px solid #334155' }}>
+                                <div className="col-12 col-md-3">
+                                  <div className="text-slate-400" style={{ fontSize: '0.875rem', fontWeight: '600' }}>
+                                    Children ({blockInfo.verboseData.childrenHashes.length})
+                                  </div>
+                                </div>
+                                <div className="col-12 col-md-9">
+                                  <div className="d-flex flex-column gap-2">
+                                    {blockInfo.verboseData.childrenHashes.map((hash, idx) => (
+                                      <Link
+                                        key={idx}
+                                        to={`/blocks/${hash}`}
+                                        className="text-hoosat-teal hover:text-teal-400 font-mono"
+                                        style={{ fontSize: '0.85rem', wordBreak: 'break-all', textDecoration: 'none' }}
+                                      >
+                                        {hash}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+
+
+                            {/* Pruning Point */}
+                            <div className="row py-3" style={{ borderBottom: '1px solid #334155' }}>
+                              <div className="col-12 col-md-3">
+                                <div className="text-slate-400" style={{ fontSize: '0.875rem', fontWeight: '600' }}>
+                                  Pruning Point
+                                </div>
+                              </div>
+                              <div className="col-12 col-md-9">
+                                <Link
+                                  to={`/blocks/${blockInfo.header.pruningPoint}`}
+                                  className="text-hoosat-teal hover:text-teal-400 font-mono"
+                                  style={{ fontSize: '0.85rem', wordBreak: 'break-all', textDecoration: 'none' }}
+                                >
+                                  {blockInfo.header.pruningPoint}
+                                </Link>
+                              </div>
+                            </div>
+
+                            {/* Miner Info */}
+                            <div className="row py-3" style={{ borderBottom: '1px solid #334155' }}>
+                              <div className="col-12 col-md-3">
+                                <div className="text-slate-400" style={{ fontSize: '0.875rem', fontWeight: '600' }}>
+                                  Miner Info
+                                </div>
+                              </div>
+                              <div className="col-12 col-md-9">
+                                <div className="text-slate-300 mb-2" style={{ fontSize: '0.9rem' }}>
+                                  {minerName}
+                                </div>
+                                <Link
+                                  to={`/addresses/${minerAddress}`}
+                                  className="text-hoosat-teal hover:text-teal-400 font-mono"
+                                  style={{ fontSize: '0.85rem', wordBreak: 'break-all', textDecoration: 'none' }}
+                                >
+                                  {minerAddress}
+                                </Link>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
+              </>
             ) : (
               <></>
             )}
@@ -349,201 +457,72 @@ const BlockInfo = () => {
 
         <Row>
           <Col>
-            {!!blockInfo ? (
-              <div className="blockinfo-content mt-4 mb-5">
-                <div className="blockinfo-header">
-                  <h4>Transactions</h4>
+            {!!blockInfo && !!txInfo ? (
+              <div className="mt-4 mb-5">
+                <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 h-full w-full">
+                  <div className="mb-3 pb-3 text-left" style={{ borderBottom: '1px solid #334155' }}>
+                    <h4 className="mb-0" style={{ color: '#14B8A6', fontWeight: '600' }}>
+                      Transaction History ({blockInfo.transactions?.length || 0})
+                    </h4>
+                  </div>
+                <div>
+                  {(blockInfo.transactions || []).map((tx, tx_index) => {
+                    const txData = txInfo[tx.verboseData.transactionId];
+
+                    // Transform to TransactionItem format
+                    const transformedTx = {
+                      transaction_id: tx.verboseData.transactionId,
+                      block_time: blockInfo.header.timestamp,
+                      is_accepted: txData?.is_accepted || false,
+                      accepting_block_blue_score: txData?.accepting_block_blue_score || 0,
+                      inputs: tx.inputs?.map(input => ({
+                        previous_outpoint_hash: input.previousOutpoint.transactionId,
+                        previous_outpoint_index: input.previousOutpoint.index || 0
+                      })) || [],
+                      outputs: tx.outputs?.map(output => ({
+                        script_public_key_address: output.verboseData.scriptPublicKeyAddress,
+                        amount: output.amount
+                      })) || []
+                    };
+
+                    // Helper function to calculate amount (total outputs)
+                    const getAmount = (outputs) => {
+                      return outputs.reduce((sum, output) => sum + (output.amount / 100000000), 0);
+                    };
+
+                    // Helper function to get address from outputs
+                    const getAddrFromOutputsHelper = (outputs, index) => {
+                      const output = outputs.find(o => o.index === index);
+                      return output?.script_public_key_address || '';
+                    };
+
+                    // Helper function to get amount from outputs
+                    const getAmountFromOutputsHelper = (outputs, index) => {
+                      const output = outputs.find(o => o.index === index);
+                      return output ? output.amount / 100000000 : 0;
+                    };
+
+                    // Since this is block view (no specific address context), amount is always positive (showing total)
+                    const calculationFailed = (val) => val;
+
+                    return (
+                      <TransactionItem
+                        key={tx.verboseData.transactionId}
+                        transaction={transformedTx}
+                        addr={null}
+                        price={price}
+                        blueScore={blueScore}
+                        txsInpCache={txInfo}
+                        getAmount={(outputs) => getAmount(outputs)}
+                        getAddrFromOutputs={getAddrFromOutputsHelper}
+                        getAmountFromOutputs={getAmountFromOutputsHelper}
+                        calculationFailed={calculationFailed}
+                        detailedView={false}
+                      />
+                    );
+                  })}
                 </div>
-                <Container className="webpage utxo-box" fluid>
-                  {(blockInfo.transactions || []).map((tx, tx_index) => (
-                    <>
-                      <Row className="utxo-border py-3">
-                        <Col sm={12} md={12} lg={12}>
-                          <div className="utxo-header">transaction id</div>
-                          <div className="utxo-value-mono">
-                            <Link to={`/txs/${tx.verboseData.transactionId}`} className="blockinfo-link">
-                              {tx.verboseData.transactionId}
-                            </Link>
-                            <CopyButton text={tx.verboseData.transactionId} />
-                          </div>
-
-                          <Col sm={12} md={12}>
-                            <div className="utxo-header mt-3">FROM</div>
-                            <Container className="utxo-value-mono" fluid>
-                              {(tx.inputs || []).map((txInput) => (
-                                <Row>
-                                  {!!txInfo && txInfo[txInput.previousOutpoint.transactionId] ? (
-                                    <>
-                                      <Col xs={12} sm={8} md={9} lg={9} xl={8} xxl={7} className="text-truncate">
-                                        <Link
-                                          to={`/addresses/${getAddrFromOutputs(
-                                            txInfo[txInput.previousOutpoint.transactionId]["outputs"],
-                                            txInput.previousOutpoint.index || 0
-                                          )}`}
-                                          className="blockinfo-link"
-                                        >
-                                          {getAddrFromOutputs(
-                                            txInfo[txInput.previousOutpoint.transactionId]["outputs"],
-                                            txInput.previousOutpoint.index || 0
-                                          )}
-                                        </Link>
-                                        <CopyButton
-                                          text={getAddrFromOutputs(
-                                            txInfo[txInput.previousOutpoint.transactionId]["outputs"],
-                                            txInput.previousOutpoint.index || 0
-                                          )}
-                                        />
-                                      </Col>
-                                      <Col className="block-utxo-amount-minus" xs={12} sm={4} md={2}>
-                                        -
-                                        {numberWithCommas(
-                                          getAmountFromOutputs(
-                                            txInfo[txInput.previousOutpoint.transactionId]["outputs"],
-                                            txInput.previousOutpoint.index || 0
-                                          )
-                                        )}
-                                        &nbsp;HTN
-                                      </Col>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Col xs={12} sm={8} md={9} lg={9} xl={8} xxl={7} className="text-truncate">
-                                        <a
-                                          className="blockinfo-link"
-                                          href={`https://explorer.hoosat.fi/tx/${txInput.previousOutpoint.transactionId}`}
-                                          target="_blank"
-                                          rel="noreferrer"
-                                        >
-                                          TX #{txInput.previousOutpoint.index || 0}{" "}
-                                          {txInput.previousOutpoint.transactionId}
-                                        </a>
-                                      </Col>
-                                      <Col className="me-auto" xs={12} sm={4} md={2}></Col>
-                                    </>
-                                  )}
-                                </Row>
-                              ))}
-                              {!tx.inputs ? (
-                                <Row>
-                                  <Col xs={12} sm={8} md="auto" className="text-truncate">
-                                    COINBASE (New coins)
-                                  </Col>
-                                </Row>
-                              ) : (
-                                <></>
-                              )}
-                            </Container>
-                          </Col>
-
-                          <Col sm={12} md={12}>
-                            <div className="utxo-header mt-1">TO</div>
-                            <Container className="utxo-value-mono" fluid>
-                              {(tx.outputs || []).map((txOutput) => (
-                                <Row>
-                                  <Col xs={12} sm={8} md={9} lg={9} xl={8} xxl={7} className="text-truncate">
-                                    <Link
-                                      to={`/addresses/${txOutput.verboseData.scriptPublicKeyAddress}`}
-                                      className="blockinfo-link"
-                                    >
-                                      {txOutput.verboseData.scriptPublicKeyAddress}
-                                    </Link>
-
-                                    <CopyButton text={txOutput.verboseData.scriptPublicKeyAddress} />
-                                  </Col>
-                                  <Col className="block-utxo-amount" xs={12} sm={4} md={3}>
-                                    +{numberWithCommas(txOutput.amount / 100000000)}&nbsp;HTN
-                                  </Col>
-                                </Row>
-                              ))}
-                            </Container>
-                          </Col>
-                        </Col>
-                        <Col sm={5} md={4}>
-                          <div className="utxo-header mt-3">tx amount</div>
-                          <div className="utxo-value d-flex flex-row">
-                            <div className="utxo-amount">
-                              {numberWithCommas(
-                                tx.outputs.reduce((a, b) => (a || 0) + parseInt(b.amount), 0) / 100000000
-                              )}{" "}
-                              HTN
-                            </div>
-                          </div>
-                        </Col>
-                        <Col sm={3} md={2}>
-                          <div className="utxo-header mt-3">tx value</div>
-                          <div className="utxo-value">
-                            {(
-                              (tx.outputs.reduce((a, b) => (a || 0) + parseInt(b.amount), 0) / 100000000) *
-                              price
-                            ).toFixed(2)}{" "}
-                            $
-                          </div>
-                        </Col>
-                        <Col sm={4} md={6}>
-                          <div className="utxo-header mt-3">details</div>
-                          <div className="utxo-value d-flex flex-row flex-wrap">
-                            {!!txInfo && txInfo[tx.verboseData.transactionId] ? (
-                              txInfo[tx.verboseData.transactionId]?.is_accepted ? (
-                                <div className="accepted-true me-3 mb-3">
-                                  <span data-tooltip-id="accepted-tooltip">accepted</span>
-                                  <Tooltip
-                                    id="accepted-tooltip"
-                                    place="top"
-                                    style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                                    content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
-                                  />
-                                </div>
-                              ) : (
-                                <div className="accepted-false me-3 mb-3">
-                                  <span data-tooltip-id="accepted-tooltip">not accepted</span>
-                                  <Tooltip
-                                    id="accepted-tooltip"
-                                    place="top"
-                                    style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                                    content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
-                                  />
-                                </div>
-                              )
-                            ) : (
-                              <>-</>
-                            )}
-                            {!!txInfo &&
-                              !!txInfo[tx.verboseData.transactionId]?.is_accepted &&
-                              blueScore !== 0 &&
-                              blueScore - txInfo[tx.verboseData.transactionId].accepting_block_blue_score < 86400 && (
-                                <div className="confirmations mb-3">
-                                  <span data-tooltip-id="confirmations-tooltip">
-                                    {blueScore - txInfo[tx.verboseData.transactionId].accepting_block_blue_score}
-                                    &nbsp;confirmations
-                                  </span>
-                                  <Tooltip
-                                    id="confirmations-tooltip"
-                                    place="top"
-                                    style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                                    content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
-                                  />
-                                </div>
-                              )}
-                            {!!txInfo &&
-                              !!txInfo[tx.verboseData.transactionId]?.is_accepted &&
-                              blueScore !== 0 &&
-                              blueScore - txInfo[tx.verboseData.transactionId].accepting_block_blue_score >= 86400 && (
-                                <div className="confirmations mb-3">
-                                  <span data-tooltip-id="confirmations-tooltip">confirmed</span>
-                                  <Tooltip
-                                    id="confirmations-tooltip"
-                                    place="top"
-                                    style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                                    content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
-                                  />
-                                </div>
-                              )}
-                          </div>
-                        </Col>
-                      </Row>
-                    </>
-                  ))}
-                </Container>
+                </div>
               </div>
             ) : (
               <></>
