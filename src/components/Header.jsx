@@ -111,7 +111,8 @@ const Header = ({ price, isConnected }) => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className="sticky top-0 left-0 right-0 z-50 bg-hoosat-dark/80 backdrop-blur-lg border-b border-slate-800"
+      className="sticky top-0 left-0 right-0 z-50 bg-hoosat-dark/80 backdrop-blur-lg"
+      style={{ borderBottom: '1px solid #1e293b' }}
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">

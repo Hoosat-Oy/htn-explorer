@@ -3,11 +3,15 @@ import { useContext, useEffect, useRef, useState, useCallback } from "react";
 import { Col, Container, Row, Spinner } from "react-bootstrap";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
+import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { numberWithCommas } from "../helper.js";
 import { getTransaction, getTransactions } from "../htn-api-client.js";
 import BlueScoreContext from "./BlueScoreContext.js";
 import CopyButton from "./CopyButton.js";
 import { Tooltip } from "react-tooltip";
+import InputItem from "./InputItem.js";
+import OutputItem from "./OutputItem.js";
+import EmptyTablePlaceholder from "./EmptyTablePlaceholder.js";
 
 const getOutputFromIndex = (outputs, index) => {
   return outputs[index];
@@ -19,10 +23,16 @@ const TransactionInfo = () => {
   const [additionalTxInfo, setAdditionalTxInfo] = useState();
   const [showTxFee, setShowTxFee] = useState(false);
   const [, setError] = useState(false);
+  const [view, setView] = useState('outputs');
+  const [showAdditionalDetails, setShowAdditionalDetails] = useState(false);
 
   const retryCnt = useRef(0);
   const retryNotAccepted = useRef(6);
   const { blueScore } = useContext(BlueScoreContext);
+
+  const handleViewSwitch = (newView) => {
+    setView(newView);
+  };
 
   const getTx = useCallback(
     () =>
@@ -82,170 +92,276 @@ const TransactionInfo = () => {
 
   return (
     <div className="blockinfo-page">
-      <Container className="webpage" fluid>
+      <Container className="webpage" fluid >
+        <Row>
+          <Col xs={12}>
+            {!!txInfo && txInfo?.detail !== "Transaction not found" && (
+              <h2 className="text-white mb-4" style={{ fontSize: '2rem', fontWeight: '700' }}>Transaction Details</h2>
+            )}
+          </Col>
+        </Row>
+
         <Row>
           <Col className="mx-0">
             {!!txInfo && txInfo?.detail !== "Transaction not found" ? (
-              <div className="blockinfo-content">
-                <div className="blockinfo-header">
-                  <h4 className="d-flex flex-row align-items-center">transaction info</h4>
-                </div>
-                <Container className="blockinfo-table mx-0" fluid>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Transaction Id
-                    </Col>
-                    <Col className="blockinfo-value-mono" lg={10}>
-                      {txInfo.transaction_id}
-                      <CopyButton text={txInfo.transaction_id} />
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Subnetwork Id
-                    </Col>
-                    <Col className="blockinfo-value-mono" lg={10}>
-                      {txInfo.subnetwork_id}
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Hash
-                    </Col>
-                    <Col className="blockinfo-value-mono" lg={10}>
-                      {txInfo.hash}
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Mass
-                    </Col>
-                    <Col className="blockinfo-value" lg={10}>
-                      {txInfo.mass ? txInfo.mass : "-"}
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Block Hashes
-                    </Col>
-                    <Col className="blockinfo-value-mono" lg={10}>
-                      <ul>
-                        {txInfo.block_hash?.map((x) => (
-                          <li>
-                            <Link to={`/blocks/${x}`} className="blockinfo-link">
-                              {x}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Block Time
-                    </Col>
-                    <Col className="blockinfo-value" lg={10}>
-                      {moment(parseInt(txInfo.block_time)).format("YYYY-MM-DD HH:mm:ss")} ({txInfo.block_time})
-                    </Col>
-                  </Row>
-                  <Row className="blockinfo-row">
-                    <Col className="blockinfo-key" lg={2}>
-                      Accepting Block Hash
-                    </Col>
-                    <Col className="blockinfo-value-mono" lg={10}>
-                      <Link to={`/blocks/${txInfo.accepting_block_hash}`} className="blockinfo-link">
-                        {txInfo.accepting_block_hash || "-"}
-                      </Link>
-                    </Col>
-                  </Row>
-                  {showTxFee && (
-                    <Row className="blockinfo-row">
-                      <Col className="blockinfo-key" lg={2}>
-                        Transaction fee
-                      </Col>
-                      <Col className="blockinfo-value-mono" lg={10}>
-                        {txInfo && additionalTxInfo && (
-                          <>
-                            {(txInfo.inputs
-                              .map(
-                                (tx_input) =>
-                                  getOutputFromIndex(
-                                    additionalTxInfo[tx_input.previous_outpoint_hash]?.outputs || [],
-                                    tx_input?.previous_outpoint_index
-                                  )?.amount || 0
-                              )
-                              .reduce((a, b) => a + b) -
-                              (txInfo.outputs?.map((v) => v?.amount) || [0]).reduce((a, b) => a + b)) /
-                              100000000}{" "}
-                            HTN
-                          </>
-                        )}
-                      </Col>
-                    </Row>
-                  )}
-                  <Row className="blockinfo-row border-bottom-0">
-                    <Col className="blockinfo-key" md={2}>
-                      Details
-                    </Col>
-                    <Col
-                      className="blockinfo-value mt-2 d-flex flex-row flex-wrap"
-                      md={10}
-                      lg={10}
-                      style={{ marginBottom: "-1rem" }}
-                    >
-                      {txInfo.is_accepted ? (
-                        <div className="accepted-true me-3 mb-3">
-                          <span data-tooltip-id="accepted-tooltip">accepted</span>
-                          <Tooltip
-                            id="accepted-tooltip"
-                            place="top"
-                            style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                            content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
-                          />
-                        </div>
-                      ) : (
-                        <div className="accepted-false me-3 mb-3">
-                          <span data-tooltip-id="accepted-tooltip">not accepted</span>
-                          <Tooltip
-                            id="accepted-tooltip"
-                            place="top"
-                            style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                            content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
-                          />
-                        </div>
-                      )}
-                      {txInfo.is_accepted &&
-                        blueScore !== 0 &&
-                        blueScore - txInfo.accepting_block_blue_score < 86400 && (
-                          <div className="confirmations mb-3">
-                            <span data-tooltip-id="confirmations-tooltip">
-                              {Math.max(blueScore - txInfo.accepting_block_blue_score, 0)}&nbsp;confirmations
-                            </span>
-                            <Tooltip
-                              id="confirmations-tooltip"
-                              place="top"
-                              style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                              content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
-                            />
+              <>
+                {/* Transaction Info Card */}
+                <Row className="mb-4">
+                  <Col xs={12}>
+                    <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 h-full w-full">
+                      {/* Transaction ID and Subnetwork ID */}
+                      <div className="mb-4">
+                        <div className="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-2">
+                          <div className="flex-grow-1" style={{ minWidth: '0' }}>
+                            {/* Tx ID */}
+                            <div className="d-flex align-items-center gap-2 mb-2" style={{ fontSize: '0.95rem', wordBreak: 'break-all', fontFamily: 'monospace' }}>
+                              <span className="text-slate-200">Tx ID: {txInfo.transaction_id}</span>
+                              <CopyButton text={txInfo.transaction_id} />
+                            </div>
+
+                            {/* Subnetwork ID */}
+                            <div className="d-flex align-items-center gap-2" style={{ fontSize: '0.95rem', wordBreak: 'break-all', fontFamily: 'monospace' }}>
+                              <span className="text-slate-200">Subnetwork ID: {txInfo.subnetwork_id}</span>
+                            </div>
                           </div>
-                        )}
-                      {txInfo.is_accepted &&
-                        blueScore !== 0 &&
-                        blueScore - txInfo.accepting_block_blue_score >= 86400 && (
-                          <div className="confirmations mb-3">
-                            <span data-tooltip-id="confirmations-tooltip">confirmed</span>
-                            <Tooltip
-                              id="confirmations-tooltip"
-                              place="top"
-                              style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
-                              content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
-                            />
+
+                          {/* Badges - Desktop only */}
+                          <div className="d-none d-md-flex align-items-center gap-2 flex-wrap">
+                            {txInfo.is_accepted ? (
+                              <div className="accepted-true">
+                                <span data-tooltip-id="accepted-tooltip">accepted</span>
+                                <Tooltip
+                                  id="accepted-tooltip"
+                                  place="top"
+                                  style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                                  content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
+                                />
+                              </div>
+                            ) : (
+                              <div className="accepted-false">
+                                <span data-tooltip-id="accepted-tooltip">not accepted</span>
+                                <Tooltip
+                                  id="accepted-tooltip"
+                                  place="top"
+                                  style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                                  content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
+                                />
+                              </div>
+                            )}
+                            {txInfo.is_accepted &&
+                              blueScore !== 0 &&
+                              blueScore - txInfo.accepting_block_blue_score < 86400 && (
+                                <div className="confirmations">
+                                  <span data-tooltip-id="confirmations-tooltip">
+                                    {Math.max(blueScore - txInfo.accepting_block_blue_score, 0)}&nbsp;confirmations
+                                  </span>
+                                  <Tooltip
+                                    id="confirmations-tooltip"
+                                    place="top"
+                                    style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                                    content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
+                                  />
+                                </div>
+                              )}
+                            {txInfo.is_accepted &&
+                              blueScore !== 0 &&
+                              blueScore - txInfo.accepting_block_blue_score >= 86400 && (
+                                <div className="confirmations">
+                                  <span data-tooltip-id="confirmations-tooltip">confirmed</span>
+                                  <Tooltip
+                                    id="confirmations-tooltip"
+                                    place="top"
+                                    style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                                    content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
+                                  />
+                                </div>
+                              )}
                           </div>
+                        </div>
+
+                        {/* Badges - Mobile only */}
+                        <div className="d-flex d-md-none align-items-center gap-2 flex-wrap mt-3">
+                          {txInfo.is_accepted ? (
+                            <div className="accepted-true">
+                              <span data-tooltip-id="accepted-tooltip-mobile">accepted</span>
+                              <Tooltip
+                                id="accepted-tooltip-mobile"
+                                place="top"
+                                style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                                content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
+                              />
+                            </div>
+                          ) : (
+                            <div className="accepted-false">
+                              <span data-tooltip-id="accepted-tooltip-mobile">not accepted</span>
+                              <Tooltip
+                                id="accepted-tooltip-mobile"
+                                place="top"
+                                style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                                content="A transaction may appear as unaccepted for several reasons. First the transaction may be so new that it has not been accepted yet. Second, the explorer's database filler might have missed it while processing the virtual chain. Additionally, when parallel blocks with identical blue scores are created, only one reward transaction is accepted. In rare cases, a double-spend transaction may also be rejected."
+                              />
+                            </div>
+                          )}
+                          {txInfo.is_accepted &&
+                            blueScore !== 0 &&
+                            blueScore - txInfo.accepting_block_blue_score < 86400 && (
+                              <div className="confirmations">
+                                <span data-tooltip-id="confirmations-tooltip-mobile">
+                                  {Math.max(blueScore - txInfo.accepting_block_blue_score, 0)}&nbsp;confirmations
+                                </span>
+                                <Tooltip
+                                  id="confirmations-tooltip-mobile"
+                                  place="top"
+                                  style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                                  content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
+                                />
+                              </div>
+                            )}
+                          {txInfo.is_accepted &&
+                            blueScore !== 0 &&
+                            blueScore - txInfo.accepting_block_blue_score >= 86400 && (
+                              <div className="confirmations">
+                                <span data-tooltip-id="confirmations-tooltip-mobile">confirmed</span>
+                                <Tooltip
+                                  id="confirmations-tooltip-mobile"
+                                  place="top"
+                                  style={{ maxWidth: "250px", whiteSpace: "normal", wordWrap: "break-word" }}
+                                  content="Confirmations indicate how many blocks have been added after the transaction was accepted. A higher number of confirmations increases the security of the transaction. Once the confirmation count reaches 86,400, the transaction is considered finalized and cannot be reversed. Confirmations are not required for HTN wallets, exchanges require confirmations for crediting deposits."
+                                />
+                              </div>
+                            )}
+                        </div>
+                      </div>
+
+                      {/* Stats Cards */}
+                      <Row className="g-3 mt-3 pt-3" style={{ borderTop: '1px solid #334155' }}>
+                        <Col xs={12} sm={6} lg={4}>
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                            <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Block Time</div>
+                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                              {moment(parseInt(txInfo.block_time)).format("YYYY-MM-DD HH:mm:ss")}
+                            </div>
+                          </div>
+                        </Col>
+
+                        <Col xs={12} sm={6} lg={4}>
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                            <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Mass</div>
+                            <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                              {txInfo.mass ? txInfo.mass : "-"}
+                            </div>
+                          </div>
+                        </Col>
+
+                        {showTxFee && (
+                          <Col xs={12} sm={6} lg={4}>
+                            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                              <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Transaction Fee</div>
+                              <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600' }}>
+                                {txInfo && additionalTxInfo && (
+                                  <>
+                                    {(txInfo.inputs
+                                      .map(
+                                        (tx_input) =>
+                                          getOutputFromIndex(
+                                            additionalTxInfo[tx_input.previous_outpoint_hash]?.outputs || [],
+                                            tx_input?.previous_outpoint_index
+                                          )?.amount || 0
+                                      )
+                                      .reduce((a, b) => a + b) -
+                                      (txInfo.outputs?.map((v) => v?.amount) || [0]).reduce((a, b) => a + b)) /
+                                      100000000}{" "}
+                                    HTN
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </Col>
                         )}
-                    </Col>
-                  </Row>
-                </Container>
-              </div>
+                      </Row>
+
+                      {/* Show Additional Details Button */}
+                      <div className="mt-4 pt-3" style={{ borderTop: '1px solid #334155' }}>
+                        <button
+                          onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}
+                          className="d-flex align-items-center gap-2 bg-transparent border-0 text-slate-400 hover:text-hoosat-teal transition-colors"
+                          style={{ cursor: 'pointer', fontSize: '0.95rem', fontWeight: '500' }}
+                        >
+                          {showAdditionalDetails ? <BiChevronUp size={20} /> : <BiChevronDown size={20} />}
+                          <span>{showAdditionalDetails ? 'Hide Additional Details' : 'Show Additional Details'}</span>
+                        </button>
+
+                        {/* Additional Details - Expandable */}
+                        <div
+                          style={{
+                            maxHeight: showAdditionalDetails ? '5000px' : '0',
+                            overflow: 'hidden',
+                            transition: 'max-height 0.4s ease-in-out, opacity 0.3s ease-in-out',
+                            opacity: showAdditionalDetails ? 1 : 0
+                          }}
+                        >
+                          <div className="mt-4">
+                            {/* Hash */}
+                            <div className="row py-3" style={{ borderBottom: '1px solid #334155' }}>
+                              <div className="col-12 col-md-3">
+                                <div className="text-slate-400" style={{ fontSize: '0.875rem', fontWeight: '600' }}>
+                                  Hash
+                                </div>
+                              </div>
+                              <div className="col-12 col-md-9">
+                                <div className="text-slate-300 font-mono" style={{ fontSize: '0.85rem', wordBreak: 'break-all' }}>
+                                  {txInfo.hash}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Accepting Block Hash */}
+                            <div className="row py-3" style={{ borderBottom: '1px solid #334155' }}>
+                              <div className="col-12 col-md-3">
+                                <div className="text-slate-400" style={{ fontSize: '0.875rem', fontWeight: '600' }}>
+                                  Accepting Block Hash
+                                </div>
+                              </div>
+                              <div className="col-12 col-md-9">
+                                <Link
+                                  to={`/blocks/${txInfo.accepting_block_hash}`}
+                                  className="text-hoosat-teal hover:text-teal-400 font-mono"
+                                  style={{ fontSize: '0.85rem', wordBreak: 'break-all', textDecoration: 'none' }}
+                                >
+                                  {txInfo.accepting_block_hash || "-"}
+                                </Link>
+                              </div>
+                            </div>
+
+                            {/* Block Hashes */}
+                            <div className="row py-3">
+                              <div className="col-12 col-md-3">
+                                <div className="text-slate-400" style={{ fontSize: '0.875rem', fontWeight: '600' }}>
+                                  Block Hashes ({txInfo.block_hash?.length || 0})
+                                </div>
+                              </div>
+                              <div className="col-12 col-md-9">
+                                <div className="d-flex flex-column gap-2">
+                                  {txInfo.block_hash?.map((hash, idx) => (
+                                    <Link
+                                      key={idx}
+                                      to={`/blocks/${hash}`}
+                                      className="text-hoosat-teal hover:text-teal-400 font-mono"
+                                      style={{ fontSize: '0.85rem', wordBreak: 'break-all', textDecoration: 'none' }}
+                                    >
+                                      {hash}
+                                    </Link>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
+              </>
             ) : (
               <>
                 <Spinner animation="border" variant="primary" />
@@ -258,128 +374,121 @@ const TransactionInfo = () => {
           </Col>
         </Row>
 
-        {/* id = Column(Integer, primary_key=True)
-    transaction_id = Column(String)
-    index = Column(Integer)
-
-    previous_outpoint_hash = Column(String)  # "ebf6da83db96d312a107a2ced19a01823894c9d7072ed0d696a9a152fd81485e"
-    previous_outpoint_index = Column(String)  # "ebf6da83db96d312a107a2ced19a01823894c9d7072ed0d696a9a152fd81485e"
-
-    signatureScript = Column(String)  # "41c903159094....281a1d26f70b0037d600554e01",
-    sigOpCount = Column(Integer) */}
-
-        <Row>
-          <Col>
-            {!!txInfo && txInfo?.detail !== "Transaction not found" ? (
-              <div className="blockinfo-content mt-4 mb-5">
-                <div className="blockinfo-header">
-                  <h4>Inputs</h4>
+        {/* Tab Switcher */}
+        {!!txInfo && txInfo?.detail !== "Transaction not found" && (
+          <Container className="webpage mt-4" fluid>
+            <Row>
+              <Col className="d-flex flex-row justify-content-center">
+                <div className="d-flex gap-2 p-1 rounded" style={{ backgroundColor: 'rgba(30, 41, 59, 0.6)', border: '1px solid #334155' }}>
+                  <button
+                    onClick={() => handleViewSwitch('outputs')}
+                    className={`px-4 py-2 rounded transition-all ${
+                      view === 'outputs'
+                        ? 'bg-hoosat-teal text-white'
+                        : 'bg-transparent text-slate-400 hover:text-hoosat-teal'
+                    }`}
+                    style={{
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontWeight: view === 'outputs' ? '600' : '400',
+                      backgroundColor: view === 'outputs' ? '#14B8A6' : 'transparent',
+                      color: view === 'outputs' ? 'white' : '#94a3b8',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (view !== 'outputs') {
+                        e.target.style.color = '#14B8A6';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (view !== 'outputs') {
+                        e.target.style.color = '#94a3b8';
+                      }
+                    }}
+                  >
+                    Outputs
+                  </button>
+                  <button
+                    onClick={() => handleViewSwitch('inputs')}
+                    className={`px-4 py-2 rounded transition-all ${
+                      view === 'inputs'
+                        ? 'bg-hoosat-teal text-white'
+                        : 'bg-transparent text-slate-400 hover:text-hoosat-teal'
+                    }`}
+                    style={{
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontWeight: view === 'inputs' ? '600' : '400',
+                      backgroundColor: view === 'inputs' ? '#14B8A6' : 'transparent',
+                      color: view === 'inputs' ? 'white' : '#94a3b8',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (view !== 'inputs') {
+                        e.target.style.color = '#14B8A6';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (view !== 'inputs') {
+                        e.target.style.color = '#94a3b8';
+                      }
+                    }}
+                  >
+                    Inputs
+                  </button>
                 </div>
-                <Container className="webpage utxo-box" fluid>
-                  {(txInfo.inputs || []).map((tx_input) => (
-                    <>
-                      <Row className="utxo-border py-3">
-                        <Col sm={6} md={6} lg={2}>
-                          <div className="blockinfo-key mt-0 mt-md-2">Signature Op Count</div>
-                          <div className="utxo-value-mono">{tx_input.sig_op_count}</div>
-                        </Col>
-                        <Col sm={12} md={12} lg={7}>
-                          <div className="blockinfo-key mt-2">Signature Script</div>
-                          <div className="utxo-value-mono">{tx_input.signature_script}</div>
-                        </Col>
-                        {!!additionalTxInfo && additionalTxInfo[tx_input.previous_outpoint_hash] && (
-                          <Col sm={12} md={12} lg={3}>
-                            <div className="blockinfo-key mt-2">Amount</div>
-                            <div className="utxo-value">
-                              <span className="utxo-amount-minus">
-                                -
-                                {getOutputFromIndex(
-                                  additionalTxInfo[tx_input.previous_outpoint_hash].outputs,
-                                  tx_input?.previous_outpoint_index
-                                )?.amount / 100000000}
-                                &nbsp;HTN
-                              </span>
-                            </div>
-                          </Col>
-                        )}
-                        <Col sm={12} md={12} lg={12}>
-                          <div className="blockinfo-key mt-2">Previous Outpoint Index + Hash</div>
-                          <div className="utxo-value-mono">
-                            #{tx_input?.previous_outpoint_index} {tx_input.previous_outpoint_hash}
-                          </div>
-                        </Col>
-                        {additionalTxInfo && additionalTxInfo[tx_input.previous_outpoint_hash] && (
-                          <>
-                            <Col sm={12} md={12} lg={12}>
-                              <div className="blockinfo-key mt-2">Address</div>
-                              <div className="utxo-value-mono">
-                                <Link
-                                  to={`/addresses/${
-                                    getOutputFromIndex(
-                                      additionalTxInfo[tx_input.previous_outpoint_hash].outputs,
-                                      tx_input?.previous_outpoint_index
-                                    )?.script_public_key_address
-                                  }`}
-                                  className="blockinfo-link"
-                                >
-                                  {
-                                    getOutputFromIndex(
-                                      additionalTxInfo[tx_input.previous_outpoint_hash].outputs,
-                                      tx_input?.previous_outpoint_index
-                                    )?.script_public_key_address
-                                  }
-                                </Link>
-                              </div>
-                            </Col>
-                          </>
-                        )}
-                      </Row>
-                    </>
-                  ))}
-                </Container>
-                <div className="blockinfo-header mt-5">
-                  <h4>Outputs</h4>
-                </div>
-                <Container className="webpage utxo-box" fluid>
-                  {(txInfo.outputs || []).map((tx_output) => (
-                    <Row className="utxo-border py-3">
-                      <Col sm={6} md={6} lg={2}>
-                        <div className="blockinfo-key mt-2 mt-lg-0">Index</div>
-                        <div className="utxo-value-mono">#{tx_output.index}</div>
-                      </Col>
-                      <Col sm={12} md={12} lg={7}>
-                        <div className="blockinfo-key mt-2 mt-lg-0">Script Public Key Type</div>
-                        <div className="utxo-value-mono">{tx_output.script_public_key_type}</div>
-                      </Col>
-                      <Col sm={6} md={6} lg={3}>
-                        <div className="blockinfo-key mt-2 mt-lg-0">Amount</div>
-                        <div className="utxo-value">
-                          <span className="utxo-amount">
-                            +{numberWithCommas(tx_output?.amount / 100000000)}&nbsp;HTN
-                          </span>
-                        </div>
-                      </Col>
-                      <Col sm={12} md={12} lg={12}>
-                        <div className="blockinfo-key mt-2">Script Public Key</div>
-                        <div className="utxo-value-mono">{tx_output.script_public_key}</div>
-                      </Col>
-                      <Col sm={12} md={12} lg={12}>
-                        <div className="blockinfo-key mt-2">Script Public Key Address</div>
-                        <div className="utxo-value-mono">
-                          <Link to={`/addresses/${tx_output?.script_public_key_address}`} className="blockinfo-link">
-                            {tx_output?.script_public_key_address}
-                          </Link>
-                        </div>
-                      </Col>
-                    </Row>
-                  ))}
-                </Container>
+              </Col>
+            </Row>
+          </Container>
+        )}
+
+        {/* Inputs View */}
+        {view === "inputs" && !!txInfo && txInfo?.detail !== "Transaction not found" && (
+          <Row className="mt-4">
+            <Col>
+              <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 h-full w-full">
+                <Row className="mb-3 pb-3 align-items-center" style={{ borderBottom: '1px solid #334155' }}>
+                  <Col xs={12} md={6} className="d-flex flex-row align-items-center mb-3 mb-md-0">
+                    <h4 className="mb-0" style={{ color: '#14B8A6', fontWeight: '600' }}>Inputs ({txInfo.inputs?.length || 0})</h4>
+                  </Col>
+                </Row>
+                {txInfo.inputs?.length > 0 ? (
+                  (txInfo.inputs || []).map((tx_input, idx) => (
+                    <InputItem
+                      key={`${tx_input.previous_outpoint_hash}-${tx_input.previous_outpoint_index}`}
+                      txInput={tx_input}
+                      additionalTxInfo={additionalTxInfo}
+                      getOutputFromIndex={getOutputFromIndex}
+                    />
+                  ))
+                ) : (
+                  <EmptyTablePlaceholder message="No inputs at this transaction" />
+                )}
               </div>
-            ) : (
-              <></>
-            )}
-          </Col>
-        </Row>
+            </Col>
+          </Row>
+        )}
+
+        {/* Outputs View */}
+        {view === "outputs" && !!txInfo && txInfo?.detail !== "Transaction not found" && (
+          <Row className="mt-4">
+            <Col>
+              <div className="bg-hoosat-slate/50 backdrop-blur-lg p-8 rounded-2xl border border-slate-700 h-full w-full">
+                <Row className="mb-3 pb-3 align-items-center" style={{ borderBottom: '1px solid #334155' }}>
+                  <Col xs={12} md={6} className="d-flex flex-row align-items-center mb-3 mb-md-0">
+                    <h4 className="mb-0" style={{ color: '#14B8A6', fontWeight: '600' }}>Outputs ({txInfo.outputs?.length || 0})</h4>
+                  </Col>
+                </Row>
+                {(txInfo.outputs || []).map((tx_output, idx) => (
+                  <OutputItem
+                    key={`${tx_output.index}`}
+                    txOutput={tx_output}
+                  />
+                ))}
+              </div>
+            </Col>
+          </Row>
+        )}
       </Container>
     </div>
   );
