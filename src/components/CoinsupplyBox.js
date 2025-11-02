@@ -40,7 +40,6 @@ const CBox = () => {
           const currentTimestamp = Date.now();
           const halvingTimestamp = d.nextHalvingTimestamp * 1000;
           const timeDifference = halvingTimestamp - currentTimestamp;
-          const duration = moment.duration(timeDifference, "milliseconds");
           const timeToHalving = formatDuration(timeDifference);
 
           setHalvingDate(moment(halvingTimestamp).format("YYYY-MM-DD HH:mm"));

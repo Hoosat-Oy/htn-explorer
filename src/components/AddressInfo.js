@@ -1,11 +1,10 @@
-import moment from "moment";
 import { useContext, useEffect, useRef, useState, useCallback } from "react";
 import { Button, Col, Container, Form, Row, Spinner, OverlayTrigger, Tooltip as BSTooltip } from "react-bootstrap";
 import { BiGhost } from "react-icons/bi";
 import { useParams } from "react-router";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import Toggle from "react-toggle";
-import usePrevious, { floatToStr, numberWithCommas } from "../helper";
+import usePrevious, { numberWithCommas } from "../helper";
 import {
   getAddressBalance,
   getAddressTxCount,
@@ -16,13 +15,10 @@ import {
   getTransactionsFromAddress,
 } from "../htn-api-client.js";
 import BlueScoreContext from "./BlueScoreContext";
-import CopyButton from "./CopyButton.js";
 import PriceContext from "./PriceContext.js";
 import UtxoPagination from "./UtxoPagination.js";
 
 import QRCodeStyling from "qr-code-styling";
-import QrButton from "./QrButton";
-import { Tooltip } from "react-tooltip";
 import { TransactionListSkeleton, UtxoListSkeleton } from "./SkeletonLoader";
 import { BiCopy } from "react-icons/bi";
 import { FaQrcode, FaCheck, FaDownload } from "react-icons/fa";
@@ -90,11 +86,11 @@ const AddressInfo = () => {
   };
 
   const getAddrFromOutputs = (outputs, index) => {
-    if (outputs[index] && outputs[index].index == index) {
+    if (outputs[index] && outputs[index].index === index) {
       return outputs[index].script_public_key_address;
     } else {
       if (outputs && outputs.length > 0) {
-        for (var i = 0; i < outputs.length; i++) {
+        for (let i = 0; i < outputs.length; i++) {
           if (outputs[i].index === index) {
             return outputs[i].script_public_key_address;
           }
@@ -104,11 +100,11 @@ const AddressInfo = () => {
   };
 
   const getAmountFromOutputs = (outputs, index) => {
-    if (outputs[index] && outputs[index].index == index) {
+    if (outputs[index] && outputs[index].index === index) {
       return outputs[index].amount / 100000000;
     } else {
       if (outputs && outputs.length > 0) {
-        for (var i = 0; i < outputs.length; i++) {
+        for (let i = 0; i < outputs.length; i++) {
           if (outputs[i].index === index) {
             return outputs[i].amount / 100000000;
           }
@@ -125,18 +121,18 @@ const AddressInfo = () => {
   };
 
   const getAmount = (outputs, inputs) => {
-    var balance = 0;
-    for (var i = 0; i < outputs.length; i++) {
+    let balance = 0;
+    for (let i = 0; i < outputs.length; i++) {
       if (outputs[i].script_public_key_address === addr) {
         balance += outputs[i].amount / 100000000;
       }
     }
     if (inputs && inputs.length > 0) {
-      for (var i = 0; i < inputs.length; i++) {
-        var outputs = txsInpCache[inputs[i].previous_outpoint_hash]?.outputs;
-        if (outputs !== undefined && outputs.length > 0) {
-          if (getAddrFromOutputs(outputs, inputs[i].previous_outpoint_index) === addr) {
-            let amount = getAmountFromOutputs(outputs, inputs[i].previous_outpoint_index);
+      for (let j = 0; j < inputs.length; j++) {
+        const cachedOutputs = txsInpCache[inputs[j].previous_outpoint_hash]?.outputs;
+        if (cachedOutputs !== undefined && cachedOutputs.length > 0) {
+          if (getAddrFromOutputs(cachedOutputs, inputs[j].previous_outpoint_index) === addr) {
+            let amount = getAmountFromOutputs(cachedOutputs, inputs[j].previous_outpoint_index);
             balance -= amount;
           }
         }

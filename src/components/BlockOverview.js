@@ -1,24 +1,16 @@
-import moment from "moment";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { FaDiceD20, FaPause, FaPlay } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { FaPause, FaPlay } from "react-icons/fa";
 import LastBlocksContext from "./LastBlocksContext";
 import { TableSkeleton } from "./SkeletonLoader";
 import BlockItem from "./BlockItem";
 
 const BlockOverview = (props) => {
-  const navigate = useNavigate();
-
-  const { blocks, isConnected } = useContext(LastBlocksContext);
+  const { blocks } = useContext(LastBlocksContext);
   const [tempBlocks, setTempBlocks] = useState([]);
   const [keepUpdating, setKeepUpdating] = useState(true);
 
   const keepUpdatingRef = useRef();
   keepUpdatingRef.current = keepUpdating;
-
-  const onClickRow = (e) => {
-    navigate(`/blocks/${e.target.parentElement.id}`);
-  };
 
   useEffect(() => {
     if (keepUpdatingRef.current) {

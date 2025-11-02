@@ -3,7 +3,7 @@
 import moment from "moment";
 import { useContext, useEffect, useState } from "react";
 import { Col, Container, OverlayTrigger, Row, Spinner, Tooltip } from "react-bootstrap";
-import { BiNetworkChart, BiChevronDown, BiChevronUp } from "react-icons/bi";
+import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
 import { parsePayload } from "../bech32.js";
@@ -12,7 +12,6 @@ import { getBlock, getTransactions } from "../htn-api-client.js";
 import BlueScoreContext from "./BlueScoreContext.js";
 import CopyButton from "./CopyButton.js";
 import PriceContext from "./PriceContext.js";
-import { Tooltip as ReactTooltip } from "react-tooltip";
 import TransactionItem from "./TransactionItem.js";
 import { BlockDetailsSkeleton } from "./SkeletonLoader.js";
 

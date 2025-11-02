@@ -1,12 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import { HiCurrencyDollar } from "react-icons/hi";
 import { IoMdTrendingDown, IoMdTrendingUp } from "react-icons/io";
 import { numberWithCommas } from "../helper";
 import { getCoinSupply, getBlockdagInfo } from "../htn-api-client";
 import PriceContext from "./PriceContext";
 import { CardSkeleton } from "./SkeletonLoader";
-
-const BPS = 5;
 
 const MarketDataBox = () => {
   const [circCoinsMData, setCircCoinsMData] = useState("-");
@@ -15,7 +13,7 @@ const MarketDataBox = () => {
   const [dailyEmissions, setDailyEmissions] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  const initBox = async () => {
+  const initBox = useCallback(async () => {
     try {
       const coin_supply = await getCoinSupply();
       const dag_info = await getBlockdagInfo();
@@ -32,7 +30,7 @@ const MarketDataBox = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   async function getBlockReward() {
     try {
@@ -46,7 +44,7 @@ const MarketDataBox = () => {
 
   useEffect(() => {
     initBox();
-  }, []);
+  }, [initBox]);
 
   if (isLoading) {
     return <CardSkeleton />;

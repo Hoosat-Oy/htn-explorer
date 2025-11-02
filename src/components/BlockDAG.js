@@ -1,6 +1,6 @@
 import { faDiagramProject } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { getBlockdagInfo, getInfo } from "../htn-api-client";
 import { CardSkeleton } from "./SkeletonLoader";
 
@@ -8,7 +8,7 @@ const BPS = 5;
 
 const BlockDAGBox = () => {
   // const [nextHFDAAScore, setNextHFDAAScore] = useState(29335426);
-  const [nextHFDAAScore, setNextHFDAAScore] = useState(43334184);
+  const [nextHFDAAScore] = useState(43334184);
   const [showHF, setShowHF] = useState(false);
   const [blockCount, setBlockCount] = useState();
   const [difficulty, setDifficulty] = useState();
@@ -21,7 +21,7 @@ const BlockDAGBox = () => {
   const [serverVersion, setServerVersion] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  const initBox = async () => {
+  const initBox = useCallback(async () => {
     try {
       const dag_info = await getBlockdagInfo();
       setBlockCount(dag_info.blockCount);
@@ -63,7 +63,8 @@ const BlockDAGBox = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [nextHFDAAScore]);
+
   useEffect(() => {
     initBox();
     const updateInterval = setInterval(async () => {
@@ -91,7 +92,7 @@ const BlockDAGBox = () => {
     return async () => {
       clearInterval(updateInterval);
     };
-  }, []);
+  }, [initBox, nextHFDAAScore]);
 
   useEffect(() => {
     const updateInterval = setInterval(async () => {

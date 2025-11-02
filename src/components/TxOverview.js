@@ -2,9 +2,6 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { BiHide } from "react-icons/bi";
 import { FaPause, FaPlay } from "react-icons/fa";
-import { RiMoneyDollarCircleFill } from "react-icons/ri";
-import { useNavigate } from "react-router-dom";
-import { numberWithCommas } from "../helper";
 import LastBlocksContext from "./LastBlocksContext";
 import { TxTableSkeleton } from "./SkeletonLoader";
 import TxItem from "./TxItem";
@@ -18,16 +15,7 @@ const TxOverview = (props) => {
   const keepUpdatingRef = useRef();
   keepUpdatingRef.current = keepUpdating;
 
-  const { blocks, isConnected } = useContext(LastBlocksContext);
-  const navigate = useNavigate();
-
-  const onClickRow = (e) => {
-    navigate(`/txs/${e.target.closest("tr").getAttribute("txid")}`);
-  };
-
-  const onClickAddr = (e) => {
-    navigate(`/addresses/${e.target.closest("tr").getAttribute("id")}`);
-  };
+  const { blocks } = useContext(LastBlocksContext);
 
   useEffect(() => {
     if (keepUpdatingRef.current) {

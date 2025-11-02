@@ -45,7 +45,7 @@ const AddressesPage = () => {
     if (!searchParams.has('page')) {
       setSearchParams({ page: '1' }, { replace: true });
     }
-  }, []);
+  }, [searchParams, setSearchParams]);
 
   const calculateCharts = useCallback(
     (addresses) => {

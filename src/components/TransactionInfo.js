@@ -4,7 +4,6 @@ import { Col, Container, Row, Spinner } from "react-bootstrap";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
-import { numberWithCommas } from "../helper.js";
 import { getTransaction, getTransactions } from "../htn-api-client.js";
 import BlueScoreContext from "./BlueScoreContext.js";
 import CopyButton from "./CopyButton.js";
