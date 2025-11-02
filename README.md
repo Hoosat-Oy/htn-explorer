@@ -1,17 +1,100 @@
-# HOOSAT EXPLORER
+# Hoosat Explorer
 
-This is the source code for Kaspa Explorer [https://explorer.htn.org](https://explorer.htn.org) written in JS with React.JS library.
+A modern, performant blockchain explorer for the Hoosat Network built with React.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**Live Version:** [https://network.hoosat.fi](https://network.hoosat.fi)
+
+## Features
+
+- **Real-time Block Explorer** - View the latest blocks and transactions as they happen
+- **Address Lookup** - Search and track addresses, balances, and transaction history
+- **Transaction Details** - Comprehensive transaction information with inputs and outputs
+- **Network Statistics** - Live network metrics including hashrate, difficulty, and block count
+- **Responsive Design** - Optimized for both desktop and mobile devices
+- **Performance Optimized** - Built with React best practices for fast rendering and smooth UX
+
+## Technology Stack
+
+- **React** - UI framework
+- **React Router** - Client-side routing
+- **Bootstrap** - Responsive grid and components
+- **SCSS** - Styling with variables and mixins
+- **Moment.js** - Date formatting
+- **Framer Motion** - Smooth animations
+- **React Tooltip** - Interactive tooltips
+
+## Prerequisites
+
+- Node.js (v14 or higher)
+- npm or yarn
+
+## Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/hoosat-explorer.git
+
+# Navigate to the explorer directory
+cd Hoosat/explorer
+
+# Install dependencies
+npm install
+```
 
 ## Development
 
-For developing this you need Node.JS and just npm install.
+```bash
+# Start development server
+npm start
+```
 
-## Any ideas?
+The app will open at [http://localhost:3000](http://localhost:3000)
 
-Do you have any new ideas, wishes or bugs? Contact @lAmeR^#7173 at Discord.
+## Build
 
-## DONATION ♥
+```bash
+# Create production build
+npm run build
+```
 
-Please consider a donation for my work: [hoosat:qqkqkzjvr7zwxxmjxjkmxxdwju9kjs6e9u82uh59z07vgaks6gg62v8707g73](https://explorer.htn.org/addresses/hoosat:qqkqkzjvr7zwxxmjxjkmxxdwju9kjs6e9u82uh59z07vgaks6gg62v8707g73)
+The optimized build will be in the `build/` directory.
+
+## Environment Variables
+
+Create a `.env` file in the root directory:
+
+```
+REACT_APP_API=https://api.hoosat.fi
+```
+
+## Project Structure
+
+```
+explorer/
+├── public/           # Static assets
+├── src/
+│   ├── components/   # React components
+│   ├── htn-api-client.js  # API client
+│   ├── App.js        # Main app component
+│   └── App.scss      # Global styles
+└── package.json
+```
+
+## API Integration
+
+This explorer connects to the Hoosat API to fetch blockchain data. The API base URL is configured via the `REACT_APP_API` environment variable.
+
+## Performance Optimizations
+
+- React.memo for component memoization
+- useMemo and useCallback hooks for expensive computations
+- Optimized mobile rendering with disabled backdrop-blur
+- Efficient WebSocket handling for real-time updates
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

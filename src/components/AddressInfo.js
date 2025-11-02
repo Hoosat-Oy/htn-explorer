@@ -62,6 +62,7 @@ const AddressInfo = () => {
   const [active, setActive] = useState(1);
   const [activeTx, setActiveTx] = useState((search.get("page") && parseInt(search.get("page"))) || 1);
   const prevActiveTx = usePrevious(activeTx);
+  const prevView = usePrevious(view);
 
   const [currentEpochTime, setCurrentEpochTime] = useState(0);
   const [currentDaaScore, setCurrentDaaScore] = useState(0);
@@ -233,7 +234,15 @@ const AddressInfo = () => {
 
   useEffect(() => {
     setSearch({ page: activeTx }, { replace: true });
-    window.scrollTo(0, 0);
+
+    // Scroll to top on initial load or when pagination changes, but not when switching tabs
+    const isInitialLoad = prevActiveTx === undefined;
+    const isPaginationChange = prevActiveTx !== activeTx;
+    const isOnlyTabSwitch = prevView !== view && prevActiveTx === activeTx;
+
+    if ((isInitialLoad || isPaginationChange) && !isOnlyTabSwitch) {
+      window.scrollTo(0, 0);
+    }
 
     if (view === "transactions") {
       setLoadingTxs(true);
@@ -254,7 +263,7 @@ const AddressInfo = () => {
         });
       }
     }
-  }, [view, activeTx, addr, loadTransactionsToShow, prevActiveTx, setSearch]);
+  }, [view, activeTx, addr, loadTransactionsToShow, prevActiveTx, prevView, setSearch]);
 
   const sleep = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));

@@ -84,8 +84,8 @@ const AddressBalanceItem = ({ address, rank, balance, change, tag }) => {
 
       {/* Mobile Layout */}
       <div className="mobile-layout">
-        {/* First Row: Rank, Balance, Label, Change */}
-        <div className="d-flex align-items-center justify-content-between mb-2">
+        {/* First Row: Rank, Balance, Change, Label */}
+        <div className="d-flex justify-content-between mb-2">
           <div className="d-flex align-items-center gap-3">
             <div>
               <div className="mobile-label text-slate-500 text-xs mb-1">Rank</div>
@@ -97,29 +97,28 @@ const AddressBalanceItem = ({ address, rank, balance, change, tag }) => {
                 {Number(balance).toLocaleString()}
               </div>
             </div>
-            {tag && (
-              <div>
-                <div className="mobile-label text-slate-500 text-xs mb-1">Label</div>
-                <span className="label-badge">
-                  {tag}
-                </span>
-              </div>
-            )}
+            <div>
+              <div className="mobile-label text-slate-500 text-xs mb-1">24H Change</div>
+              {change !== 0 ? (
+                <div className={`change-amount font-semibold d-flex align-items-center gap-1 ${
+                  isPositiveChange ? 'text-success' : isNegativeChange ? 'text-danger' : 'text-slate-400'
+                }`}>
+                  {isPositiveChange && <FaArrowUp size={12} />}
+                  {isNegativeChange && <FaArrowDown size={12} />}
+                  {Number(change).toLocaleString()}
+                </div>
+              ) : (
+                <div className="change-amount font-semibold text-slate-400">-</div>
+              )}
+            </div>
           </div>
-          <div>
-            <div className="mobile-label text-slate-500 text-xs mb-1 text-end">24H Change</div>
-            {change !== 0 ? (
-              <div className={`change-amount font-semibold d-flex align-items-center justify-content-end gap-1 ${
-                isPositiveChange ? 'text-success' : isNegativeChange ? 'text-danger' : 'text-slate-400'
-              }`}>
-                {isPositiveChange && <FaArrowUp size={12} />}
-                {isNegativeChange && <FaArrowDown size={12} />}
-                {Number(change).toLocaleString()}
-              </div>
-            ) : (
-              <div className="change-amount font-semibold text-slate-400 text-end">-</div>
-            )}
-          </div>
+          {tag && (
+            <div>
+              <span className="label-badge">
+                {tag}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Second Row: Address */}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BiCopy, BiChevronDown, BiChevronUp } from 'react-icons/bi';
-import { FaCheck, FaClock } from 'react-icons/fa';
+import { BiChevronDown, BiChevronUp } from 'react-icons/bi';
+import { FaClock } from 'react-icons/fa';
 import { Tooltip } from 'react-tooltip';
 import moment from 'moment';
 import { numberWithCommas, floatToStr } from '../helper';
@@ -20,7 +20,7 @@ const TransactionItem = ({
   detailedView
 }) => {
   const [isExpanded, setIsExpanded] = useState(detailedView);
-  const [copiedTxId, setCopiedTxId] = useState(false);
+  const [copiedTxId] = useState(false);
 
   // Sync with parent detailedView toggle
   useEffect(() => {
@@ -30,12 +30,6 @@ const TransactionItem = ({
   const amount = getAmount(transaction.outputs, transaction.inputs);
   const isPositive = amount > 0;
   const valueUsd = (amount * price).toFixed(2);
-
-  const handleCopyTxId = () => {
-    navigator.clipboard.writeText(transaction.transaction_id);
-    setCopiedTxId(true);
-    setTimeout(() => setCopiedTxId(false), 2000);
-  };
 
   const confirmations = transaction.is_accepted && blueScore !== 0
     ? blueScore - transaction.accepting_block_blue_score
@@ -110,14 +104,6 @@ const TransactionItem = ({
                 >
                   {transaction.transaction_id}
                 </Link>
-                <button
-                  onClick={handleCopyTxId}
-                  className="copy-btn bg-transparent border-0 text-slate-400 hover:text-hoosat-teal transition-colors p-1"
-                  style={{ cursor: 'pointer', flexShrink: 0 }}
-                  data-tooltip-id={`copy-tx-${transaction.transaction_id}`}
-                >
-                  {copiedTxId ? <FaCheck size={14} /> : <BiCopy size={16} />}
-                </button>
                 <Tooltip
                   id={`copy-tx-${transaction.transaction_id}`}
                   place="top"

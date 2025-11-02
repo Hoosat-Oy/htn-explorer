@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BiCopy } from 'react-icons/bi';
-import { FaCheck, FaClock } from 'react-icons/fa';
+import { FaClock } from 'react-icons/fa';
 import { Tooltip } from 'react-tooltip';
 import moment from 'moment';
 import { numberWithCommas } from '../helper';
@@ -13,13 +12,7 @@ const UtxoItem = ({
   currentEpochTime,
   currentDaaScore
 }) => {
-  const [copiedTxId, setCopiedTxId] = useState(false);
-
-  const handleCopyTxId = () => {
-    navigator.clipboard.writeText(utxo.outpoint.transactionId);
-    setCopiedTxId(true);
-    setTimeout(() => setCopiedTxId(false), 2000);
-  };
+  const [copiedTxId] = useState(false);
 
   const amount = utxo.utxoEntry.amount / 100000000;
   const valueUsd = (amount * price).toFixed(2);
@@ -55,14 +48,6 @@ const UtxoItem = ({
                 >
                   {utxo.outpoint.transactionId}
                 </Link>
-                <button
-                  onClick={handleCopyTxId}
-                  className="copy-btn bg-transparent border-0 text-slate-400 hover:text-hoosat-teal transition-colors p-1"
-                  style={{ cursor: 'pointer', flexShrink: 0 }}
-                  data-tooltip-id={`copy-utxo-${utxo.outpoint.transactionId}`}
-                >
-                  {copiedTxId ? <FaCheck size={14} /> : <BiCopy size={16} />}
-                </button>
                 <Tooltip
                   id={`copy-utxo-${utxo.outpoint.transactionId}`}
                   place="top"
