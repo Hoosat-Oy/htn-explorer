@@ -363,8 +363,7 @@ body {
 
 @include media-breakpoint-up(sm) {
   .secondRow {
-    padding: 3rem;
-    padding-top: 0px;
+    padding: 0 3rem;
   }
 }
 

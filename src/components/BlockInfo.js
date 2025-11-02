@@ -101,7 +101,7 @@ const BlockInfo = () => {
 
   return (
     <div className="blockinfo-page">
-      <Container className="webpage" fluid style={{ paddingTop: '2rem' }}>
+      <Container className="webpage" fluid>
         <Row>
           <Col xs={12}>
             {error ? <h1 variant="danger">Error loading block</h1> : <></>}
@@ -146,7 +146,7 @@ const BlockInfo = () => {
                       {/* Stats Cards inside block card */}
                       <Row className="g-3 mt-3 pt-3" style={{ borderTop: '1px solid #334155' }}>
                         <Col xs={12} sm={6} lg={3}>
-                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Blue Score</div>
                             <div className="text-hoosat-teal" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               {numberWithCommas(blockInfo.header.blueScore)}
@@ -155,7 +155,7 @@ const BlockInfo = () => {
                         </Col>
 
                         <Col xs={12} sm={6} lg={3}>
-                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Timestamp</div>
                             <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               {moment(parseInt(blockInfo.header.timestamp)).format("YYYY-MM-DD HH:mm:ss")}
@@ -164,7 +164,7 @@ const BlockInfo = () => {
                         </Col>
 
                         <Col xs={12} sm={6} lg={3}>
-                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Is Chain Block</div>
                             <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               {!!blockInfo.verboseData.isChainBlock ? "true" : "false"}
@@ -173,7 +173,7 @@ const BlockInfo = () => {
                         </Col>
 
                         <Col xs={12} sm={6} lg={3}>
-                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Transactions</div>
                             <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               {numberWithCommas(blockInfo.transactions?.length || 0)}
@@ -185,7 +185,7 @@ const BlockInfo = () => {
                       {/* Second row of stats */}
                       <Row className="g-3 mt-3">
                         <Col xs={12} sm={6} lg={3}>
-                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Bits</div>
                             <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               {blockInfo.header.bits}
@@ -194,7 +194,7 @@ const BlockInfo = () => {
                         </Col>
 
                         <Col xs={12} sm={6} lg={3}>
-                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Version</div>
                             <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               {blockInfo.header.version}
@@ -203,7 +203,7 @@ const BlockInfo = () => {
                         </Col>
 
                         <Col xs={12} sm={6} lg={3}>
-                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Nonce</div>
                             <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               {blockInfo.header.nonce}
@@ -212,7 +212,7 @@ const BlockInfo = () => {
                         </Col>
 
                         <Col xs={12} sm={6} lg={3}>
-                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+                          <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
                             <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>DAA Score</div>
                             <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                               {numberWithCommas(blockInfo.header.daaScore)}
@@ -245,7 +245,7 @@ const BlockInfo = () => {
                               {/* Technical Details Row */}
                               <Row className="g-3 mb-3">
                                   <Col xs={12} md={6}>
-                                      <div className="bg-hoosat-slate/30 p-3 rounded-xl border border-slate-700">
+                                      <div className="bg-hoosat-slate/30 p-3 border border-slate-700">
                                           <div className="text-slate-400 mb-1" style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase' }}>
                                               Merkle Root
                                           </div>
@@ -255,7 +255,7 @@ const BlockInfo = () => {
                                       </div>
                                   </Col>
                                   <Col xs={12} md={6}>
-                                      <div className="bg-hoosat-slate/30 p-3 rounded-xl border border-slate-700">
+                                      <div className="bg-hoosat-slate/30 p-3 border border-slate-700">
                                           <div className="text-slate-400 mb-1" style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase' }}>
                                               Accepted Merkle Root
                                           </div>
@@ -265,7 +265,7 @@ const BlockInfo = () => {
                                       </div>
                                   </Col>
                                   <Col xs={12} md={6}>
-                                      <div className="bg-hoosat-slate/30 p-3 rounded-xl border border-slate-700">
+                                      <div className="bg-hoosat-slate/30 p-3 border border-slate-700">
                                           <div className="text-slate-400 mb-1" style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase' }}>
                                               UTXO Commitment
                                           </div>
@@ -275,7 +275,7 @@ const BlockInfo = () => {
                                       </div>
                                   </Col>
                                   <Col xs={12} md={6}>
-                                      <div className="bg-hoosat-slate/30 p-3 rounded-xl border border-slate-700">
+                                      <div className="bg-hoosat-slate/30 p-3 border border-slate-700">
                                           <div className="text-slate-400 mb-1" style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase' }}>
                                               Blue Work
                                           </div>

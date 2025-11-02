@@ -371,7 +371,7 @@ const AddressInfo = () => {
 
   return (
     <div className="addressinfo-page">
-      <Container className="webpage" fluid style={{ paddingTop: '2rem' }}>
+      <Container className="webpage" fluid>
         <Row>
           <Col xs={12}>
             <h2 className="text-white mb-4" style={{ fontSize: '2rem', fontWeight: '700' }}>Address Overview</h2>
@@ -468,7 +468,7 @@ const AddressInfo = () => {
               {/* Stats Cards inside address card */}
               <Row className="g-3 mt-3 pt-3" style={{ borderTop: '1px solid #334155' }}>
           <Col xs={12} sm={6} lg={3}>
-            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
               <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Balance (HTN)</div>
               {addressBalance !== undefined ? (
                 <div className="text-hoosat-teal" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
@@ -481,7 +481,7 @@ const AddressInfo = () => {
           </Col>
 
           <Col xs={12} sm={6} lg={3}>
-            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
               <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Value (USD)</div>
               {addressBalance !== undefined ? (
                 <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
@@ -494,7 +494,7 @@ const AddressInfo = () => {
           </Col>
 
           <Col xs={12} sm={6} lg={3}>
-            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
               <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>UTXOs</div>
               {!loadingUtxos ? (
                 <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
@@ -508,7 +508,7 @@ const AddressInfo = () => {
           </Col>
 
           <Col xs={12} sm={6} lg={3}>
-            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 rounded-2xl border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
+            <div className="bg-hoosat-slate/50 backdrop-blur-lg p-6 border border-slate-700 hover:border-hoosat-teal transition-all duration-300 hover:shadow-xl hover:shadow-hoosat-teal/20 h-100">
               <div className="text-slate-400 mb-2" style={{ fontSize: '0.875rem' }}>Transactions</div>
               {txCount !== null ? (
                 <div className="text-white" style={{ fontSize: '1.15rem', fontWeight: '600', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
@@ -525,7 +525,7 @@ const AddressInfo = () => {
         </Row>
       </Container>
 
-      <Container className="webpage mt-4" fluid>
+      <Container className="webpage" fluid>
         <Row>
           <Col className="d-flex flex-row justify-content-center">
             <div className="d-flex gap-2 p-1 rounded" style={{ backgroundColor: 'rgba(30, 41, 59, 0.6)', border: '1px solid #334155' }}>
