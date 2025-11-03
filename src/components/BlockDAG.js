@@ -290,7 +290,7 @@ const BlockDAGBox = () => {
 
         {showHF === true && (
           <>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center whitespace-nowrap">
               <span className="text-slate-400">Hard Fork Date</span>
               <span className="text-white font-semibold text-right" id="nextHardForkTime">
                 {nextHardForkTime}
