@@ -7,7 +7,7 @@ import { CardSkeleton } from "./SkeletonLoader";
 const BPS = 5;
 
 const BlockDAGBox = () => {
-  const [nextHFDAAScore] = useState(43334184);
+  const [nextHFDAAScore] = useState(102832005);
   const [showHF, setShowHF] = useState(false);
   const [blockCount, setBlockCount] = useState();
   const [difficulty, setDifficulty] = useState();
@@ -26,39 +26,39 @@ const BlockDAGBox = () => {
       setBlockCount(dag_info.blockCount);
       setHeaderCount(dag_info.headerCount);
       setVirtualDaaScore(dag_info.virtualDaaScore);
-    // Difficulty comes from node through the rest server.
-    // We can estimate hashrate is two times difficulty.
-    // We can also multiply the difficulty and hashrate with Block Per Second constant.
-    // 1 Block per second does not even matter to the calculations, but 10 BPS would.
-    // Kaspa has hidden difficulty from explorer frontend.
-    // Kaspa API reports difficulty and it is 1:2 to estimated hashrate.
-    setDifficulty(dag_info.difficulty * BPS);
-    setHashrate(dag_info.difficulty * 2 * BPS);
-    const info = await getInfo();
-    setMempoolSize(info.mempoolSize);
+      // Difficulty comes from node through the rest server.
+      // We can estimate hashrate is two times difficulty.
+      // We can also multiply the difficulty and hashrate with Block Per Second constant.
+      // 1 Block per second does not even matter to the calculations, but 10 BPS would.
+      // Kaspa has hidden difficulty from explorer frontend.
+      // Kaspa API reports difficulty and it is 1:2 to estimated hashrate.
+      setDifficulty(dag_info.difficulty * BPS);
+      setHashrate(dag_info.difficulty * 2 * BPS);
+      const info = await getInfo();
+      setMempoolSize(info.mempoolSize);
 
-    // Fetch server version from htnd endpoint
-    try {
-      const htndInfo = await fetch(`${process.env.REACT_APP_API}/info/htnd`);
-      const htndData = await htndInfo.json();
-      setServerVersion(htndData.serverVersion);
-    } catch (err) {
-      // Error handling
-    }
-    const unixTimestamp = Math.floor(Date.now() / 1000);
-    const timeToFork = nextHFDAAScore - dag_info.virtualDaaScore;
-    const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
-    if (timeToFork > 0) {
-      const hours = Math.floor(timeToFork / 3600);
-      const minutes = Math.floor((timeToFork % 3600) / 60);
-      const seconds = timeToFork % 60;
-      const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
-      setShowHF(true);
-      setNextHardForkTime(hardForkTime);
-      setNextHardForkTimeTo(formattedTimeToFork);
-    } else {
-      setShowHF(false);
-    }
+      // Fetch server version from htnd endpoint
+      try {
+        const htndInfo = await fetch(`${process.env.REACT_APP_API}/info/htnd`);
+        const htndData = await htndInfo.json();
+        setServerVersion(htndData.serverVersion);
+      } catch (err) {
+        // Error handling
+      }
+      const unixTimestamp = Math.floor(Date.now() / 1000);
+      const timeToFork = nextHFDAAScore - dag_info.virtualDaaScore;
+      const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
+      if (timeToFork > 0) {
+        const hours = Math.floor(timeToFork / 3600);
+        const minutes = Math.floor((timeToFork % 3600) / 60);
+        const seconds = timeToFork % 60;
+        const formattedTimeToFork = `${hours}h ${minutes}m ${seconds}s`;
+        setShowHF(true);
+        setNextHardForkTime(hardForkTime);
+        setNextHardForkTimeTo(formattedTimeToFork);
+      } else {
+        setShowHF(false);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -252,12 +252,16 @@ const BlockDAGBox = () => {
 
         <div className="flex justify-between items-center">
           <span className="text-slate-400">Virtual DAA Score</span>
-          <span className="text-white font-semibold" id="virtualDaaScore">{Number(virtualDaaScore).toLocaleString()}</span>
+          <span className="text-white font-semibold" id="virtualDaaScore">
+            {Number(virtualDaaScore).toLocaleString()}
+          </span>
         </div>
 
         <div className="flex justify-between items-center">
           <span className="text-slate-400">Block height</span>
-          <span className="text-white font-semibold" id="blockCount">{Number(blockCount).toLocaleString()}</span>
+          <span className="text-white font-semibold" id="blockCount">
+            {Number(blockCount).toLocaleString()}
+          </span>
         </div>
 
         <div className="flex justify-between items-center">
@@ -267,12 +271,16 @@ const BlockDAGBox = () => {
 
         <div className="flex justify-between items-center">
           <span className="text-slate-400">Hashrate</span>
-          <span className="text-white font-semibold" id="hashrate">{formatHashrate(hashrate)}</span>
+          <span className="text-white font-semibold" id="hashrate">
+            {formatHashrate(hashrate)}
+          </span>
         </div>
 
         <div className="flex justify-between items-center">
           <span className="text-slate-400">Mempool size</span>
-          <span className="text-white font-semibold" id="headerCount">{Number(mempoolSize).toLocaleString()}</span>
+          <span className="text-white font-semibold" id="headerCount">
+            {Number(mempoolSize).toLocaleString()}
+          </span>
         </div>
 
         <div className="flex justify-between items-center">
@@ -284,7 +292,9 @@ const BlockDAGBox = () => {
           <>
             <div className="flex justify-between items-start pt-4 border-t border-slate-700">
               <span className="text-slate-400">Hard Fork Date</span>
-              <span className="text-white font-semibold text-right" id="nextHardForkTime">{nextHardForkTime}</span>
+              <span className="text-white font-semibold text-right" id="nextHardForkTime">
+                {nextHardForkTime}
+              </span>
             </div>
 
             <div className="flex justify-between items-center">
