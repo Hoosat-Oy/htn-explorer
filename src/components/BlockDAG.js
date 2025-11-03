@@ -7,7 +7,7 @@ import { CardSkeleton } from "./SkeletonLoader";
 const BPS = 5;
 
 const BlockDAGBox = () => {
-  const [nextHFDAAScore] = useState(102832005);
+  const [nextHFDAAScore] = useState(92464005);
   const [showHF, setShowHF] = useState(false);
   const [blockCount, setBlockCount] = useState();
   const [difficulty, setDifficulty] = useState();
@@ -290,7 +290,7 @@ const BlockDAGBox = () => {
 
         {showHF === true && (
           <>
-            <div className="flex justify-between items-start pt-4 border-t border-slate-700">
+            <div className="flex justify-between items-center">
               <span className="text-slate-400">Hard Fork Date</span>
               <span className="text-white font-semibold text-right" id="nextHardForkTime">
                 {nextHardForkTime}
