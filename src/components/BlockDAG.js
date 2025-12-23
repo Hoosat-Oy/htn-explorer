@@ -46,7 +46,8 @@ const BlockDAGBox = () => {
         // Error handling
       }
       const unixTimestamp = Math.floor(Date.now() / 1000);
-      const timeToFork = nextHFDAAScore - dag_info.virtualDaaScore;
+      nocturneDAAScore = dag_info.virtualDaaScore - 43334184;
+      const timeToFork = (nextHFDAAScore - nocturneDAAScore) / 5;
       const hardForkTime = new Date((unixTimestamp + timeToFork) * 1000).toUTCString();
       if (timeToFork > 0) {
         const hours = Math.floor(timeToFork / 3600);
